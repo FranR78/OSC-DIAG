@@ -4,7 +4,7 @@ Aplicación web de **análisis de señales de osciloscopio (hasta 8 canales) par
 Autores/créditos que deben aparecer: **J.A.Ortúñez y Fran Rosales**. Marca del taller: **Ortu Automoción** (logo en `assets/`).
 Idioma de trabajo con el usuario: **español**. La interfaz es bilingüe (español/inglés).
 
-Todo el proyecto es **un único archivo HTML autocontenido** (`src/analyzer-scope.html`, ~170 KB, sin compilación).
+Todo el proyecto es **un único archivo HTML autocontenido** (`src/analyzer-scope.html`, ~530 KB con jsPDF incrustado, sin compilación). Funciona **sin internet**.
 Era un artefacto publicado de claude.ai (`https://claude.ai/artifact/Mo32r74KB8kD9ih1SZevHw`); en otro proyecto hay que **publicarlo de nuevo** (será otra URL).
 
 ```
@@ -15,8 +15,7 @@ analyzer-scope/
 ├─ assets/logo_ortu_automocion.jpg
 ├─ tests/                    ← pruebas de regresión en navegador real (Playwright) + datos de ejemplo
 │  ├─ smoke.js, package.json
-│  └─ data/ (4 .rfc de Hantek, 3 CSV de PicoScope/otros, 1 .psdata nativo)
-├─ tools/hantek_inspect.py   ← lista las DLL de Hantek instaladas (para el puente USB pendiente)
+│  └─ data/ (7 CSV de varios osciloscopios, 1 .psdata nativo)
 └─ docs/i18n-dictionary.json ← diccionario español→inglés (341 pares) en formato legible
 ```
 
@@ -29,7 +28,7 @@ Selector **Español | English** arriba a la derecha (cambia TODO el contenido).
 
 | Área | Funciones |
 |---|---|
-| **Carga** | CSV/TSV/TXT de varias marcas (separador `,` `;` tab, coma decimal, fila de unidades `(ms)`, `(mbar)`…), `.RFC` de Hantek (texto), sesiones propias `.psdata` JSON (solo lectura). Varios archivos ⇒ **páginas** (barra «Páginas» con cursor ◀ ▶). CSV con cabeceras repetidas ⇒ varias páginas. |
+| **Carga** | CSV/TSV/TXT de varias marcas (separador `,` `;` tab, coma decimal, fila de unidades `(ms)`, `(mbar)`…), sesiones propias `.psdata` JSON (solo lectura). Varios archivos ⇒ **páginas** (barra «Páginas» con cursor ◀ ▶). CSV con cabeceras repetidas ⇒ varias páginas. |
 | **Visor** | 8 canales, zoom con rueda, desplazar arrastrando, escala V/div y posición por canal, **flecha de color** por canal en el borde izquierdo (arrastrar = mover la gráfica en vertical), parámetro medido por canal (etiqueta), filtros por canal (Usuario 500 Hz / paso bajo / paso alto / ancho de banda, doble pasada sin desfase), invertir, **deslizador de fondo negro→gris→blanco** (los colores se adaptan por contraste). |
 | **Reglas** | Fase 0–720° / 0–360° con 2/4/8 divisiones (INICIO=0°, FIN), PMS independiente de INICIO, T1/T2 y T3/T4 (Δt, frecuencia, grados), amplitud por canal (2 reglas horizontales), **candados 🔓/🔒** que mueven el grupo conservando la distancia. |
 | **Cilindros** | Nº de cilindros (1,2,3,4,5,6,8,10,12,16), orden de encendido habitual + orden de usuario, círculos numerados que se **deslizan todos a la vez** con separación equidistante **720°/n**, cilindros a mostrar (casillas), modos «Todos · identificación» / «Cilindro n · 4 tiempos» / «Tiempos de los marcados · vertical» (filas apiladas), tabla de tiempos por cilindro, picos de compresión (verde/ámbar/rojo −5 %/−10 %). |
@@ -38,7 +37,7 @@ Selector **Español | English** arriba a la derecha (cambia TODO el contenido).
 | **Distribución** | Reglas **AAA·RCE·AAE·RCA** (botón), tabla y diagrama circular. Ángulos **siempre en positivo**: AAA y RCE respecto al PMS; AAE y RCA respecto al PMI; ⚠ si la regla está al otro lado de su referencia (se muestra el valor absoluto, pero duraciones y cruce usan el valor con signo). |
 | **Anotar** | Botón «Anotar» muestra/oculta la barra: texto, flecha, línea, lápiz, rectángulo, elipse, borrar, deshacer (Ctrl+Z), color, grosor, «ver anotaciones». Se anclan al tiempo (siguen zoom/desplazamiento). |
 | **Documentar** | Informe **PDF** (fondo blanco/negro; captura + lecturas + diagrama; logo pequeño), **CSV** de la vista, **GIF** animado por rango de páginas. |
-| **Convertir archivos** | Lista en orden de carga; **unir en un solo CSV** (concatena en el tiempo), **convertir cada archivo a CSV**, cargar como páginas; opciones del `.RFC` (CLOCK = tiempo/división, periodo de muestra o duración total; nº de divisiones, 10 por defecto). |
+| **Convertir archivos** | Lista en orden de carga; **unir en un solo CSV** (concatena en el tiempo), **convertir cada archivo a CSV**, cargar como páginas |
 | **Panel izquierdo** | Asignación de canales siempre visible (casilla, nombre, parámetro). Botón **«Ajustes»** pliega/despliega en bloque escala, posición, reglas, filtro e invertir (desplegados por defecto). Secciones plegables con casilla (empiezan plegadas): Regla de fase, Identificación de cilindros, Avance, Sincronización por disparo. |
 
 Interacciones: rueda = zoom · arrastrar fondo = desplazar · clic = T1 · Mayús+clic = T2 · Esc = volver a «Cursor» · Ctrl+Z = deshacer anotación.
@@ -55,11 +54,11 @@ Orden de secciones del `<script>` (cada una empieza con un comentario `/* ------
 4. **Dibujo** – `draw(theme)` (lienzo principal), `distCalc()`, `distRows()`, helpers de color (`pkc`, `mixc`, `lumHex`…), `drawDist()` (diagrama circular), **Mediciones** `measure()`.
 5. **Filtros, inversión y panel de canales** – `filt2` (biquad Butterworth RBJ adelante+atrás), `proc(c)`, `ui()`.
 6. **Cilindros** – `engA`, `engEvents`, `cylData`, `cylList`, `fillSC`, **`groupIv`/`trigEvents`/`syncCyl`** (detección de disparos y sincronización).
-7. **Páginas, RFC/RFE, unión CSV, GIF** – `parseRfc`, `splitBlocks`, `parseAny`, `addPages/showPage/updPager`, `loadFiles`, `fAddFiles/fMerge/fConv`, `lzw/quant/gifEncode/makeGif`, `showTab`.
+7. **Páginas, unión CSV, GIF** – `splitBlocks`, `parseAny`, `addPages/showPage/updPager`, `loadFiles`, `fAddFiles/fMerge/fConv`, `lzw/quant/gifEncode/makeGif`, `showTab`.
 8. **Instrucciones y objetivo** – objeto `DOCS` (es/en) + `renderDocs()`.
 9. **Anotaciones** – `setTool`, `annDown/Move/Up`, `drawAnn`.
 10. **Interacción** – `hit()` (qué hay bajo el puntero), `lockMove()`, manejadores de puntero/rueda, CSV/sesión.
-11. **Adquisición** – simulador y cliente WebSocket (`ws://localhost:8765`) del puente USB (el puente **no existe**, ver §6).
+11. **Adquisición** – solo el simulador (fuente «Simulador» + «Iniciar»).
 12. Cableado final (`report()` PDF, botones, `ui();sync();draw();…`).
 
 ### Estado global (los nombres importan)
@@ -98,7 +97,8 @@ ancla por defecto `ph.t0 + T/2` (el cilindro 1 a 360° de INICIO) hasta que se a
 ## 4. Decisiones y preferencias del usuario (respetarlas)
 
 * Título «**Analyzer Scope** — by J.A.Ortúñez y Fran Rosales». Logo de Ortu Automoción en cabecera y en el PDF (pequeño), **no** dentro del visor.
-* En la pantalla de inicio **no** deben aparecer las marcas PicoScope/Hantek. Las pestañas Instrucciones/Objetivo **no** mencionan el uso como software de Hantek («de momento»).
+* En la pantalla de inicio **no** deben aparecer las marcas PicoScope/Hantek.
+* **Se quitó todo lo de Hantek** (lectura `.RFC`/`.RFE`, puente USB, `tools/hantek_inspect.py`): la app trabaja con **CSV** exportados desde el software de cada osciloscopio.
 * Estética: fondo azul-negro/blanco/gris con paneles de cristal; visor que va de negro a blanco con el deslizador.
 * **Sin bandas de color a toda altura** para identificar cilindros: se usan círculos dorados numerados (estilo «Pressure Waveform Overlays»); las filas verticales por cilindro son una opción aparte.
 * Orden de siglas en listas/tablas: **AAA · RCE · AAE · RCA**. Sobre la señal las reglas se colocan en orden cronológico AAE, AAA, RCE, RCA.
@@ -111,7 +111,6 @@ ancla por defecto `ph.t0 + T/2` (el cilindro 1 a 360° de INICIO) hasta que se a
 
 ## 5. Formatos de archivo (lo que se averiguó)
 
-* **`.RFC` de Hantek** (texto, CRLF): bloques por canal `#CHANNEL:CHn`, `#CLOCK=5.00mS`, `#SIZE=937`, `#UNITS:V`, líneas con las muestras; canales apagados: `CHn OFF`. El `CLOCK` se interpreta como **tiempo por división con 10 divisiones** (⇒ 53,36 µs entre muestras; coherente con una rueda fónica 60-2 a ~890 rpm). Es una **suposición** ajustable en «Convertir archivos». No se dispone de ningún `.RFE` de ejemplo (si es binario la app avisa).
 * **`.psdata` de PicoScope**: empieza por `JWWD`; el bloque de datos está comprimido/cifrado (alta entropía, no es zlib/lzma/bz2) y solo hay una miniatura PNG 256×256 legible al final. **No se puede leer**; la app avisa y pide exportar a CSV.
 * **CSV de PicoScope**: `Tiempo;Canal A…` / `(ms);(V)…` / línea vacía / datos con coma decimal. Otros CSV: cabecera `Time,CH-1` con bloque de metadatos previo.
 * Sesión propia (solo lectura): JSON que empieza por `{"format":"ortu-psdata"`.
@@ -120,9 +119,9 @@ ancla por defecto `ph.t0 + T/2` (el cilindro 1 a 360° de INICIO) hasta que se a
 
 ## 6. Pendiente / ideas
 
-1. **Puente USB para Hantek 1008C** (en vía muerta): el navegador no puede usar la DLL. Plan: programa local en Python (`ctypes` + `HTHardDll.dll`, probablemente 32 bits) que sirva `ws://localhost:8765` con tramas JSON `{"rate":Hz,"ch":[[…8 listas…]]}` (el cliente ya existe en la app). **Falta el informe de DLL**: ejecutar `tools/hantek_inspect.py` en el PC con el software de Hantek instalado y enviar `hantek_dll_report.txt` (+ SDK/cabeceras si existen). Además, una página publicada no puede abrir `ws://localhost` (CSP): hay que usar el archivo en local. La opción «Equipo USB (puente local)» sigue en el desplegable de fuente.
-2. Formato `.RFE` (pedir un ejemplo).
-3. El PDF necesita internet la primera vez (jsPDF 2.5.1 desde cdnjs). Opción: incrustar la librería.
+1. ~~Puente USB para Hantek 1008C~~ (descartado: el navegador no puede usar la DLL; se trabaja con CSV exportados).
+2. ~~Formato `.RFE`~~ (descartado).
+3. ~~PDF con internet~~: hecho, jsPDF 2.5.1 (MIT) incrustado en el HTML.
 4. Regla de **PMI** propia (hoy se toma a ±180° del PMS).
 5. Umbrales de picos de compresión (5 %/10 %) y de detección (35 %) son elecciones propias.
 6. El GIF usa paleta fija (degradados algo menos finos); se podría añadir cuantización adaptativa.
@@ -134,15 +133,15 @@ ancla por defecto `ph.t0 + T/2` (el cilindro 1 a 360° de INICIO) hasta que se a
 **Editar**: abrir `src/analyzer-scope.html`; el `<script>` es el último bloque. Tras cualquier cambio de código:
 ```
 node --check  (extraer el último <script> y comprobar sintaxis)
-cd tests && npm install && npx playwright install chromium && npm test   # 37 comprobaciones
+cd tests && npm install && npx playwright install chromium && npm test   # 40 comprobaciones
 ```
-`smoke.js` abre la página en Chromium real, carga los `.rfc`/CSV de `tests/data`, y comprueba carga, páginas, fondo, ajustes, sincronización, distribución, idioma (busca español sobrante en inglés), instrucciones, unión, conversión, GIF y errores JS.
+`smoke.js` abre la página en Chromium real, carga los CSV de `tests/data` (con la red bloqueada), y comprueba carga, páginas, fondo, ajustes, sincronización, distribución, idioma (busca español sobrante en inglés), instrucciones, unión, conversión, GIF y errores JS.
 Para depurar visualmente: `page.screenshot()` con Playwright y mirar la imagen (así se detectaron etiquetas cortadas y problemas de contraste).
 
 **Publicar como artefacto de claude.ai** (si el nuevo proyecto lo permite): publicar el archivo con la herramienta Artifact declarando `capabilities {"downloads": true}` (las descargas usan `window.claude.use('downloads')`, con `<a download>` como alternativa en local; extensiones permitidas incluyen csv, pdf, gif, json). La acción `edit` actúa sobre la copia **publicada**: si el archivo local cambió y no se publicó, publicar primero el archivo entero.
 
 ### Trampas ya encontradas (no repetir)
-* **Parches por script**: usar `s.index('</script>')` encuentra el de jsPDF (el `<script src>` de la cabecera) y duplicó media aplicación. Localizar siempre el último `<script>` y verificar que quede 1 `<style>`, 1 `<header>`, 1 `<main>`.
+* **Parches por script**: usar `s.index('</script>')` encuentra el de jsPDF (ahora incrustado en la cabecera) y duplicó media aplicación. Localizar siempre el último `<script>` y verificar que quede 1 `<style>`, 1 `<header>`, 1 `<main>`.
 * **Choques de nombres**: `tr` ya es el estado de las reglas T1/T2 (el traductor se llama `i18`); `pk` es el array local de picos en `draw()` (el helper de color es `pkc`).
 * Al comprobar el GIF con PIL, `round()` de Python es de «banquero»: usar redondeo hacia arriba como JS.
 * Playwright `setInputFiles` falla en silencio con rutas con `Ñ`/`º`: copiar a un nombre ASCII.

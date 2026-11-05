@@ -8,7 +8,7 @@ const path = require('path'), fs = require('fs');
 let pw; try { pw = require('playwright'); } catch (e) { if (!process.env.PLAYWRIGHT_PATH) throw e; pw = require(process.env.PLAYWRIGHT_PATH); }
 const APP = 'file://' + path.resolve(process.env.APP || path.join(__dirname, '..', 'src', 'analyzer-scope.html'));
 const D = f => path.join(__dirname, 'data', f);
-const RFC = ['seat_altea_fase_pms_y_inyector_1.rfc', 'fase_pms_inyecctor_2.rfc', 'fase_pms_inyector_3.rfc', 'fase_pms_inyector_4.rfc'].map(D);
+const CAPS = ['seat_altea_fase_pms_y_inyector_1.csv', 'fase_pms_inyecctor_2.csv', 'fase_pms_inyector_3.csv', 'fase_pms_inyector_4.csv'].map(D);
 
 let ok = 0, bad = 0;
 const check = (name, cond, extra = '') => { if (cond) { ok++; console.log('  ✓', name); } else { bad++; console.log('  ✗', name, extra); } };
@@ -18,6 +18,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
 (async () => {
   const b = await pw.chromium.launch({ headless: true });
   const ctx = await b.newContext({ viewport: { width: 1500, height: 950 }, acceptDownloads: true });
+  await ctx.route(/^https?:/, r => r.abort()); // sin internet: todo debe funcionar en local
   const p = await ctx.newPage(); p.setDefaultTimeout(6000);
   const errs = []; p.on('pageerror', e => errs.push(String(e)));
   const E = (fn, ...a) => p.evaluate(fn, ...a);
@@ -30,11 +31,11 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   check('ajustes de canales visibles por defecto', await E(() => !document.getElementById('leftp').classList.contains('nos')));
   check('sección «Sincronización» plegada por defecto', await E(() => document.getElementById('sBox').hidden));
 
-  console.log('\n2 · Archivos .RFC como páginas');
-  await p.setInputFiles('#fi', RFC); await p.waitForTimeout(900);
+  console.log('\n2 · Varios CSV como páginas');
+  await p.setInputFiles('#fi', CAPS); await p.waitForTimeout(900);
   check('4 páginas', await E(() => PG.length) === 4);
   check('3 canales de 937 muestras', await E(() => PG[0].chs.length === 3 && PG[0].chs[0].x.length === 937));
-  check('dt = 5 ms × 10 div / 937 ≈ 53,36 µs', Math.abs(await E(() => PG[0].chs[0].x[1] * 1e6) - 53.36) < 0.05);
+  check('dt ≈ 53,36 µs', Math.abs(await E(() => PG[0].chs[0].x[1] * 1e6) - 53.36) < 0.05);
   check('barra de páginas visible', await E(() => !document.getElementById('pgbar').hidden));
   await E(() => { const r = document.getElementById('pgR'); r.value = 3; r.dispatchEvent(new Event('input')); });
   check('el cursor cambia de página', await E(() => pgI) === 2);
@@ -110,7 +111,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   await click('#lES');
 
   console.log('\n9 · Convertir archivos: unir, convertir, GIF');
-  await click('#tabF'); await p.setInputFiles('#fIn', RFC); await p.waitForTimeout(700);
+  await click('#tabF'); await p.setInputFiles('#fIn', CAPS); await p.waitForTimeout(700);
   check('lista de 4 archivos', await E(() => QF.length) === 4);
   await p.uncheck('#fLoadM');
   const [dl] = await Promise.all([p.waitForEvent('download'), click('#fMerge')]);
@@ -131,9 +132,16 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   await p.setInputFiles('#fi', [D('sensor_inyector_test.psdata')]); await p.waitForTimeout(500);
   check('.psdata nativo: aviso en lugar de error', /no se puede leer/.test(await p.textContent('#st')));
 
-  console.log('\nErrores JS durante la sesión:', errs.filter(e => !/jspdf|cdnjs|net::/i.test(e)).length);
-  errs.filter(e => !/jspdf|cdnjs|net::/i.test(e)).forEach(e => console.log('  !', e));
-  check('sin errores JS', errs.filter(e => !/jspdf|cdnjs|net::/i.test(e)).length === 0);
+  console.log('\n11 · PDF sin internet y sin restos de Hantek');
+  check('jsPDF incrustado (sin red)', await E(() => !!(window.jspdf && window.jspdf.jsPDF)));
+  check('sin opción de equipo USB en «Fuente»', await E(() => ![...document.querySelectorAll('#src option')].some(o => o.value === 'hantek')));
+  await p.setInputFiles('#fi', [CAPS[0]]); await p.waitForTimeout(600); await click('#tabS');
+  { const [dl] = await Promise.all([p.waitForEvent('download'), click('#bPdf')]);
+    const buf = fs.readFileSync(await dl.path()); check('Informe PDF generado (%PDF)', buf.slice(0, 4).toString() === '%PDF', dl.suggestedFilename()); }
+
+  console.log('\nErrores JS durante la sesión:', errs.length);
+  errs.forEach(e => console.log('  !', e));
+  check('sin errores JS', errs.length === 0);
   console.log(`\nRESULTADO: ${ok} correctas, ${bad} fallidas`);
   await b.close(); process.exit(bad ? 1 : 0);
 })().catch(e => { console.log('FALLO DEL GUION:', e.message.split('\n')[0]); process.exit(2); });

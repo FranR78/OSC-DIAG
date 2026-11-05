@@ -50,10 +50,6 @@
    "Simulator"
   ],
   [
-   "Equipo USB (puente local)",
-   "USB device (local bridge)"
-  ],
-  [
    "Iniciar",
    "Start"
   ],
@@ -108,10 +104,6 @@
   [
    "Rango de grados",
    "Degree range"
-  ],
-  [
-   "Divisiones horizontales",
-   "Horizontal divisions"
   ],
   [
    "Divisiones",
@@ -522,8 +514,8 @@
    "load the result into the oscilloscope"
   ],
   [
-   "Convierte cada archivo (por ejemplo .RFC de Hantek) a su propio CSV",
-   "Converts each file (for example a Hantek .RFC) into its own CSV"
+   "Convierte cada archivo a su propio CSV",
+   "Converts each file into its own CSV"
   ],
   [
    "Convertir cada archivo a CSV",
@@ -536,26 +528,6 @@
   [
    "Cargar como páginas en el osciloscopio",
    "Load as pages in the oscilloscope"
-  ],
-  [
-   "Archivos de Hantek (.RFC / .RFE)",
-   "Hantek files (.RFC / .RFE)"
-  ],
-  [
-   "El «CLOCK» del archivo es",
-   "The file “CLOCK” is"
-  ],
-  [
-   "tiempo por división",
-   "time per division"
-  ],
-  [
-   "periodo entre muestras",
-   "sample interval"
-  ],
-  [
-   "duración total",
-   "total duration"
   ],
   [
    "Al usar «Abrir archivos…» con varios archivos",
@@ -1010,10 +982,6 @@
    "No files yet."
   ],
   [
-   "Último .RFC leído: ",
-   "Last .RFC read: "
-  ],
-  [
    "Añade al menos dos archivos para unirlos.",
    "Add at least two files to join them."
   ],
@@ -1118,20 +1086,12 @@
    "Simulator running."
   ],
   [
-   "Conectado al puente local del equipo USB.",
-   "Connected to the local bridge of the USB device."
+   "Elige «Simulador» en el desplegable de fuente; en modo archivo usa «Abrir archivos».",
+   "Choose “Simulator” in the source drop-down; in file mode use “Open files”."
   ],
   [
-   "No hay puente en ws://localhost:8765. Ejecuta el programa puente en el PC al que está conectado el equipo.",
-   "No bridge at ws://localhost:8765. Run the bridge program on the PC the device is connected to."
-  ],
-  [
-   "Elige Simulador o Equipo USB para adquirir; en modo archivo usa «Abrir archivos».",
-   "Choose Simulator or USB device to acquire; in file mode use “Open files”."
-  ],
-  [
-   "No se cargó jsPDF: hace falta conexión a internet para generar el PDF.",
-   "jsPDF did not load: an internet connection is needed to generate the PDF."
+   "No se pudo cargar el generador de PDF.",
+   "The PDF generator could not be loaded."
   ],
   [
    "No hay señales cargadas.",
