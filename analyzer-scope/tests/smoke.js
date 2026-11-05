@@ -6,7 +6,7 @@
  * Sale con código 1 si falla alguna comprobación. */
 const path = require('path'), fs = require('fs');
 let pw; try { pw = require('playwright'); } catch (e) { if (!process.env.PLAYWRIGHT_PATH) throw e; pw = require(process.env.PLAYWRIGHT_PATH); }
-const APP = 'file://' + path.resolve(process.env.APP || path.join(__dirname, '..', 'src', 'analyzer-scope.html'));
+const APP = 'file://' + path.resolve(process.env.APP || path.join(__dirname, '..', 'dist', 'analyzer-scope.html'));
 const D = f => path.join(__dirname, 'data', f);
 const CAPS = ['seat_altea_fase_pms_y_inyector_1.csv', 'fase_pms_inyecctor_2.csv', 'fase_pms_inyector_3.csv', 'fase_pms_inyector_4.csv'].map(D);
 

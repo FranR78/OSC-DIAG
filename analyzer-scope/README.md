@@ -4,14 +4,22 @@ Aplicación web de **análisis de señales de osciloscopio (hasta 8 canales) par
 Autores/créditos que deben aparecer: **J.A.Ortúñez y Fran Rosales**. Marca del taller: **Ortu Automoción** (logo en `assets/`).
 Idioma de trabajo con el usuario: **español**. La interfaz es bilingüe (español/inglés).
 
-Todo el proyecto es **un único archivo HTML autocontenido** (`src/analyzer-scope.html`, ~530 KB con jsPDF incrustado, sin compilación). Funciona **sin internet**.
+Se distribuye como **un único archivo HTML autocontenido** (`dist/analyzer-scope.html`, ~520 KB con jsPDF incrustado). Funciona **sin internet**.
+Se **edita** en módulos (`src/`) y se **construye** con `node build.js` (sin dependencias). `dist/` se sube a git: es lo que se entrega.
 Era un artefacto publicado de claude.ai (`https://claude.ai/artifact/Mo32r74KB8kD9ih1SZevHw`); en otro proyecto hay que **publicarlo de nuevo** (será otra URL).
 
 ```
 analyzer-scope/
 ├─ README.md                 ← este documento
 ├─ PROMPT_INICIAL.md         ← mensaje listo para pegar al empezar el nuevo proyecto
-├─ src/analyzer-scope.html   ← LA APLICACIÓN (fuente completa, logo incrustado en base64)
+├─ build.js                  ← src/ → dist/analyzer-scope.html  (--check: comprueba que dist está al día)
+├─ dist/analyzer-scope.html  ← LA APLICACIÓN para entregar (generada, no editar a mano)
+├─ src/
+│  ├─ index.html             ← plantilla: cabecera, HTML de la interfaz y marcadores {{…}}
+│  ├─ css/styles.css
+│  ├─ js/01-idioma.js … 14-pdf-y-arranque.js  ← se concatenan en orden en UN <script> (ámbito global)
+│  ├─ img/logo.jpg           ← se incrusta en base64
+│  └─ vendor/jspdf.umd.min.js ← jsPDF 2.5.1 (MIT), sin tocar
 ├─ assets/logo_ortu_automocion.jpg
 ├─ tests/                    ← pruebas de regresión en navegador real (Playwright) + datos de ejemplo
 │  ├─ smoke.js, package.json
@@ -44,22 +52,24 @@ Interacciones: rueda = zoom · arrastrar fondo = desplazar · clic = T1 · Mayú
 
 ---------------------------------------------------------------------------------------------------
 
-## 2. Arquitectura del código (`src/analyzer-scope.html`)
+## 2. Arquitectura del código (`src/js/`)
 
-Orden de secciones del `<script>` (cada una empieza con un comentario `/* ---------- … ---------- */`):
+Un archivo por sección, en este orden (cada uno empieza con `/* ---------- … ---------- */`). **No son módulos ES**: se concatenan y comparten el ámbito global, así que el orden importa y los nombres no se pueden repetir entre archivos.
 
-1. **Idioma** – `DICT`, `i18()`, parches de `innerHTML`/`textContent`, `applyStatic()`, `setLang()`.
-2. **Parser multiformato** – `parseText()` (CSV/TSV/TXT).
-3. **Escala / vista** – `rng`, `autoCh`, `refOf`, `fit`, búsqueda binaria `lb`.
-4. **Dibujo** – `draw(theme)` (lienzo principal), `distCalc()`, `distRows()`, helpers de color (`pkc`, `mixc`, `lumHex`…), `drawDist()` (diagrama circular), **Mediciones** `measure()`.
-5. **Filtros, inversión y panel de canales** – `filt2` (biquad Butterworth RBJ adelante+atrás), `proc(c)`, `ui()`.
-6. **Cilindros** – `engA`, `engEvents`, `cylData`, `cylList`, `fillSC`, **`groupIv`/`trigEvents`/`syncCyl`** (detección de disparos y sincronización).
-7. **Páginas, unión CSV, GIF** – `splitBlocks`, `parseAny`, `addPages/showPage/updPager`, `loadFiles`, `fAddFiles/fMerge/fConv`, `lzw/quant/gifEncode/makeGif`, `showTab`.
-8. **Instrucciones y objetivo** – objeto `DOCS` (es/en) + `renderDocs()`.
-9. **Anotaciones** – `setTool`, `annDown/Move/Up`, `drawAnn`.
-10. **Interacción** – `hit()` (qué hay bajo el puntero), `lockMove()`, manejadores de puntero/rueda, CSV/sesión.
-11. **Adquisición** – solo el simulador (fuente «Simulador» + «Iniciar»).
-12. Cableado final (`report()` PDF, botones, `ui();sync();draw();…`).
+* `01-idioma.js` – `DICT`, `i18()`, parches de `innerHTML`/`textContent`, `applyStatic()`, `setLang()`.
+* `02-parser.js` – `parseText()` (CSV/TSV/TXT).
+* `03-escala-vista.js` – `rng`, `autoCh`, `refOf`, `fit`, búsqueda binaria `lb`.
+* `04-dibujo.js` – `draw(theme)` (lienzo principal) y helpers de color (`pkc`, `mixc`, `lumHex`…).
+* `05-distribucion.js` – `distCalc()`, `distRows()`, `drawDist()` (diagrama circular).
+* `06-mediciones.js` – `measure()`.
+* `07-filtros-canales.js` – `filt2` (biquad Butterworth RBJ adelante+atrás), `proc(c)`, `ui()`.
+* `08-cilindros.js` – `engA`, `engEvents`, `cylData`, `cylList`, `fillSC`, **`groupIv`/`trigEvents`/`syncCyl`** (disparos y sincronización).
+* `09-paginas-csv-gif.js` – `splitBlocks`, `parseAny`, `addPages/showPage/updPager`, `loadFiles`, `fAddFiles/fMerge/fConv`, `lzw/quant/gifEncode/makeGif`, `showTab`.
+* `10-instrucciones.js` – objeto `DOCS` (es/en) + `renderDocs()`.
+* `11-anotaciones.js` – `setTool`, `annDown/Move/Up`, `drawAnn`.
+* `12-interaccion.js` – `hit()`, `lockMove()`, manejadores de puntero/rueda, CSV/sesión.
+* `13-simulador.js` – simulador (fuente «Simulador» + «Iniciar»).
+* `14-pdf-y-arranque.js` – `saveFile()`, `report()` (PDF), cableado de botones y `ui();sync();draw();…`.
 
 ### Estado global (los nombres importan)
 ```
@@ -130,18 +140,19 @@ ancla por defecto `ph.t0 + T/2` (el cilindro 1 a 360° de INICIO) hasta que se a
 
 ## 7. Cómo seguir trabajando
 
-**Editar**: abrir `src/analyzer-scope.html`; el `<script>` es el último bloque. Tras cualquier cambio de código:
+**Editar**: el archivo de `src/` que toque (JS en `src/js/`, estilos en `src/css/`, interfaz en `src/index.html`). Después:
 ```
-node --check  (extraer el último <script> y comprobar sintaxis)
-cd tests && npm install && npx playwright install chromium && npm test   # 40 comprobaciones
+node --check src/js/<archivo>.js
+cd tests && npm install && npx playwright install chromium && npm test   # construye dist/ y pasa 40 comprobaciones
 ```
+Antes de subir a git: `node build.js --check` (falla si `dist/` no se reconstruyó).
 `smoke.js` abre la página en Chromium real, carga los CSV de `tests/data` (con la red bloqueada), y comprueba carga, páginas, fondo, ajustes, sincronización, distribución, idioma (busca español sobrante en inglés), instrucciones, unión, conversión, GIF y errores JS.
 Para depurar visualmente: `page.screenshot()` con Playwright y mirar la imagen (así se detectaron etiquetas cortadas y problemas de contraste).
 
 **Publicar como artefacto de claude.ai** (si el nuevo proyecto lo permite): publicar el archivo con la herramienta Artifact declarando `capabilities {"downloads": true}` (las descargas usan `window.claude.use('downloads')`, con `<a download>` como alternativa en local; extensiones permitidas incluyen csv, pdf, gif, json). La acción `edit` actúa sobre la copia **publicada**: si el archivo local cambió y no se publicó, publicar primero el archivo entero.
 
 ### Trampas ya encontradas (no repetir)
-* **Parches por script**: usar `s.index('</script>')` encuentra el de jsPDF (ahora incrustado en la cabecera) y duplicó media aplicación. Localizar siempre el último `<script>` y verificar que quede 1 `<style>`, 1 `<header>`, 1 `<main>`.
+* **No editar `dist/` a mano**: se sobrescribe en cada `node build.js`. (Antes, parchear el HTML único buscando `</script>` encontraba el de jsPDF y duplicó media aplicación; con `src/` ya no hace falta.)
 * **Choques de nombres**: `tr` ya es el estado de las reglas T1/T2 (el traductor se llama `i18`); `pk` es el array local de picos en `draw()` (el helper de color es `pkc`).
 * Al comprobar el GIF con PIL, `round()` de Python es de «banquero»: usar redondeo hacia arriba como JS.
 * Playwright `setInputFiles` falla en silencio con rutas con `Ñ`/`º`: copiar a un nombre ASCII.

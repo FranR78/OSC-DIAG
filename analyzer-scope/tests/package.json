@@ -1,6 +1,6 @@
 {
   "name": "analyzer-scope-tests",
   "private": true,
-  "scripts": { "test": "node smoke.js" },
+  "scripts": { "test": "node ../build.js && node smoke.js" },
   "devDependencies": { "playwright": "^1.56.0" }
 }

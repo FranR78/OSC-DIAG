@@ -10,4 +10,4 @@ basado solo en tus PDF de experto. Motor: Gemini API con key personal (gratis).
 ## Analyzer Scope
 
 Analizador de señales de osciloscopio (8 canales) para diagnosis de motores.
-Proyecto aparte, un único HTML: [`analyzer-scope/`](analyzer-scope/) — leer su `README.md`.
+Proyecto aparte: [`analyzer-scope/`](analyzer-scope/) — leer su `README.md`. Archivo para usar: `analyzer-scope/dist/analyzer-scope.html`.
