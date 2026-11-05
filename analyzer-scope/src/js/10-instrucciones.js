@@ -28,6 +28,7 @@ sec:[
 {h:'2 · Preparar la vista',t:[
 '«Ajustar» encaja las escalas y el tiempo; «Limpiar» borra todo.',
 'Rueda del ratón = zoom en el tiempo; arrastrar el fondo del visor = desplazar.',
+'En tablet o móvil: pellizca con dos dedos = zoom; arrastra con un dedo = desplazar; toca = T1. El botón «Canales» de la cabecera muestra u oculta el panel de canales (debajo del visor).',
 'El botón «Ajustes» de la parte superior del panel izquierdo muestra u oculta a la vez los ajustes de todos los canales (escala, posición, reglas, filtro e invertir). La casilla, el nombre y el parámetro de cada canal se ven siempre; los ajustes aparecen por defecto al iniciar la aplicación.',
 'Por cada canal (panel izquierdo): casilla «Ver», escala por división y posición, nombre del parámetro medido, filtro (Usuario, Paso bajo, Paso alto, Ancho de banda) e «Invertir». Pulsa el nombre del canal para que sea el de las lecturas y de la regla de amplitud.',
 'Cada canal tiene una <b>flecha de color</b> en el borde izquierdo del visor: arrástrala para subir o bajar su gráfica.',
@@ -91,6 +92,7 @@ sec:[
 {h:'2 · Set up the view',t:[
 '“Fit” adjusts the scales and the time span; “Clear” removes everything.',
 'Mouse wheel = zoom in time; dragging the viewer background = pan.',
+'On a tablet or phone: pinch with two fingers = zoom; drag with one finger = pan; tap = T1. The “Channels” button in the header shows or hides the channels panel (below the viewer).',
 'The “Settings” button at the top of the left panel shows or hides the settings of all channels at once (scale, position, rulers, filter and invert). The checkbox, name and parameter of each channel are always visible; the settings are shown by default when the application starts.',
 'For each channel (left panel): “Show” checkbox, scale per division and position, name of the measured parameter, filter (User, Low-pass, High-pass, Band-pass) and “Invert”. Click the channel name to make it the one used for the readings and the amplitude ruler.',
 'Every channel has a <b>coloured arrow</b> on the left edge of the viewer: drag it to move its trace up or down.',

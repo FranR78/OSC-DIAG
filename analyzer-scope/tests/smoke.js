@@ -139,6 +139,20 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   { const [dl] = await Promise.all([p.waitForEvent('download'), click('#bPdf')]);
     const buf = fs.readFileSync(await dl.path()); check('Informe PDF generado (%PDF)', buf.slice(0, 4).toString() === '%PDF', dl.suggestedFilename()); }
 
+  console.log('\n12 · Tablet / móvil');
+  await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(300);
+  check('sin desplazamiento horizontal a 390 px', await E(() => document.documentElement.scrollWidth <= innerWidth + 1), await E(() => document.documentElement.scrollWidth));
+  check('panel de canales oculto y botón «Canales» visible', await E(() => getComputedStyle(document.getElementById('leftp')).display === 'none' && getComputedStyle(document.getElementById('bPan')).display !== 'none'));
+  await click('#bPan');
+  check('«Canales» muestra el panel debajo del visor', await E(() => { const l = document.getElementById('leftp').getBoundingClientRect(), v = document.getElementById('cv').getBoundingClientRect(); return l.height > 0 && l.top > v.top; }));
+  await click('#bPan');
+  check('pellizco con dos dedos: separar ×3 = zoom ×3', await E(() => {
+    fit(); const s0 = view.span, r = cv.getBoundingClientRect(), y = r.top + r.height / 2, cx = r.left + M.l + PW() / 2;
+    const ev = (t, id, x) => cv.dispatchEvent(new PointerEvent(t, { pointerId: id, pointerType: 'touch', clientX: x, clientY: y, bubbles: true, isPrimary: id === 1 }));
+    ev('pointerdown', 1, cx - 50); ev('pointerdown', 2, cx + 50); ev('pointermove', 2, cx + 150); ev('pointermove', 1, cx - 150); ev('pointerup', 1, cx - 150); ev('pointerup', 2, cx + 150);
+    return Math.abs(view.span / s0 - 1 / 3) < 0.02 && pinch === null && TP.size === 0; }), await E(() => view.span));
+  await p.setViewportSize({ width: 1500, height: 950 });
+
   console.log('\nErrores JS durante la sesión:', errs.length);
   errs.forEach(e => console.log('  !', e));
   check('sin errores JS', errs.length === 0);

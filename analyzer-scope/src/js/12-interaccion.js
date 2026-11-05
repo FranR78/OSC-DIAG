@@ -1,12 +1,16 @@
 /* ---------- Interacción ---------- */
 let drag=null;
+/* gestos táctiles: dos dedos = zoom (pellizco) centrado entre los dedos */
+const TP=new Map();let pinch=null;
+function pinchSet(){const [a,b]=[...TP.values()],m=(a+b)/2,u=(m-M.l)/PW();pinch={d:Math.max(20,Math.abs(a-b)),span:view.span,t:view.t0+u*view.span}}
+function pinchMove(){const [a,b]=[...TP.values()],u=((a+b)/2-M.l)/PW();view.span=pinch.span*pinch.d/Math.max(20,Math.abs(a-b));view.t0=pinch.t-u*view.span;draw()}
 const tOf=e=>view.t0+(e.offsetX-M.l)/PW()*view.span;
 function hit(e){
   const x=e.offsetX,y=e.offsetY,inV=y>=M.t-46&&y<=M.t+PH(),inP=x>=M.l-6&&x<=M.l+PW()+6&&y>=M.t&&y<=M.t+PH();
   for(const ci of [sel,...CH.map((_,i)=>i).filter(i=>i!==sel).reverse()]){const c=CH[ci];
     if(c&&c.on&&c.x&&x>=M.l-4&&x<=M.l+27&&Math.abs(y-arrowY(c))<=9)return{k:'arrow',ci}}
   if(eng.on&&ph.T>0){for(const e of engEvents()){const ex=M.l+(e.t-view.t0)/view.span*PW();if(isVis(e.cyl)&&Math.abs(x-ex)<=11&&Math.abs(y-(M.t+11))<=11)return{k:'cyl',cyl:e.cyl}}}
-  let best=null,bd=7;
+  let best=null,bd=e.pointerType==='touch'?16:7;
   const vx=(k,t)=>{if(t==null||!inV)return;const d=Math.abs(x-(M.l+(t-view.t0)/view.span*PW()));if(d<bd){bd=d;best={k}}};
   if(pms.on)vx('pms',pms.t);
   if(tr.on){vx('t1',cur.a);vx('t2',cur.b)}
@@ -27,9 +31,12 @@ function lockMove(o,dt){
   if((k==='p0'||k==='p1')&&ph.lk){ph.t0=S.t0+dt;ph.auto=false;return true}
   return false;
 }
-cv.addEventListener('pointerdown',e=>{if(ann.tool!=='none'){annDown(e);return}cv.setPointerCapture(e.pointerId);drag={x:e.clientX,t0:view.t0,mv:false,o:hit(e),t00:tOf(e),snap:{a:cur.a,b:cur.b,c:cur.c,d:cur.d,t0:ph.t0,pms:pms.t,A:ph.T>0?engA():null,vv:{ia:vv.ia,fa:vv.fa,ie:vv.ie,fe:vv.fe}}};if(drag.o&&drag.o.k==='arrow'){const c=CH[drag.o.ci];drag.dy=e.offsetY-arrowY(c);if(sel!==drag.o.ci){sel=drag.o.ci;ui();draw()}}});
+cv.addEventListener('pointerdown',e=>{if(ann.tool!=='none'){annDown(e);return}try{cv.setPointerCapture(e.pointerId)}catch(_){}
+  if(e.pointerType==='touch'){TP.set(e.pointerId,e.offsetX);if(TP.size===2){drag=null;pinchSet();return}if(TP.size>2)return}
+  drag={x:e.clientX,t0:view.t0,mv:false,o:hit(e),t00:tOf(e),snap:{a:cur.a,b:cur.b,c:cur.c,d:cur.d,t0:ph.t0,pms:pms.t,A:ph.T>0?engA():null,vv:{ia:vv.ia,fa:vv.fa,ie:vv.ie,fe:vv.fe}}};if(drag.o&&drag.o.k==='arrow'){const c=CH[drag.o.ci];drag.dy=e.offsetY-arrowY(c);if(sel!==drag.o.ci){sel=drag.o.ci;ui();draw()}}});
 cv.addEventListener('pointermove',e=>{
   if(ann.tool!=='none'){annMove(e);return}
+  if(TP.has(e.pointerId)){TP.set(e.pointerId,e.offsetX);if(pinch){pinchMove();return}}
   if(!drag){const h=hit(e);cv.style.cursor=h?(h.k==='h'||h.k==='arrow'?'ns-resize':'ew-resize'):'crosshair';return}
   const dx=e.clientX-drag.x;if(Math.abs(dx)>3||drag.o)drag.mv=true;if(!drag.mv)return;
   const o=drag.o;
@@ -44,6 +51,7 @@ cv.addEventListener('pointermove',e=>{
   draw()});
 cv.addEventListener('pointerup',e=>{
   if(ann.tool!=='none'){annUp(e);return}
+  if(TP.delete(e.pointerId)&&pinch){if(TP.size<2)pinch=null;drag=null;return}
   if(drag&&!drag.mv&&!drag.o&&e.offsetX>=M.l&&e.offsetX<=M.l+PW()&&e.offsetY>=M.t&&e.offsetY<=M.t+PH()){
     const t=tOf(e);if(e.shiftKey)cur.b=t;else cur.a=t;if(cur.a==null)cur.a=t;if(cur.b==null)cur.b=t;tr.on=true;sync();draw()}
   if(drag&&drag.mv&&drag.o&&drag.o.k==='arrow')ui();
@@ -51,7 +59,9 @@ cv.addEventListener('pointerup',e=>{
   drag=null});
 cv.addEventListener('wheel',e=>{e.preventDefault();const f=e.deltaY>0?1.25:.8,u=Math.min(1,Math.max(0,(e.offsetX-M.l)/PW())),t=view.t0+u*view.span;
   view.span*=f;view.t0=t-u*view.span;draw()},{passive:false});
+cv.addEventListener('pointercancel',e=>{TP.delete(e.pointerId);if(TP.size<2)pinch=null;drag=null});
 addEventListener('resize',draw);
+$('bPan').onclick=()=>{const o=document.body.classList.toggle('pan');$('bPan').classList.toggle('on',o);if(o)$('leftp').scrollIntoView({behavior:'smooth',block:'start'})};
 $('bOpen').onclick=()=>$('fi').click();
 $('fi').onchange=e=>{loadFiles([...e.target.files]);e.target.value=''};
 $('bFit').onclick=()=>{CH.forEach((c,i)=>c.x&&autoCh(i));fit();ui();draw()};
