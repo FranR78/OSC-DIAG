@@ -15,8 +15,7 @@
 <button class="p" id="bOpen">Abrir archivos…</button>
 <input type="file" id="fi" multiple accept=".csv,.txt,.tsv,.psdata,.dat" hidden>
 <button id="bFit">Ajustar</button><button id="bClr">Limpiar</button>
-<select id="src"><option value="file">Fuente: archivo</option><option value="sim">Simulador</option></select>
-<button id="bRun">Iniciar</button>
+<select id="ex" title="Capturas de ejemplo incluidas en la aplicación"><option value="">Ejemplos…</option></select>
 <div class="lang" role="group" aria-label="Idioma / Language"><button id="lES" class="on" title="Español">Español</button><button id="lEN" title="English">English</button></div>
 </header>
 <main>
@@ -25,8 +24,8 @@
 <div id="chs"></div>
 <p class="hint st">Fila inferior de cada canal: filtro (Hz, editables; doble pasada sin desfase) e Invertir. Usuario = paso bajo con corte de 500 Hz por defecto.</p>
 <hr>
-<label class="sec"><input type="checkbox" id="oPh"> <b>Regla de fase</b></label>
-<div id="bPh" hidden>
+<label class="sec"><input type="checkbox" id="oPh" checked> <b>Regla de fase</b></label>
+<div id="bPh">
 <p class="hint">INICIO marca los 0° de la regla de fase; arrastra FIN para ajustar el ciclo y elige el rango y las divisiones. La regla PMS es independiente: señala el PMS real y es la referencia (0°) del diagrama de distribución y del avance.</p>
 <div style="display:grid;gap:6px;margin-top:6px">
 <label>RPM del motor <input type="number" id="rpm" min="1" style="width:84px" placeholder="p. ej. 800"></label>
@@ -37,8 +36,8 @@
 <p class="hint" id="phi"></p>
 </div>
 <hr>
-<label class="sec"><input type="checkbox" id="oCy"> <b>Identificación de cilindros</b></label>
-<div id="bCy" hidden>
+<label class="sec"><input type="checkbox" id="oCy" checked> <b>Identificación de cilindros</b></label>
+<div id="bCy">
 <div style="display:grid;gap:6px;margin-top:6px">
 <label>Cilindros <select id="gN"></select></label>
 <label>Orden <select id="gO"></select></label>
@@ -73,7 +72,7 @@
 </div>
 </section>
 <section class="card">
-<div id="tabs"><button class="tab on" id="tabS">Osciloscopio</button><button class="tab" id="tabD">Diagrama de distribución</button><button class="tab" id="tabF">Convertir archivos</button><button class="tab" id="tabG">GIF</button><button class="tab" id="tabI">Instrucciones</button><button class="tab" id="tabO">Objetivo</button></div>
+<div id="tabs"><button class="tab on" id="tabS">Osciloscopio</button><button class="tab" id="tabD">Diagrama de distribución</button><button class="tab" id="tabF">Unir y convertir CSV</button><button class="tab" id="tabG">GIF</button><button class="tab" id="tabI">Instrucciones</button><button class="tab" id="tabO">Objetivo</button></div>
 <div id="viewS">
 <div id="tb">
 <button class="tog on" id="tPh" title="Conectar o desconectar las reglas de fase">Reglas de fase</button><button class="tog lk" id="kPh" title="Bloquear el ciclo: al arrastrar FIN (o INICIO) se desplaza el ciclo entero">🔓</button>
@@ -151,5 +150,6 @@
 </section>
 </main>
 <footer>Ortu Automoción · ortuautomocion.com</footer>
+<script>const EJEMPLOS={{ejemplos:ejemplos}};</script>
 <script>
 {{js/*.js}}</script></body></html>

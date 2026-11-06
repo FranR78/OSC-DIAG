@@ -24,7 +24,7 @@ sec:[
 'Pulsa «Abrir archivos…» o arrastra los archivos a la ventana. Se aceptan CSV de distintos osciloscopios.',
 'Un archivo con varios canales ocupa CH1, CH2…, hasta 8 canales. Si cargas varios archivos a la vez, cada uno es una <b>página</b>: recórrelas con la barra «Páginas» (cursor y botones ◀ ▶).',
 'Los .psdata nativos no se pueden leer: expórtalos a CSV desde el programa del osciloscopio.',
-'Para probar la aplicación sin datos, elige «Simulador» en el desplegable de fuente y pulsa «Iniciar».']},
+'Para probar la aplicación sin datos, elige una captura en el desplegable «Ejemplos…» de la cabecera.']},
 {h:'2 · Preparar la vista',t:[
 '«Ajustar» encaja las escalas y el tiempo; «Limpiar» borra todo.',
 'Rueda del ratón = zoom en el tiempo; arrastrar el fondo del visor = desplazar.',
@@ -57,10 +57,10 @@ sec:[
 'Los ángulos se muestran siempre en positivo: AAA y RCE se miden respecto al PMS; AAE y RCA, respecto al PMI. Si una regla queda al otro lado de su referencia, aparece ⚠ junto al valor.']},
 {h:'9 · Anotar y documentar',t:[
 '«Anotar» muestra las herramientas de texto, flecha, línea, lápiz, rectángulo y elipse, con borrar y deshacer.',
-'«Informe PDF» (con fondo blanco o negro) incluye la captura, las lecturas y el diagrama; «Exportar CSV» guarda la vista actual.',
+'«Informe PDF» (con fondo blanco o negro) incluye la captura, las lecturas y el diagrama; «Exportar CSV» guarda el archivo completo con todos tus ajustes (escalas, reglas, cilindros, filtros, anotaciones): al volver a abrirlo aquí aparece tal como lo dejaste.',
 'En la pestaña «GIF» eliges desde qué página hasta cuál, el retardo y el ancho, y creas una animación con las capturas.']},
 {h:'10 · Unir y convertir archivos',t:[
-'En «Convertir archivos» añade los archivos en el orden que quieras: «Unir en un solo CSV» los concatena en el tiempo, «Convertir cada archivo a CSV» los convierte uno a uno y «Cargar como páginas en el osciloscopio» los abre para compararlos.']},
+'En «Unir y convertir CSV» añade los archivos en el orden que quieras: «Unir en un solo CSV» los concatena en el tiempo, «Convertir cada archivo a CSV» los convierte uno a uno y «Cargar como páginas en el osciloscopio» los abre para compararlos.']},
 {h:'11 · Idioma',t:[
 'El selector Español | English de la esquina superior derecha cambia todos los textos de la aplicación.']}]}
 },
@@ -88,7 +88,7 @@ sec:[
 'Press “Open files…” or drag the files into the window. CSV files from different oscilloscopes are accepted.',
 'A file with several channels takes CH1, CH2…, up to 8 channels. If you load several files at once, each one is a <b>page</b>: browse them with the “Pages” bar (slider and ◀ ▶ buttons).',
 'Native .psdata files cannot be read: export them to CSV from the oscilloscope program.',
-'To try the application without data, choose “Simulator” in the source drop-down and press “Start”.']},
+'To try the application without data, choose a capture in the “Examples…” drop-down in the header.']},
 {h:'2 · Set up the view',t:[
 '“Fit” adjusts the scales and the time span; “Clear” removes everything.',
 'Mouse wheel = zoom in time; dragging the viewer background = pan.',
@@ -121,10 +121,10 @@ sec:[
 'Angles are always shown as positive values: IVO and EVC are measured relative to TDC; EVO and IVC, relative to BDC. If a ruler is on the other side of its reference, ⚠ appears next to the value.']},
 {h:'9 · Annotate and document',t:[
 '“Annotate” shows the text, arrow, line, pen, rectangle and ellipse tools, with erase and undo.',
-'“PDF report” (with a white or black background) includes the capture, the readings and the diagram; “Export CSV” saves the current view.',
+'“PDF report” (with a white or black background) includes the capture, the readings and the diagram; “Export CSV” saves the whole file with all your settings (scales, rulers, cylinders, filters, annotations): when you open it here again it looks exactly as you left it.',
 'In the “GIF” tab you choose from which page to which, the delay and the width, and create an animation of the captures.']},
 {h:'10 · Join and convert files',t:[
-'In “Convert files” add the files in the order you want: “Join into a single CSV” concatenates them in time, “Convert each file to CSV” converts them one by one, and “Load as pages in the oscilloscope” opens them for comparison.']},
+'In “Join and convert CSV” add the files in the order you want: “Join into a single CSV” concatenates them in time, “Convert each file to CSV” converts them one by one, and “Load as pages in the oscilloscope” opens them for comparison.']},
 {h:'11 · Language',t:[
 'The Español | English selector in the top-right corner changes all the texts of the application.']}]}
 }};

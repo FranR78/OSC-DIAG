@@ -19,6 +19,7 @@ analyzer-scope/
 │  ├─ css/styles.css
 │  ├─ js/01-idioma.js … 14-pdf-y-arranque.js  ← se concatenan en orden en UN <script> (ámbito global)
 │  ├─ img/logo.jpg           ← se incrusta en base64
+│  ├─ ejemplos/*.csv         ← capturas del desplegable «Ejemplos…»: soltar aquí el CSV y construir (nombre = archivo sin «N » inicial)
 │  └─ vendor/jspdf.umd.min.js ← jsPDF 2.5.1 (MIT), sin tocar
 ├─ assets/logo_ortu_automocion.jpg
 ├─ tests/                    ← pruebas de regresión en navegador real (Playwright) + datos de ejemplo
@@ -68,7 +69,7 @@ Un archivo por sección, en este orden (cada uno empieza con `/* ---------- … 
 * `10-instrucciones.js` – objeto `DOCS` (es/en) + `renderDocs()`.
 * `11-anotaciones.js` – `setTool`, `annDown/Move/Up`, `drawAnn`.
 * `12-interaccion.js` – `hit()`, `lockMove()`, manejadores de puntero/rueda, CSV/sesión.
-* `13-simulador.js` – simulador (fuente «Simulador» + «Iniciar»).
+* `13-ejemplos.js` – desplegable «Ejemplos…» (capturas de `src/ejemplos/`, que `build.js` incrusta en `EJEMPLOS`).
 * `14-pdf-y-arranque.js` – `saveFile()`, `report()` (PDF), cableado de botones y `ui();sync();draw();…`.
 
 ### Estado global (los nombres importan)
@@ -113,7 +114,9 @@ ancla por defecto `ph.t0 + T/2` (el cilindro 1 a 360° de INICIO) hasta que se a
 * **Sin bandas de color a toda altura** para identificar cilindros: se usan círculos dorados numerados (estilo «Pressure Waveform Overlays»); las filas verticales por cilindro son una opción aparte.
 * Orden de siglas en listas/tablas: **AAA · RCE · AAE · RCA**. Sobre la señal las reglas se colocan en orden cronológico AAE, AAA, RCE, RCA.
 * PMS **independiente** de INICIO. Ángulos de distribución **siempre positivos** (con ⚠ si hay inversión).
-* Secciones del panel izquierdo plegadas por defecto (como «Sincronización por disparo»); **ajustes de canales desplegados por defecto**.
+* Al iniciar (petición de Ortu): «Regla de fase» e «Identificación de cilindros» **desplegadas**, «Cilindros» activo en «Tiempos de cilindros · rejilla»; el resto de secciones plegadas; ajustes de canales desplegados.
+* Sin simulador ni «Fuente»: en su lugar el desplegable **«Ejemplos…»**.
+* **«Exportar CSV»** = archivo completo, valores **sin filtrar** (`y0`) + 1.ª línea `#analyzer-scope-ajustes;{json}` (`cfgOf`/`applyCfg`); al reabrirlo se recupera todo. Otros programas verán esa línea extra.
 * Se quitó la exportación `.psdata` (no se puede generar el formato nativo de PicoScope).
 * Los órdenes de encendido de 10, 12 y 16 cilindros son **de referencia** (avisar al usuario de que los confirme con el manual).
 
@@ -143,7 +146,7 @@ ancla por defecto `ph.t0 + T/2` (el cilindro 1 a 360° de INICIO) hasta que se a
 **Editar**: el archivo de `src/` que toque (JS en `src/js/`, estilos en `src/css/`, interfaz en `src/index.html`). Después:
 ```
 node --check src/js/<archivo>.js
-cd tests && npm install && npx playwright install chromium && npm test   # construye dist/ y pasa 40 comprobaciones
+cd tests && npm install && npx playwright install chromium && npm test   # construye dist/ y pasa 51 comprobaciones
 ```
 Antes de subir a git: `node build.js --check` (falla si `dist/` no se reconstruyó).
 `smoke.js` abre la página en Chromium real, carga los CSV de `tests/data` (con la red bloqueada), y comprueba carga, páginas, fondo, ajustes, sincronización, distribución, idioma (busca español sobrante en inglés), instrucciones, unión, conversión, GIF y errores JS.

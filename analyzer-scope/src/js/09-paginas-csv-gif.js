@@ -13,8 +13,10 @@ function splitBlocks(txt){
   return st0.map((a,k)=>L.slice(a,st0[k+1]).join('\n'));
 }
 function parseAny(text,name){
+  let cfg=null;const m=/^\uFEFF?#analyzer-scope-ajustes;([^\r\n]*)\r?\n/.exec(text);
+  if(m){try{cfg=JSON.parse(m[1])}catch(e){}text=text.slice(m[0].length)}
   const blocks=text.length<30e6?splitBlocks(text):[text],res=[];let err=null;
-  blocks.forEach((b,i)=>{try{const r=parseText(b);res.push({name:name+(blocks.length>1?' · bloque '+(i+1):''),chs:r.chs,n:r.n,meta:r.meta})}catch(e){err=err||e}});
+  blocks.forEach((b,i)=>{try{const r=parseText(b);res.push({name:name+(blocks.length>1?' · bloque '+(i+1):''),chs:r.chs,n:r.n,meta:r.meta,cfg:i===0?cfg:null})}catch(e){err=err||e}});
   if(!res.length)throw err||new Error('archivo vacío');return res;
 }
 /* ---- páginas ---- */
@@ -25,13 +27,14 @@ function showPage(i){
     if(d){Object.assign(c,{n:d.n,u:d.u||'V',x:d.x,y0:d.y,y:d.y,on:true});proc(c);if(!c._set){c.h=null;autoCh(k);c._set=true}}
     else{c.x=c.y=c.y0=null;c.on=false;c._set=false}});
   if(!viewSet){fit();viewSet=true}
+  if(p.cfg&&!p.cfgOk){p.cfgOk=true;applyCfg(p.cfg)}
   ui();sync();draw();updPager();
 }
 function updPager(){
   const N=PG.length;$('pgbar').hidden=N<2;$('pgR').max=Math.max(1,N);$('pgR').value=pgI+1;
   $('pgL').textContent=(pgI+1)+' / '+N;$('pgNm').textContent=PG[pgI]?PG[pgI].name:'';
   $('gA').max=$('gB').max=Math.max(1,N);if(!gTouched||+$('gB').value>N)$('gB').value=N;if(+$('gA').value>N)$('gA').value=1;
-  $('gInfo').textContent=N?N+' página(s) cargada(s). Elige el rango y crea el GIF.':'No hay páginas cargadas: añade archivos en «Convertir archivos» o con «Abrir archivos…».';
+  $('gInfo').textContent=N?N+' página(s) cargada(s). Elige el rango y crea el GIF.':'No hay páginas cargadas: añade archivos en «Unir y convertir CSV» o con «Abrir archivos…».';
 }
 async function loadFiles(files){
   const msg=[],pages=[],asCh=$('fmode').value==='channels';
@@ -42,7 +45,7 @@ async function loadFiles(files){
       const h2=await f.slice(0,80).text();if(h2.includes('ortu-psdata')){st('Leyendo sesión…');msg.push(await importSession(f));continue}
       st('Leyendo '+f.name+'…');await new Promise(q=>setTimeout(q,30));
       const ds=parseAny(await f.text(),f.name);ds.forEach(d=>pages.push(d));
-      msg.push(f.name+': '+ds.map(d=>d.chs.length+' canal(es), '+d.n+' muestras').join(' | ')+(ds.length>1?' ('+ds.length+' páginas)':''));
+      msg.push(f.name+': '+ds.map(d=>d.chs.length+' canal(es), '+d.n+' muestras').join(' | ')+(ds.length>1?' ('+ds.length+' páginas)':'')+(ds[0].cfg?' · ajustes recuperados':''));
     }catch(e){msg.push(f.name+': '+e.message)}
   }
   if(pages.length){
@@ -122,7 +125,7 @@ function gifEncode(fr,delay,loop){
 }
 const gst=m=>{$('gSt').textContent=m};
 async function makeGif(){
-  const N=PG.length;if(!N)return gst('No hay páginas cargadas: añade archivos en «Convertir archivos» o con «Abrir archivos…».');
+  const N=PG.length;if(!N)return gst('No hay páginas cargadas: añade archivos en «Unir y convertir CSV» o con «Abrir archivos…».');
   let a=Math.max(1,Math.min(N,+$('gA').value||1)),b=Math.max(1,Math.min(N,+$('gB').value||N));if(a>b)[a,b]=[b,a];
   const W=+$('gW').value||800,th=$('gT').value||'dark',delay=+$('gD').value||600,loop=$('gL').checked,keep=pgI,was=curTab,fr=[];
   $('gMk').disabled=true;showTab('S');await tick();

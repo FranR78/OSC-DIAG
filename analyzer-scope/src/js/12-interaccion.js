@@ -68,15 +68,30 @@ $('bFit').onclick=()=>{CH.forEach((c,i)=>c.x&&autoCh(i));fit();ui();draw()};
 $('bClr').onclick=()=>{stop();CH.forEach(c=>{c.x=c.y=c.y0=null;c.h=null;c.on=false;c._set=false});PG.length=0;pgI=0;updPager();cur={a:null,b:null};ui();draw();st('Limpio.')};
 document.body.addEventListener('dragover',e=>e.preventDefault());
 document.body.addEventListener('drop',e=>{e.preventDefault();loadFiles([...e.dataTransfer.files])});
-function visRange(){const A=CH.filter(c=>c.on&&c.x);if(!A.length)return null;const x=A[0].x,a=lb(x,view.t0),b=Math.min(x.length,lb(x,view.t0+view.span));return{A,x,a,b}}
-const chLab=c=>(c.n+(c.p?' - '+c.p:'')).replace(/;/g,',');
+/* CSV con ajustes: 1.ª línea «#analyzer-scope-ajustes;{json}» + archivo completo con valores sin filtrar (y0) */
+const CHK=['n','p','on','vd','off','hr','h','fl','f1','f2','inv'];
+function cfgOf(A){
+  const cp=o=>JSON.parse(JSON.stringify(o));
+  return{v:1,ch:A.map(c=>{const o={};CHK.forEach(k=>o[k]=c[k]);return o}),sel:Math.max(0,A.indexOf(CH[sel])),view:cp(view),cur:cp(cur),
+    ph:cp(ph),pms:cp(pms),tr:cp(tr),tr2:cp(tr2),amp:cp(amp),adv:cp(adv),vv:cp(vv),eng:cp(eng),bg:bgV,ann:cp(ann.list),
+    sec:['oPh','oCy','oAv','sOn'].filter(id=>$(id).checked)};
+}
+function applyCfg(j){
+  (j.ch||[]).forEach((q,k)=>{const c=CH[k];if(!c||!c.x)return;CHK.forEach(f=>{if(q[f]!==undefined)c[f]=q[f]});proc(c);c._set=true});
+  [[view,j.view],[cur,j.cur],[ph,j.ph],[pms,j.pms],[tr,j.tr],[tr2,j.tr2],[amp,j.amp],[adv,j.adv],[vv,j.vv],[eng,j.eng]].forEach(([o,v])=>v&&Object.assign(o,v));
+  if(j.sel!=null&&CH[j.sel]&&CH[j.sel].x)sel=j.sel;if(j.bg!=null){bgV=j.bg;$('bgR').value=Math.round(bgV*100)}if(j.ann)ann.list=j.ann;
+  if(j.sec)['oPh','oCy','oAv','sOn'].forEach(id=>{$(id).checked=j.sec.includes(id);$(id).onchange()});
+  $('phR').value=ph.deg;$('phD').value=ph.div;$('gN').value=eng.n;$('rpm').value=ph.T>0&&!ph.auto?Math.round(120/ph.T):'';
+  $('cPk').checked=!!eng.pk;$('advk').value=adv.k;fillG();fillSC();if(eng.sync)$('sC').value=eng.sync.ch;cylList();
+}
 $('bExp').onclick=()=>{
-  const r=visRange();if(!r)return st('Nada que exportar.');const{A,x,a,b}=r;
-  const val=(c,i)=>c.x===x||c.y.length===x.length?c.y[i]:c.y[Math.min(c.y.length-1,lb(c.x,x[i]))],nf=v=>(+v).toFixed(8).replace('.',',');
-  const out=[i18('Tiempo')+';'+A.map(chLab).join(';'),'(ms);'+A.map(c=>'('+c.u+')').join(';'),''];
-  for(let i=a;i<b;i++)out.push(nf(x[i]*1000)+';'+A.map(c=>nf(val(c,i))).join(';'));
-  saveFile('vista_exportada.csv',new Blob([out.join('\r\n')],{type:'text/csv'}));
-  st('CSV exportado (separador «;» y coma decimal; valores tras filtro e inversión).');
+  const A=CH.filter(c=>c.x);if(!A.length)return st('Nada que exportar.');const x=A[0].x;
+  const val=(c,i)=>c.x===x||c.y0.length===x.length?c.y0[i]:c.y0[Math.min(c.y0.length-1,lb(c.x,x[i]))],nf=v=>(+v).toFixed(8).replace('.',',');
+  const out=['#analyzer-scope-ajustes;'+JSON.stringify(cfgOf(A)),i18('Tiempo')+';'+A.map(c=>String(c.n||'CH').replace(/;/g,',')).join(';'),'(ms);'+A.map(c=>'('+c.u+')').join(';'),''];
+  for(let i=0;i<x.length;i++)out.push(nf(x[i]*1000)+';'+A.map(c=>nf(val(c,i))).join(';'));
+  const nm=((PG[pgI]&&PG[pgI].name)||'captura').replace(/\.[^.]+$/,'').replace(/_ajustes$/,'');
+  saveFile(nm+'_ajustes.csv',new Blob([out.join('\r\n')],{type:'text/csv'}));
+  st('CSV exportado con los ajustes (archivo completo, valores sin filtrar; al abrirlo aquí se recuperan escalas, reglas, cilindros, filtros y anotaciones).');
 };
 async function importSession(f){
   const j=JSON.parse(await f.text()),u8=s=>{const b=atob(s),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a.buffer};

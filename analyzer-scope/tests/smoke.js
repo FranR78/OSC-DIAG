@@ -27,9 +27,12 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
 
   console.log('\n1 · Arranque');
   check('título con los créditos', (await p.title()).includes('J.A.Ortúñez') && (await p.title()).includes('Fran Rosales'));
-  check('seis pestañas', (await p.$$eval('#tabs .tab', e => e.map(x => x.textContent))).join('|') === 'Osciloscopio|Diagrama de distribución|Convertir archivos|GIF|Instrucciones|Objetivo');
+  check('seis pestañas', (await p.$$eval('#tabs .tab', e => e.map(x => x.textContent))).join('|') === 'Osciloscopio|Diagrama de distribución|Unir y convertir CSV|GIF|Instrucciones|Objetivo');
   check('ajustes de canales visibles por defecto', await E(() => !document.getElementById('leftp').classList.contains('nos')));
   check('sección «Sincronización» plegada por defecto', await E(() => document.getElementById('sBox').hidden));
+  check('«Regla de fase» e «Identificación de cilindros» desplegadas al iniciar', await E(() => !$('bPh').hidden && !$('bCy').hidden && $('oPh').checked && $('oCy').checked));
+  check('Cilindros activo con «Tiempos de cilindros · rejilla»', await E(() => eng.on && eng.show === -1 && $('gS').selectedOptions[0].textContent === 'Tiempos de cilindros · rejilla' && $('tGr').classList.contains('on')));
+  check('sin «Fuente»/simulador; desplegable «Ejemplos» con capturas', await E(() => !$('src') && !$('bRun') && $('ex').options.length === EJEMPLOS.length + 1 && EJEMPLOS.length >= 1));
 
   console.log('\n2 · Varios CSV como páginas');
   await p.setInputFiles('#fi', CAPS); await p.waitForTimeout(900);
@@ -91,13 +94,13 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   await E(() => { for (const id of ['oPh', 'oCy', 'oAv', 'sOn']) { const c = document.getElementById(id); c.checked = true; c.dispatchEvent(new Event('change')); } });
   await click('#lEN'); await p.waitForTimeout(300);
   const left = [];
-  const tabTxt = () => E(() => { const o = [document.body.innerText]; document.querySelectorAll('[title],[placeholder]').forEach(e => { ['title', 'placeholder'].forEach(a => { const v = e.getAttribute(a); if (v) o.push(v); }); }); return o.join('\n'); });
+  const tabTxt = () => E(() => { let bt = document.body.innerText; [...document.querySelectorAll('#ex option')].slice(1).forEach(op => { bt = bt.split(op.textContent).join(''); }); const o = [bt]; document.querySelectorAll('[title],[placeholder]').forEach(e => { ['title', 'placeholder'].forEach(a => { const v = e.getAttribute(a); if (v) o.push(v); }); }); return o.join('\n'); });
   for (const t of ['#tabS', '#tabD', '#tabF', '#tabG', '#tabI', '#tabO']) { await click(t); await p.waitForTimeout(150); left.push(...spanish(await tabTxt())); }
   check('sin texto en español en inglés (todas las pestañas)', left.length === 0, JSON.stringify([...new Set(left)]));
   check('mensajes de estado traducidos', await E(() => { st('Nada que exportar.'); return document.getElementById('st').textContent; }) === 'Nothing to export.');
   await click('#tabS'); await click('#lES'); await p.waitForTimeout(200);
-  check('al volver a español se restauran los textos', (await p.textContent('#tabF')) === 'Convertir archivos' && (await p.textContent('#bSet')) === 'Ajustes');
-  check('Iniciar/Parar no depende del texto traducido', await (async () => { await click('#lEN'); await p.selectOption('#src', 'sim'); await click('#bRun'); await click('#bRun'); const t = await p.textContent('#bRun'); await p.selectOption('#src', 'file'); await click('#lES'); return t === 'Start'; })());
+  check('al volver a español se restauran los textos', (await p.textContent('#tabF')) === 'Unir y convertir CSV' && (await p.textContent('#bSet')) === 'Ajustes');
+  check('«Ejemplos» traducido en inglés', await (async () => { await click('#lEN'); const t = await p.$eval('#ex option', o => o.textContent); await click('#lES'); return t === 'Examples…'; })());
 
   console.log('\n8 · Instrucciones: los nombres citados existen en la interfaz');
   for (const [lang, id, re] of [['es', '#lES', /«[^»]+»/g], ['en', '#lEN', /“[^”]+”/g]]) {
@@ -152,6 +155,22 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     ev('pointerdown', 1, cx - 50); ev('pointerdown', 2, cx + 50); ev('pointermove', 2, cx + 150); ev('pointermove', 1, cx - 150); ev('pointerup', 1, cx - 150); ev('pointerup', 2, cx + 150);
     return Math.abs(view.span / s0 - 1 / 3) < 0.02 && pinch === null && TP.size === 0; }), await E(() => view.span));
   await p.setViewportSize({ width: 1500, height: 950 });
+
+  console.log('\n13 · Ejemplos y CSV con ajustes');
+  await click('#bClr').catch(() => {}); await E(() => { PG.length = 0; });
+  await p.selectOption('#ex', '0'); await p.waitForTimeout(700);
+  check('el ejemplo se carga como página', await E(() => PG.length === 1 && CH[0].x && CH[0].x.length > 100 && /Ejemplo cargado/.test($('st').textContent)));
+  const before = await E(() => { CH[1].vd = 5; CH[1].off = 1.5; CH[1].p = 'Sensor PMS'; CH[2].inv = true; CH[0].fl = 'lp'; CH[0].f1 = 300; proc(CH[0]); proc(CH[2]);
+    view.t0 += view.span * 0.1; view.span *= 0.5; pms.on = true; pms.t = view.t0 + view.span / 3; eng.n = 6; eng.order = [1,5,3,6,2,4]; ann.list.push({ k: 'text', col: '#ffd24d', w: 2, x1: view.t0, y1: .5, txt: 'nota' });
+    fillG(); ui(); draw(); return JSON.stringify([CH.slice(0,3).map(c => [c.vd, c.off, c.p, c.inv, c.fl, c.f1, c.y[5]]), view, pms, eng.n, eng.order, ann.list.length]); });
+  const [dlx] = await Promise.all([p.waitForEvent('download'), click('#bExp')]);
+  const csvPath = path.join(require('os').tmpdir(), 'as_ajustes.csv'); await dlx.saveAs(csvPath);
+  check('CSV exportado: 1.ª línea con ajustes y nombre «…_ajustes.csv»', fs.readFileSync(csvPath, 'utf8').startsWith('#analyzer-scope-ajustes;{') && /_ajustes\.csv$/.test(dlx.suggestedFilename()), dlx.suggestedFilename());
+  await E(() => { PG.length = 0; CH.forEach(c => { c.x = c.y = c.y0 = null; c.on = false; c._set = false; c.vd = 1; c.off = 0; c.p = ''; c.inv = false; c.fl = 'off'; }); pms.on = false; eng.n = 4; ann.list = []; });
+  await p.setInputFiles('#fi', csvPath); await p.waitForTimeout(800);
+  const after = await E(() => JSON.stringify([CH.slice(0,3).map(c => [c.vd, c.off, c.p, c.inv, c.fl, c.f1, c.y[5]]), view, pms, eng.n, eng.order, ann.list.length]));
+  check('al reabrirlo se recuperan los ajustes (canales, filtros, vista, PMS, cilindros, anotaciones)', before === after, before + '\n    ≠ ' + after);
+  check('mensaje «ajustes recuperados»', /ajustes recuperados/.test(await p.textContent('#st')));
 
   console.log('\nErrores JS durante la sesión:', errs.length);
   errs.forEach(e => console.log('  !', e));

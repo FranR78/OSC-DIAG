@@ -7,6 +7,7 @@
  * Plantilla: src/index.html. Marcadores (no se buscan dentro de lo incluido):
  *   {{ruta}}          contenido de src/ruta tal cual
  *   {{base64:ruta}}   archivo en base64 (para data: URI)
+ *   {{ejemplos:dir}}  los .csv de src/dir como JSON [{name, txt}] (el desarrollador añade ejemplos soltándolos ahí)
  *   {{js/*.js}}       todos los .js de src/js en orden alfabético (un solo <script>, ámbito global compartido)
  * Sin dependencias. */
 const fs = require('fs'), path = require('path');
@@ -17,6 +18,12 @@ function build() {
   const tpl = rd('index.html').toString('utf8');
   const html = tpl.replace(/\{\{([^{}]+)\}\}/g, (_, k) => {
     if (k.startsWith('base64:')) return rd(k.slice(7)).toString('base64');
+    if (k.startsWith('ejemplos:')) {  // CSV de ejemplo → [{name, txt}] (nombre = archivo sin extensión ni número inicial)
+      const d = k.slice(9), dir = path.join(SRC, d);
+      const list = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => /\.csv$/i.test(f)).sort((a, b) => a.localeCompare(b, 'es', { numeric: true }))
+        .map(f => ({ name: f.replace(/\.csv$/i, '').replace(/^\d+[\s._-]+/, ''), txt: rd(d + '/' + f).toString('utf8').replace(/^\uFEFF/, '') })) : [];
+      return JSON.stringify(list).replace(/<\//g, '<\\/').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+    }
     if (k === 'js/*.js') return fs.readdirSync(path.join(SRC, 'js')).filter(f => f.endsWith('.js')).sort().map(f => rd('js/' + f).toString('utf8')).join('');
     return rd(k).toString('utf8');
   });

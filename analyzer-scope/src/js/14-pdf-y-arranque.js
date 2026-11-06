@@ -1,5 +1,6 @@
 /* ---------- Guardar archivos, informe PDF y arranque ---------- */
 async function saveFile(name,blob){
+  name=String(name).replace(/\s*[^\p{L}\p{N} ._()+-]+\s*/gu,'_').replace(/_+/g,'_');  // el navegador rechaza nombres con «·», «/»…
   try{const d=window.claude&&await claude.use('downloads');
     if(d){try{await d.save({filename:name,data:blob});return}catch(e){if(e&&e.code==='rejected_extension'){await d.save({filename:name+'.json',data:blob});return}throw e}}}
   catch(e){if(e&&e.code==='declined')return}
@@ -56,13 +57,13 @@ $('phD').onchange=()=>{ph.div=+$('phD').value;draw()};
 function fillG(){
   $('gO').innerHTML=ORD[eng.n].map((o,i)=>'<option value="'+i+'">'+o+'</option>').join('')+'<option value="u">Usuario</option>';
   const i=ORD[eng.n].indexOf(eng.order.join('-'));$('gO').value=i>=0?i:'u';
-  $('gS').innerHTML='<option value="0">Todos · identificación</option><option value="-1">Tiempos de los marcados · vertical</option>'+Array.from({length:eng.n},(_,k)=>'<option value="'+(k+1)+'">Cilindro '+(k+1)+' · 4 tiempos</option>').join('');
+  $('gS').innerHTML='<option value="0">Todos los cilindros</option><option value="-1">Tiempos de cilindros · rejilla</option>'+Array.from({length:eng.n},(_,k)=>'<option value="'+(k+1)+'">Cilindro '+(k+1)+' · 4 tiempos</option>').join('');
   $('gS').value=eng.show>eng.n?1:eng.show;$('gU').value=eng.order.join('-');
   $('sY').innerHTML=Array.from({length:eng.n},(_,k)=>'<option value="'+(k+1)+'">Cilindro '+(k+1)+'</option>').join('');$('sY').value=eng.c0<=eng.n?eng.c0:1;fillVis();
 }
 const parseOrd=s=>{const a=s.split(/[^0-9]+/).filter(Boolean).map(Number);return a.length===eng.n&&[...a].sort((p,q)=>p-q).every((v,i)=>v===i+1)?a:null};
 $('gN').innerHTML=[1,2,3,4,5,6,8,10,12,16].map(n=>'<option value="'+n+'">'+n+'</option>').join('');$('gN').value=4;
-$('gN').onchange=()=>{eng.n=+$('gN').value;eng.order=ORD[eng.n][0].split('-').map(Number);eng.show=0;eng.vis=null;eng.sync=null;eng.A=null;eng.c0=1;fillG();draw();cylList()};
+$('gN').onchange=()=>{eng.n=+$('gN').value;eng.order=ORD[eng.n][0].split('-').map(Number);eng.show=-1;eng.vis=null;eng.sync=null;eng.A=null;eng.c0=1;fillG();draw();cylList()};
 function fillVis(){const N=eng.n,v=eng.vis;let h='';for(let k=1;k<=N;k++)h+='<label><input type="checkbox" data-c="'+k+'" '+(!v||v[k-1]!==false?'checked':'')+'>'+k+'</label>';
   h+='<button data-a="all">Todos</button><button data-a="none">Ninguno</button>';$('cVis').innerHTML=h}
 $('cVis').onchange=e=>{const c=e.target&&e.target.dataset?e.target.dataset.c:null;if(c==null)return;if(!eng.vis)eng.vis=Array(eng.n).fill(true);eng.vis[+c-1]=e.target.checked;draw();cylList()};

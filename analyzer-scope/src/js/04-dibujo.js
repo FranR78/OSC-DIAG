@@ -59,7 +59,7 @@ function draw(theme){
   for(let i=0;i<=10;i++){const x=Math.round(M.l+i*pw/10)+.5;g.moveTo(x,M.t);g.lineTo(x,yb)}
   for(let i=0;i<=8;i++){const y=Math.round(M.t+i*hh/8)+.5;g.moveTo(M.l,y);g.lineTo(M.l+pw,y)}g.stroke();
   g.strokeStyle=GRIDB;g.strokeRect(M.l+.5,M.t+.5,pw-1,hh-1);
-  if(!CH.some(c=>c.x)){g.fillStyle=txc;g.textAlign='center';g.fillText('Abre un archivo CSV de tu osciloscopio o inicia el simulador',M.l+pw/2,M.t+hh/2)}
+  if(!CH.some(c=>c.x)){g.fillStyle=txc;g.textAlign='center';g.fillText('Abre un archivo CSV de tu osciloscopio o elige un ejemplo',M.l+pw/2,M.t+hh/2)}
   /* regla de tiempo (inferior) */
   g.strokeStyle=rk;g.fillStyle=txc;g.beginPath();
   for(let i=0;i<=10;i++){const x=Math.round(M.l+i*pw/10)+.5;g.moveTo(x,yb);g.lineTo(x,yb+7);
