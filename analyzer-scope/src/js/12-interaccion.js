@@ -65,24 +65,24 @@ $('bPan').onclick=()=>{const o=document.body.classList.toggle('pan');$('bPan').c
 $('bOpen').onclick=()=>$('fi').click();
 $('fi').onchange=e=>{loadFiles([...e.target.files]);e.target.value=''};
 $('bFit').onclick=()=>{CH.forEach((c,i)=>c.x&&autoCh(i));fit();ui();draw()};
-$('bClr').onclick=()=>{stop();CH.forEach(c=>{c.x=c.y=c.y0=null;c.h=null;c.on=false;c._set=false});PG.length=0;pgI=0;updPager();cur={a:null,b:null};ui();draw();st('Limpio.')};
+$('bClr').onclick=()=>{CH.forEach((c,i)=>{c.x=c.y=c.y0=null;c.h=null;c.on=false;c._set=false;if(c.m){c.m=null;c.mi='';c.n='CH'+(i+1)}});PG.length=0;pgI=0;updPager();cur={a:null,b:null};ui();draw();st('Limpio.')};
 document.body.addEventListener('dragover',e=>e.preventDefault());
 document.body.addEventListener('drop',e=>{e.preventDefault();loadFiles([...e.dataTransfer.files])});
 /* CSV con ajustes: 1.ª línea «#analyzer-scope-ajustes;{json}» + archivo completo con valores sin filtrar (y0) */
-const CHK=['n','p','on','vd','off','hr','h','fl','f1','f2','inv'];
+const CHK=['n','p','on','vd','off','hr','h','fl','f1','f2','inv','m'];
 function cfgOf(A){
   const cp=o=>JSON.parse(JSON.stringify(o));
-  return{v:1,ch:A.map(c=>{const o={};CHK.forEach(k=>o[k]=c[k]);return o}),sel:Math.max(0,A.indexOf(CH[sel])),view:cp(view),cur:cp(cur),
+  return{v:1,ch:A.map(c=>{const o={};CHK.forEach(k=>o[k]=c[k]);if(c.m)o.m=Object.assign({},c.m,{a:A.indexOf(CH[c.m.a]),b:c.m.b!=null?A.indexOf(CH[c.m.b]):null});return o}),sel:Math.max(0,A.indexOf(CH[sel])),view:cp(view),cur:cp(cur),
     ph:cp(ph),pms:cp(pms),tr:cp(tr),tr2:cp(tr2),amp:cp(amp),adv:cp(adv),vv:cp(vv),eng:cp(eng),bg:bgV,ann:cp(ann.list),
-    sec:['oPh','oCy','oAv','sOn'].filter(id=>$(id).checked)};
+    sec:['oPh','oCy','oAv','sOn','oMa'].filter(id=>$(id).checked)};
 }
 function applyCfg(j){
   (j.ch||[]).forEach((q,k)=>{const c=CH[k];if(!c||!c.x)return;CHK.forEach(f=>{if(q[f]!==undefined)c[f]=q[f]});proc(c);c._set=true});
   [[view,j.view],[cur,j.cur],[ph,j.ph],[pms,j.pms],[tr,j.tr],[tr2,j.tr2],[amp,j.amp],[adv,j.adv],[vv,j.vv],[eng,j.eng]].forEach(([o,v])=>v&&Object.assign(o,v));
   if(j.sel!=null&&CH[j.sel]&&CH[j.sel].x)sel=j.sel;if(j.bg!=null){bgV=j.bg;$('bgR').value=Math.round(bgV*100)}if(j.ann)ann.list=j.ann;
-  if(j.sec)['oPh','oCy','oAv','sOn'].forEach(id=>{$(id).checked=j.sec.includes(id);$(id).onchange()});
+  if(j.sec)['oPh','oCy','oAv','sOn','oMa'].forEach(id=>{$(id).checked=j.sec.includes(id);$(id).onchange()});
   $('phR').value=ph.deg;$('phD').value=ph.div;$('gN').value=eng.n;$('rpm').value=ph.T>0&&!ph.auto?Math.round(120/ph.T):'';
-  $('cPk').checked=!!eng.pk;$('advk').value=adv.k;fillG();fillSC();if(eng.sync)$('sC').value=eng.sync.ch;cylList();
+  $('cPk').checked=!!eng.pk;$('advk').value=adv.k;fillG();fillSC();if(eng.sync)$('sC').value=eng.sync.ch;cylList();mathAll();
 }
 $('bExp').onclick=()=>{
   const A=CH.filter(c=>c.x);if(!A.length)return st('Nada que exportar.');const x=A[0].x;

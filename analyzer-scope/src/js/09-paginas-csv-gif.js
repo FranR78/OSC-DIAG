@@ -24,8 +24,9 @@ function addPages(list){const first=PG.length;list.forEach(d=>PG.push(d));CH.for
 function showPage(i){
   if(!PG.length)return;i=Math.max(0,Math.min(PG.length-1,i));pgI=i;const p=PG[i];
   CH.forEach((c,k)=>{const d=p.chs[k];
-    if(d){Object.assign(c,{n:d.n,u:d.u||'V',x:d.x,y0:d.y,y:d.y,on:true});proc(c);if(!c._set){c.h=null;autoCh(k);c._set=true}}
+    if(d){Object.assign(c,{n:d.n,u:d.u||'V',x:d.x,y0:d.y,y:d.y,on:true,m:null,mi:''});proc(c);if(!c._set){c.h=null;autoCh(k);c._set=true}}
     else{c.x=c.y=c.y0=null;c.on=false;c._set=false}});
+  mathAll();
   if(!viewSet){fit();viewSet=true}
   if(p.cfg&&!p.cfgOk){p.cfgOk=true;applyCfg(p.cfg)}
   ui();sync();draw();updPager();
@@ -51,7 +52,7 @@ async function loadFiles(files){
   if(pages.length){
     if(asCh){let slot=CH.findIndex(c=>!c.x);
       pages.forEach(p=>p.chs.forEach(c=>{if(slot<0||slot>7){msg.push('Más de 8 canales: se omite '+c.n);return}
-        Object.assign(CH[slot],{n:c.n,x:c.x,y:c.y,y0:c.y,on:true,u:c.u||'V',fl:'off',inv:false,f1:500,f2:1000});autoCh(slot);slot=CH.findIndex(q=>!q.x)}));
+        Object.assign(CH[slot],{m:null,mi:'',n:c.n,x:c.x,y:c.y,y0:c.y,on:true,u:c.u||'V',fl:'off',inv:false,f1:500,f2:1000});autoCh(slot);slot=CH.findIndex(q=>!q.x)}));
       fit();ui();sync();draw()}
     else addPages(pages)}
   st(msg.join(' | ')+(pages.length>1&&!asCh?' · usa el cursor de páginas para recorrerlas':''));

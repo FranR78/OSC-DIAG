@@ -70,7 +70,8 @@ Un archivo por sección, en este orden (cada uno empieza con `/* ---------- … 
 * `11-anotaciones.js` – `setTool`, `annDown/Move/Up`, `drawAnn`.
 * `12-interaccion.js` – `hit()`, `lockMove()`, manejadores de puntero/rueda, CSV/sesión.
 * `13-ejemplos.js` – desplegable «Ejemplos…» (capturas de `src/ejemplos/`, que `build.js` incrusta en `EJEMPLOS`).
-* `14-pdf-y-arranque.js` – `saveFile()`, `report()` (PDF), cableado de botones y `ui();sync();draw();…`.
+* `14-matematicos.js` – **canales matemáticos** (`MK` plantillas, `mathCalc`, `mEdges` flancos con histéresis, `mResamp`): frecuencia, RPM desde CKP (hueco de rueda automático), ciclo útil, CAN-H−CAN-L con niveles, A±B, A×B, escala. Envuelve `proc` (recalcula si cambia el origen) y `ui` (`fillMath`). Definición en `c.m` (se guarda en el CSV con ajustes, índices remapeados).
+* `15-pdf-y-arranque.js` – `saveFile()`, `report()` (PDF), cableado de botones y `ui();sync();draw();…`.
 
 ### Estado global (los nombres importan)
 ```
@@ -136,6 +137,7 @@ ancla por defecto `ph.t0 + T/2` (el cilindro 1 a 360° de INICIO) hasta que se a
 2. ~~Formato `.RFE`~~ (descartado).
 3. ~~PDF con internet~~: hecho, jsPDF 2.5.1 (MIT) incrustado en el HTML.
 4. Regla de **PMI** propia (hoy se toma a ±180° del PMS).
+* **Siguiente (pedido por Ortu):** superponer capturas de distintos puntos (transductores en admisión, escape, cárter…) alineadas por la referencia del cilindro 1 y pasadas a grados (0–720°), para ver varios puntos del mismo coche en una vista. Ojo: no son simultáneas (motor estable).
 5. Umbrales de picos de compresión (5 %/10 %) y de detección (35 %) son elecciones propias.
 6. El GIF usa paleta fija (degradados algo menos finos); se podría añadir cuantización adaptativa.
 
@@ -146,7 +148,7 @@ ancla por defecto `ph.t0 + T/2` (el cilindro 1 a 360° de INICIO) hasta que se a
 **Editar**: el archivo de `src/` que toque (JS en `src/js/`, estilos en `src/css/`, interfaz en `src/index.html`). Después:
 ```
 node --check src/js/<archivo>.js
-cd tests && npm install && npx playwright install chromium && npm test   # construye dist/ y pasa 51 comprobaciones
+cd tests && npm install && npx playwright install chromium && npm test   # construye dist/ y pasa 59 comprobaciones
 ```
 Antes de subir a git: `node build.js --check` (falla si `dist/` no se reconstruyó).
 `smoke.js` abre la página en Chromium real, carga los CSV de `tests/data` (con la red bloqueada), y comprueba carga, páginas, fondo, ajustes, sincronización, distribución, idioma (busca español sobrante en inglés), instrucciones, unión, conversión, GIF y errores JS.

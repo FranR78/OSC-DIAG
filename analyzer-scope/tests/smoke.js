@@ -173,6 +173,33 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   check('al reabrirlo se recuperan los ajustes (canales, filtros, vista, PMS, cilindros, anotaciones)', before === after, before + '\n    ≠ ' + after);
   check('mensaje «ajustes recuperados»', /ajustes recuperados/.test(await p.textContent('#st')));
 
+  console.log('\n14 · Canales matemáticos');
+  await click('#bClr');
+  await E(() => CH.forEach(c => { c.fl = 'off'; c.inv = false; }));
+  await E(async () => { const fs = 2e5, N = 80000, L = ['Tiempo;MAF;CANH;CANL;CKP', '(ms);(V);(V);(V);(V)', '']; let ph = 0;
+    for (let i = 0; i < N; i++) { const t = i / fs, f = 1000 + 200 * Math.sin(2 * Math.PI * 5 * t); ph += f / fs; const sq = (ph % 1) < .5 ? 5 : 0, dom = Math.floor(t * 2000) % 2 === 1;
+      const tp = t * 800, pos = Math.floor(tp) % 60, ck = pos < 58 && (tp % 1) < .5 ? 5 : 0;   // rueda 60-2 a 800 rpm
+      L.push([(t * 1000).toFixed(6), sq, dom ? 3.5 : 2.5, dom ? 1.5 : 2.5, ck].join(';').replace(/\./g, ',')); }
+    await loadFiles([new File([L.join('\n')], 'sintetica.csv')]); });
+  await p.check('#oMa'); await p.waitForTimeout(100);
+  const mk = async (k, a, b) => { await p.selectOption('#mK', k); await E(() => mForm()); await p.selectOption('#mA', a); if (b) await p.selectOption('#mB', b); await click('#mGo'); await p.waitForTimeout(150); };
+  await mk('freq', '0');
+  const fq = await E(() => { const c = CH[5 - 1], at = t => c.y[lb(c.x, t)]; return c.m && c.m.k === 'freq' && c.u === 'Hz' ? [at(0.05), at(0.15)] : null; });
+  check('Frecuencia: sigue la modulación (1200 / 800 Hz ±1 %)', fq && Math.abs(fq[0] / 1200 - 1) < .01 && Math.abs(fq[1] / 800 - 1) < .01, JSON.stringify(fq));
+  await mk('rpm', '3');
+  const rp = await E(() => { const c = CH[5]; const a = lb(c.x, .05), b = lb(c.x, .35); let lo = 1e9, hi = 0; for (let i = a; i < b; i++) { lo = Math.min(lo, c.y[i]); hi = Math.max(hi, c.y[i]); } return c.u === 'rpm' ? [lo, hi] : null; });
+  check('RPM desde CKP 60-2: 800 rpm sin caídas en el hueco (±1 %)', rp && rp[0] > 792 && rp[1] < 808, JSON.stringify(rp));
+  await mk('can', '1', '2');
+  check('CAN: diferencial y niveles correctos (dominante 2,00 V ✓)', await E(() => CH[6].m && CH[6].m.k === 'can' && /dominante 2\.00 V/.test(CH[6].mi) && /✓$/.test(CH[6].mi)), await E(() => CH[6].mi));
+  check('el canal matemático se guarda en los ajustes del CSV', await E(() => { const j = cfgOf(CH.filter(c => c.x)); return j.ch[4].m.k === 'freq' && j.ch[4].m.a === 0 && j.ch[6].m.b === 2; }));
+  await E(() => { CH[0].inv = true; proc(CH[0]); });
+  check('si cambia el origen, se recalcula', await E(() => CH[4].y && Math.abs(CH[4].y[lb(CH[4].x, 0.05)] / 1200 - 1) < .02));
+  await E(() => { CH[0].inv = false; proc(CH[0]); });
+  { await click('#lEN'); await p.waitForTimeout(150); const t = await E(() => { const o = [$('leftp').innerText]; $('leftp').querySelectorAll('[title],[placeholder]').forEach(e => ['title', 'placeholder'].forEach(a => { const v = e.getAttribute(a); if (v) o.push(v); })); return o.join('\n'); });
+    const left = spanish(t.replace(/sintetica\.csv/g, '')); check('canales matemáticos traducidos al inglés', left.length === 0, JSON.stringify(left)); await click('#lES'); }
+  await p.click('#mL button[data-i="6"]');
+  check('✕ quita el canal matemático', await E(() => !CH[6].m && !CH[6].x));
+
   console.log('\nErrores JS durante la sesión:', errs.length);
   errs.forEach(e => console.log('  !', e));
   check('sin errores JS', errs.length === 0);

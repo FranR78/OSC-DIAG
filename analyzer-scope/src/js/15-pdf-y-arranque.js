@@ -89,7 +89,7 @@ fillG();
 [['kPh',ph],['kT',tr],['kT2',tr2],['kVv',vv]].forEach(([id,o])=>$(id).onclick=()=>{o.lk=!o.lk;sync();draw()});
 $('sK').onchange=()=>{$('sE').value=$('sK').value==='gas'?'down':'up'};
 $('bSy').onclick=syncCyl;$('sY').onchange=()=>{eng.c0=+$('sY').value;draw();cylList()};$('bDx').onclick=()=>{eng.A=null;draw();cylList()};
-[['oPh','bPh'],['oCy','bCy'],['oAv','bAv'],['sOn','sBox']].forEach(([c,b])=>{$(c).onchange=()=>{$(b).hidden=!$(c).checked}});
+[['oPh','bPh'],['oCy','bCy'],['oAv','bAv'],['sOn','sBox'],['oMa','bMa']].forEach(([c,b])=>{$(c).onchange=()=>{$(b).hidden=!$(c).checked}});
 $('bSet').onclick=()=>{const h=$('leftp').classList.toggle('nos');$('bSet').classList.toggle('on',!h)};
 $('bgR').oninput=()=>{bgV=$('bgR').value/100;draw()};
 $('lES').onclick=()=>setLang('es');$('lEN').onclick=()=>setLang('en');

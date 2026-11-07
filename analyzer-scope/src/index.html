@@ -70,6 +70,21 @@
 </div>
 <p class="hint">El primer disparo detectado se asigna al cilindro elegido y los siguientes siguen el orden de encendido. «Pulsos del canal»: elige «De un solo cilindro» si el canal es la inyección o el encendido de un único cilindro (un grupo de pulsos por ciclo; el piloto y el principal cuentan como un solo disparo) o «De todos» si trae los disparos de todos los cilindros.</p>
 </div>
+<hr>
+<label class="sec"><input type="checkbox" id="oMa"> <b>Canales matemáticos</b></label>
+<div id="bMa" hidden>
+<div style="display:grid;gap:6px;margin-top:6px">
+<label>Plantilla <select id="mK" style="max-width:100%"></select></label>
+<label>Canal A <select id="mA"></select></label>
+<label id="mBl">Canal B <select id="mB"></select></label>
+<label id="mZl">Dientes de la rueda (contando los que faltan) <input type="number" id="mZ" value="60" min="1" style="width:70px"></label>
+<div id="mSl" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><label>Factor <input type="number" id="mF" value="1" step="any" style="width:76px"></label><label>Desplazamiento <input type="number" id="mO" value="0" step="any" style="width:76px"></label><label>Unidad <input type="text" id="mU" maxlength="8" style="width:60px"></label></div>
+<label>Resultado en <select id="mD"></select></label>
+<div><button class="p" id="mGo">Crear canal</button></div>
+</div>
+<p class="hint" id="mH"></p>
+<div id="mL" class="tcy"></div>
+</div>
 </section>
 <section class="card">
 <div id="tabs"><button class="tab on" id="tabS">Osciloscopio</button><button class="tab" id="tabD">Diagrama de distribución</button><button class="tab" id="tabF">Unir y convertir CSV</button><button class="tab" id="tabG">GIF</button><button class="tab" id="tabI">Instrucciones</button><button class="tab" id="tabO">Objetivo</button></div>

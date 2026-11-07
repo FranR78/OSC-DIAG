@@ -61,7 +61,13 @@ sec:[
 'En la pestaña «GIF» eliges desde qué página hasta cuál, el retardo y el ancho, y creas una animación con las capturas.']},
 {h:'10 · Unir y convertir archivos',t:[
 'En «Unir y convertir CSV» añade los archivos en el orden que quieras: «Unir en un solo CSV» los concatena en el tiempo, «Convertir cada archivo a CSV» los convierte uno a uno y «Cargar como páginas en el osciloscopio» los abre para compararlos.']},
-{h:'11 · Idioma',t:[
+{h:'11 · Canales matemáticos',t:[
+'Despliega «Canales matemáticos», elige la «Plantilla», el «Canal A» (y el «Canal B» si hace falta) y pulsa «Crear canal». El resultado aparece en un canal libre y se escala, filtra e invierte como cualquier otro; se guarda con «Exportar CSV».',
+'<b>Frecuencia</b>: convierte un sensor digital de frecuencia (MAF o MAP de frecuencia) en una curva continua, parecida a la de un transductor de presión. Con la curva del sensor puedes pasar a la magnitud real (valor = Hz × factor + desplazamiento).',
+'<b>RPM desde el sensor de cigüeñal</b>: indica los dientes de la rueda contando los que faltan (60 para una 60-2); el hueco no produce caídas falsas.',
+'<b>CAN</b>: CAN-H − CAN-L con comprobación de niveles (dominante ≈2 V, recesivo ≈0 V). Indica si el bus falla, no qué unidad: para localizarla mide la terminación o desconecta unidades.',
+'<b>A − B, A + B, A × B, Escala y Ciclo útil</b> completan las plantillas (p. ej. pinza de 100 mV/A → «Escala» con factor 10 y unidad A).']},
+{h:'12 · Idioma',t:[
 'El selector Español | English de la esquina superior derecha cambia todos los textos de la aplicación.']}]}
 },
 en:{
@@ -125,7 +131,13 @@ sec:[
 'In the “GIF” tab you choose from which page to which, the delay and the width, and create an animation of the captures.']},
 {h:'10 · Join and convert files',t:[
 'In “Join and convert CSV” add the files in the order you want: “Join into a single CSV” concatenates them in time, “Convert each file to CSV” converts them one by one, and “Load as pages in the oscilloscope” opens them for comparison.']},
-{h:'11 · Language',t:[
+{h:'11 · Math channels',t:[
+'Open “Math channels”, choose the “Template”, “Channel A” (and “Channel B” if needed) and press “Create channel”. The result appears in a free channel and is scaled, filtered and inverted like any other; it is saved with “Export CSV”.',
+'<b>Frequency</b>: turns a digital frequency sensor (frequency MAF or MAP) into a continuous curve, similar to that of a pressure transducer. With the sensor curve you can get the real quantity (value = Hz × factor + offset).',
+'<b>RPM from the crankshaft sensor</b>: enter the wheel teeth counting the missing ones (60 for a 60-2); the gap causes no false drops.',
+'<b>CAN</b>: CAN-H − CAN-L with level check (dominant ≈2 V, recessive ≈0 V). It shows whether the bus fails, not which unit: to locate it, measure the termination or disconnect units.',
+'<b>A − B, A + B, A × B, Scale and Duty cycle</b> complete the templates (e.g. 100 mV/A clamp → “Scale” with factor 10 and unit A).']},
+{h:'12 · Language',t:[
 'The Español | English selector in the top-right corner changes all the texts of the application.']}]}
 }};
 function renderDocs(){
