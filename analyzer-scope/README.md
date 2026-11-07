@@ -161,6 +161,7 @@ Para depurar visualmente: `page.screenshot()` con Playwright y mirar la imagen (
 * Playwright `setInputFiles` falla en silencio con rutas con `Ñ`/`º`: copiar a un nombre ASCII.
 * `{…}` en el diccionario: las claves deben coincidir **exactamente** con el texto fuente (espacios incluidos); si se cambia un texto de la interfaz, cambiar también su clave.
 * En `distCalc` los valores internos conservan el signo; solo la **presentación** es positiva.
+* Las reglas AAA·RCE·AAE·RCA se miden con `w360` (PMS/PMI más cercano): la regla PMS puede estar en el PMS de compresión o en el de cruce. Con `w720` salía un desfase de 360° en los valores (el diagrama, circular, no lo mostraba).
 
 ---------------------------------------------------------------------------------------------------
 

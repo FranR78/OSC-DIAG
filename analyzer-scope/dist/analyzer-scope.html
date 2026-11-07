@@ -734,7 +734,8 @@ const dtxt=(v,a,b)=>Math.abs(v).toFixed(1)+'° '+(v>=0?a:b);
 function distCalc(){
   if(!(ph.T>0))return null;const R={};
   if([vv.ia,vv.fa,vv.ie,vv.fe].every(v=>v!=null)){
-    R.aae=-w720(rel(vv.ie)+180);R.aaa=-w720(rel(vv.ia));R.rce=w720(rel(vv.fe));R.rca=w720(rel(vv.fa)-180);
+    // w360: la regla PMS puede estar en el PMS de compresión o en el de cruce (separados 360°); cada regla se mide al PMS/PMI más cercano
+    R.aae=-w360(rel(vv.ie)+180);R.aaa=-w360(rel(vv.ia));R.rce=w360(rel(vv.fe));R.rca=w360(rel(vv.fa)-180);
     R.dadm=180+R.aaa+R.rca;R.desc=180+R.aae+R.rce;R.cruce=R.aaa+R.rce;R.ok=true}
   if(adv.t!=null){R.adv=w360(-rel(adv.t));R.advk=adv.k}
   return R;

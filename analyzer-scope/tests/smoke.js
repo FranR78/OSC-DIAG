@@ -87,6 +87,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   check('ángulos 15/15/45/45 en positivo', rows.slice(0, 4).map(r => r.split(' ').pop()).join(',') === '15.0°,15.0°,45.0°,45.0°');
   await click('#tabS'); await E(() => { vv.ia = pms.t + ph.T * 5 / 720; draw(); }); await click('#tabD'); await p.waitForTimeout(150);
   check('regla al otro lado: valor positivo con ⚠', /5\.0° ⚠/.test(await p.$eval('#dd', e => e.innerText)));
+  check('PMS en compresión (360° del de cruce): mismos valores, sin desfase de 360°', await E(() => { vv.ia = pms.t - ph.T * 15 / 720; const k = () => { const d = distCalc(); return ['aaa', 'rce', 'aae', 'rca', 'cruce'].map(q => d[q].toFixed(3)).join(','); }; const a = k(); pms.t += ph.T / 2; const b = k(); pms.t -= ph.T; const c = k(); pms.t += ph.T / 2; return a === b && a === c && distCalc().aaa.toFixed(1) === '15.0' || [a, b, c].join(' | '); }) === true, await E(() => [distCalc().aaa, distCalc().rce, distCalc().aae, distCalc().rca].map(v => v.toFixed(1)).join(',')));
   check('avance respecto a la regla PMS', await E(() => { adv.t = pms.t - ph.T * 12 / 720; return Math.abs(distCalc().adv - 12) < 1e-9; }));
   await click('#tabS');
 
