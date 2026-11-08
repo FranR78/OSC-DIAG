@@ -64,3 +64,4 @@ footer{text-align:center;color:var(--mu);font-size:12px;padding:6px 0 14px}
 #bMa>div{grid-template-columns:minmax(0,1fr)}#bMa label{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:0}#bMa select{max-width:100%;min-width:0}#mK{width:100%}
 #mSl{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))}#mSl label{display:grid;gap:2px;font-size:12px}#mSl input{width:100%!important;min-width:0}
 #mL .cy b{color:#ffd24d}#mL button{padding:0 7px;margin-left:6px}
+.dxr{max-height:none}.dxh h4{margin:8px 0 2px;color:var(--mu);font-size:12px}.dxc{display:flex;gap:6px;align-items:flex-start;margin:3px 0;font-size:12.5px}.dxc input{margin-top:3px}#xRes a{color:#8fc1ff;display:inline-block;margin:4px 8px 0 0}

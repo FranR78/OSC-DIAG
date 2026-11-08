@@ -144,7 +144,7 @@ async function makeGif(){
   }catch(e){gst('No se pudo crear el GIF: '+e.message)}
   showPage(keep);$('gMk').disabled=false;showTab(was);
 }
-function showTab(t){curTab=t;['S','D','F','G','I','O'].forEach(k=>{$('view'+k).hidden=t!==k;$('tab'+k).classList.toggle('on',t===k)});if(t==='D')distTab();else if(t==='S')draw();else if(t==='F')fRender();else if(t==='G')updPager();else renderDocs()}
+function showTab(t){curTab=t;['S','D','X','F','G','I','O'].forEach(k=>{$('view'+k).hidden=t!==k;$('tab'+k).classList.toggle('on',t===k)});if(t==='D')distTab();else if(t==='S')draw();else if(t==='F')fRender();else if(t==='G')updPager();else if(t==='X')dxTab();else renderDocs()}
 /* ---- cableado ---- */
 $('tabF').onclick=()=>showTab('F');$('tabG').onclick=()=>showTab('G');$('tabI').onclick=()=>showTab('I');$('tabO').onclick=()=>showTab('O');
 $('pgR').oninput=()=>showPage(+$('pgR').value-1);$('pgP').onclick=()=>showPage(pgI-1);$('pgN').onclick=()=>showPage(pgI+1);

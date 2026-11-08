@@ -51,7 +51,7 @@ function mathCalc(i){
     u=m.k==='mul'?(A.u||'V')+'·'+(B.u||'V'):A.u===B.u?A.u:(A.u||'V');
     if(m.k==='can'){let dm=[],rc=[];for(let k=0;k<n;k++){const v=y[k];if(v>.9)dm.push(v);else if(v<.5)rc.push(v)}
       const med=a=>{if(!a.length)return null;const s=Float32Array.from(a).sort();return s[s.length>>1]},bad=(a,l,h)=>a.length?a.filter(v=>v<l||v>h).length/a.length*100:0;
-      const md=med(dm),mr=med(rc),bd=bad(dm,1.5,3),br=bad(rc,-.5,.05);
+      const md=med(dm),mr=med(rc),bd=bad(dm,1.5,3),br=bad(rc,-.5,.05);c.ms={dom:md,rec:mr,fuera:dm.length+rc.length?(bd*dm.length+br*rc.length)/(dm.length+rc.length):null};
       c.mi=(md==null?'sin nivel dominante (bus en reposo o sin señal)':'dominante '+md.toFixed(2)+' V ('+bd.toFixed(0)+' % fuera de 1,5–3 V)')+' · '+(mr==null?'sin nivel recesivo':'recesivo '+mr.toFixed(2)+' V ('+br.toFixed(0)+' % fuera de −0,5–0,05 V)')+((bd>5||br>5||md==null||mr==null)?' ⚠':' ✓')}}
   if(MK[m.k].s){const f=+m.f||1,o=+m.o||0;if(f!==1||o!==0){for(let k=0;k<n;k++)y[k]=y[k]*f+o}if(m.u)u=m.u}
   const nw=!c.x;Object.assign(c,{x,y0:y,y,u,n:mNm[m.k](A.n,B?B.n:'')});_proc(c);

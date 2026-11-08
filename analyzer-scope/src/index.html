@@ -87,7 +87,7 @@
 </div>
 </section>
 <section class="card">
-<div id="tabs"><button class="tab on" id="tabS">Osciloscopio</button><button class="tab" id="tabD">Diagrama de distribución</button><button class="tab" id="tabF">Unir y convertir CSV</button><button class="tab" id="tabG">GIF</button><button class="tab" id="tabI">Instrucciones</button><button class="tab" id="tabO">Objetivo</button></div>
+<div id="tabs"><button class="tab on" id="tabS">Osciloscopio</button><button class="tab" id="tabD">Diagrama de distribución</button><button class="tab" id="tabX">Diagnóstico</button><button class="tab" id="tabF">Unir y convertir CSV</button><button class="tab" id="tabG">GIF</button><button class="tab" id="tabI">Instrucciones</button><button class="tab" id="tabO">Objetivo</button></div>
 <div id="viewS">
 <div id="tb">
 <button class="tog on" id="tPh" title="Conectar o desconectar las reglas de fase">Reglas de fase</button><button class="tog lk" id="kPh" title="Bloquear el ciclo: al arrastrar FIN (o INICIO) se desplaza el ciclo entero">🔓</button>
@@ -146,6 +146,21 @@
 </div>
 <p class="hint" id="fSt"></p>
 </div>
+<div id="viewX" hidden><div class="fgrid">
+<div class="fbox"><b>1 · Contexto</b>
+<label>Combustible <select id="xF"><option value="diesel">Diésel</option><option value="gasolina">Gasolina</option></select></label>
+<label>Código de motor (opcional) <input type="text" id="xC" maxlength="12" style="width:110px"></label>
+<label>Síntoma (opcional) <input type="text" id="xS" maxlength="120" placeholder="p. ej. ralentí irregular"></label>
+<label>Desfase de la señal respecto al PMS de compresión (°) <input type="number" id="xO" value="0" step="10" style="width:80px"></label>
+<div id="xSig"></div>
+</div>
+<div class="fbox"><b>2 · Medidas</b><div id="xMed" class="tcy"></div></div>
+<div class="fbox"><b>3 · Consulta al portal</b>
+<div class="row"><button class="p" id="xGo">Consultar diagnóstico</button></div>
+<div class="row"><input type="text" id="xQ" placeholder="Buscar notas técnicas…" style="flex:1;min-width:0"><button id="xBu">Buscar</button></div>
+<p class="hint" id="xSt"></p><div id="xRes" class="tcy dxr"></div>
+</div>
+</div></div>
 <div id="viewI" hidden><div id="docI" class="doc"></div></div>
 <div id="viewO" hidden><div id="docO" class="doc"></div></div>
 <div id="viewG" hidden>
@@ -165,6 +180,6 @@
 </section>
 </main>
 <footer>Ortu Automoción · ortuautomocion.com</footer>
-<script>const EJEMPLOS={{ejemplos:ejemplos}};</script>
+<script>const EJEMPLOS={{ejemplos:ejemplos}};const APP_CFG={{appcfg}};</script>
 <script>
 {{js/*.js}}</script></body></html>

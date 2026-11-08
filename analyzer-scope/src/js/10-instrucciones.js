@@ -67,7 +67,11 @@ sec:[
 '<b>RPM desde el sensor de cigüeñal</b>: indica los dientes de la rueda contando los que faltan (60 para una 60-2); el hueco no produce caídas falsas.',
 '<b>CAN</b>: CAN-H − CAN-L con comprobación de niveles (dominante ≈2 V, recesivo ≈0 V). Indica si el bus falla, no qué unidad: para localizarla mide la terminación o desconecta unidades.',
 '<b>A − B, A + B, A × B, Escala y Ciclo útil</b> completan las plantillas (p. ej. pinza de 100 mV/A → «Escala» con factor 10 y unidad A).']},
-{h:'12 · Idioma',t:[
+{h:'12 · Diagnóstico',t:[
+'La pestaña «Diagnóstico» reúne las medidas de la señal (todas Medido): pico a pico, rpm, desviación de cada cilindro respecto a la media, T1→T2, avance, distribución y niveles de CAN. Escribe el «Parámetro medido» de cada canal para que se reconozca qué es.',
+'Para las medidas por cilindro activa «Cilindros» y sincroniza. Si la señal se adelanta o se retrasa respecto al PMS de compresión (por ejemplo, un transductor en admisión), indícalo en «Desfase de la señal respecto al PMS de compresión (°)».',
+'En la versión del portal, «Consultar diagnóstico» busca en las notas técnicas: hallazgos, posibles causas y comprobaciones ordenadas, que puedes marcar y que pasan al «Informe PDF». Son posibles causas: confírmalas antes de sustituir piezas.']},
+{h:'13 · Idioma',t:[
 'El selector Español | English de la esquina superior derecha cambia todos los textos de la aplicación.']}]}
 },
 en:{
@@ -137,7 +141,11 @@ sec:[
 '<b>RPM from the crankshaft sensor</b>: enter the wheel teeth counting the missing ones (60 for a 60-2); the gap causes no false drops.',
 '<b>CAN</b>: CAN-H − CAN-L with level check (dominant ≈2 V, recessive ≈0 V). It shows whether the bus fails, not which unit: to locate it, measure the termination or disconnect units.',
 '<b>A − B, A + B, A × B, Scale and Duty cycle</b> complete the templates (e.g. 100 mV/A clamp → “Scale” with factor 10 and unit A).']},
-{h:'12 · Language',t:[
+{h:'12 · Diagnosis',t:[
+'The “Diagnosis” tab gathers the signal measurements (all Measured): peak to peak, rpm, deviation of each cylinder from the mean, T1→T2, advance, valve timing and CAN levels. Type the “Measured parameter” of each channel so that it is recognised.',
+'For per-cylinder measurements turn on “Cylinders” and synchronize. If the signal leads or lags the compression TDC (for example, an intake transducer), set it in “Signal offset from compression TDC (°)”.',
+'In the portal version, “Run diagnosis query” searches the technical notes: findings, possible causes and ordered checks, which you can tick and which go into the “PDF report”. They are possible causes: confirm them before replacing parts.']},
+{h:'13 · Language',t:[
 'The Español | English selector in the top-right corner changes all the texts of the application.']}]}
 }};
 function renderDocs(){

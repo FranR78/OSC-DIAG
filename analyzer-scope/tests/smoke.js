@@ -27,7 +27,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
 
   console.log('\n1 · Arranque');
   check('título con los créditos', (await p.title()).includes('J.A.Ortúñez') && (await p.title()).includes('Fran Rosales'));
-  check('seis pestañas', (await p.$$eval('#tabs .tab', e => e.map(x => x.textContent))).join('|') === 'Osciloscopio|Diagrama de distribución|Unir y convertir CSV|GIF|Instrucciones|Objetivo');
+  check('siete pestañas', (await p.$$eval('#tabs .tab', e => e.map(x => x.textContent))).join('|') === 'Osciloscopio|Diagrama de distribución|Diagnóstico|Unir y convertir CSV|GIF|Instrucciones|Objetivo');
   check('ajustes de canales visibles por defecto', await E(() => !document.getElementById('leftp').classList.contains('nos')));
   check('sección «Sincronización» plegada por defecto', await E(() => document.getElementById('sBox').hidden));
   check('«Regla de fase» e «Identificación de cilindros» desplegadas al iniciar', await E(() => !$('bPh').hidden && !$('bCy').hidden && $('oPh').checked && $('oCy').checked));
@@ -96,7 +96,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   await click('#lEN'); await p.waitForTimeout(300);
   const left = [];
   const tabTxt = () => E(() => { let bt = document.body.innerText; [...document.querySelectorAll('#ex option')].slice(1).forEach(op => { bt = bt.split(op.textContent).join(''); }); const o = [bt]; document.querySelectorAll('[title],[placeholder]').forEach(e => { ['title', 'placeholder'].forEach(a => { const v = e.getAttribute(a); if (v) o.push(v); }); }); return o.join('\n'); });
-  for (const t of ['#tabS', '#tabD', '#tabF', '#tabG', '#tabI', '#tabO']) { await click(t); await p.waitForTimeout(150); left.push(...spanish(await tabTxt())); }
+  for (const t of ['#tabS', '#tabD', '#tabX', '#tabF', '#tabG', '#tabI', '#tabO']) { await click(t); await p.waitForTimeout(150); left.push(...spanish(await tabTxt())); }
   check('sin texto en español en inglés (todas las pestañas)', left.length === 0, JSON.stringify([...new Set(left)]));
   check('mensajes de estado traducidos', await E(() => { st('Nada que exportar.'); return document.getElementById('st').textContent; }) === 'Nothing to export.');
   await click('#tabS'); await click('#lES'); await p.waitForTimeout(200);
@@ -200,9 +200,50 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   await p.click('#mL button[data-i="6"]');
   check('✕ quita el canal matemático', await E(() => !CH[6].m && !CH[6].x));
 
+  console.log('\n15 · Diagnóstico (versión libre)');
+  await click('#tabX'); await p.waitForTimeout(150);
+  check('libre: calcula medidas y avisa de que la consulta está en el portal', await E(() => APP_CFG.modo === 'libre' && $('xMed').children.length > 0 && /portal/.test($('xSt').textContent)));
+  await click('#xGo'); await p.waitForTimeout(100);
+  check('libre: «Consultar» no falla y remite al portal', /portal/.test(await p.textContent('#xSt')));
+  await click('#tabS');
+
   console.log('\nErrores JS durante la sesión:', errs.length);
   errs.forEach(e => console.log('  !', e));
   check('sin errores JS', errs.length === 0);
+  console.log('\n16 · Versión portal (google.script.run simulado, contrato v1)');
+  {
+    const pp = await ctx.newPage(); const perr = []; pp.on('pageerror', e => perr.push(String(e)));
+    await pp.addInitScript(() => {
+      const mk = (s, f) => ({ withSuccessHandler: x => mk(x, f), withFailureHandler: y => mk(s, y), apiDiagnostico: req => { (window.__reqs = window.__reqs || []).push(req); setTimeout(() => s(window.__resp(req)), 5); } });
+      window.google = { script: { run: mk(null, null) } };
+      window.__resp = req => req.op === 'diagnostico' ? { ok: true, v: 1, op: 'diagnostico', hallazgos: [{ regla: 'ADM-TRANS-R01', nt_id: 'ADM-TRANS-001', nt_titulo: 'Transductor en admisión', sintoma: 'Un pulso de depresión menor que el resto', confianza: 'media',
+          evidencia: [{ medida: 'desv_pulso_cil', canal: 'CH1', cilindro: 4, valor: -14.2, condicion: '< -10 %', etiqueta: 'Medido' }],
+          causas: [{ texto: 'Válvula de escape que no cierra', etiqueta: 'Inferido', como_separar: 'Prueba de fugas' }],
+          comprobaciones: [{ orden: 1, texto: 'Compresión relativa', tipo: 'medida' }, { orden: 2, texto: 'Prueba de fugas en el cilindro 4', tipo: 'prueba' }], url_portal: 'https://example.org/nt/ADM-TRANS-001' }],
+          relacionadas: [], sin_reglas: false, aviso: 'Posibles causas: confírmalas con las comprobaciones antes de sustituir piezas.' }
+        : req.op === 'buscar' ? { ok: true, v: 1, op: 'buscar', total: 1, resultados: [{ id: 'INY-1', titulo: 'Inyector PD', resumen: 'Resumen', url_portal: 'https://example.org/nt/INY-1' }] }
+        : { ok: true, v: 1, op: 'nt', nt: { id: 'INY-1', titulo: 'Inyector PD', cuerpo: '## Patrón\n- pico **20 A**\n<img src=x onerror="window.__xss=1">', valores_referencia: [{ magnitud: 'corriente de pico', min: 18, max: 22, unidad: 'A', etiqueta: 'Teórico OEM', fuente: 'Material del curso · PRV-0123', pagina: 45 }] } };
+    });
+    await pp.goto('file://' + path.resolve(__dirname, '..', 'dist', 'analyzer-scope-portal.html')); await pp.waitForTimeout(400);
+    await pp.setInputFiles('#fi', CAPS[0]); await pp.waitForTimeout(600);
+    await pp.evaluate(() => { CH[0].p = 'Presión admisión'; fit(); ph.auto = false; ph.t0 = view.t0; ph.T = view.span / 2.5; eng.A = null; eng.on = true; ui(); draw(); });
+    await pp.click('#tabX'); await pp.click('#xGo'); await pp.waitForTimeout(150);
+    const rq = await pp.evaluate(() => window.__reqs && window.__reqs[0]);
+    check('portal: petición «diagnostico» con contrato v1', rq && rq.v === 1 && rq.op === 'diagnostico' && rq.contexto.motor.cilindros === 4 && rq.contexto.senales[0].entidad === 'transductor admisión' && !('_cil' in rq), JSON.stringify(rq && rq.contexto));
+    check('portal: medidas por cilindro (desv_pulso_cil con 4 cilindros)', rq && rq.medidas.some(m => m.id === 'desv_pulso_cil' && Object.keys(m.por_cilindro).length === 4));
+    const tx = await pp.textContent('#xRes');
+    check('portal: hallazgo con cilindro, causas, comprobaciones y aviso', /cilindro 4/.test(tx) && /Válvula de escape/.test(tx) && /Prueba de fugas en el cilindro 4/.test(tx) && /confírmalas/.test(tx));
+    await pp.check('#xRes .dxc input >> nth=0');
+    await pp.click('#tabS');
+    const [pd] = await Promise.all([pp.waitForEvent('download'), pp.click('#bPdf')]);
+    const pdf = fs.readFileSync(await pd.path()).toString('latin1');
+    check('portal: el PDF incluye la página de diagnóstico con la comprobación marcada', /posibles causas y comprobaciones/.test(pdf) && /\[x\] 1\. Compresi/.test(pdf));
+    await pp.click('#tabX'); await pp.fill('#xQ', 'inyector'); await pp.click('#xBu'); await pp.waitForTimeout(100); await pp.click('#xRes button'); await pp.waitForTimeout(100);
+    check('portal: buscar → ver NT (texto seguro, sin HTML ejecutable)', await pp.evaluate(() => /Inyector PD/.test($('xRes').innerText) && /PRV-0123/.test($('xRes').innerText) && !$('xRes').querySelector('img') && !window.__xss));
+    check('portal: sin errores JS', perr.length === 0, perr.join(' | '));
+    await pp.close();
+  }
+
   console.log(`\nRESULTADO: ${ok} correctas, ${bad} fallidas`);
   await b.close(); process.exit(bad ? 1 : 0);
 })().catch(e => { console.log('FALLO DEL GUION:', e.message.split('\n')[0]); process.exit(2); });

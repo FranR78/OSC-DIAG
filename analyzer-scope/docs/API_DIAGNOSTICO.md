@@ -127,13 +127,15 @@ Respuesta:
 | `frecuencia` | Hz | Frecuencia media del canal |
 | `ciclo_util` | % | Ciclo útil medio |
 | `pico_pico`, `maximo`, `minimo`, `media` | unidad del canal | Valores del canal en la vista |
-| `desv_pulso_cil` | % | Desviación de la amplitud del pulso de cada cilindro respecto a la media (por_cilindro) |
-| `desv_pico_cil` | % | Desviación del pico de compresión por cilindro (por_cilindro) |
+| `desv_pulso_cil` | % | (pulso pico a pico del cilindro − media) / media de los pulsos × 100 (por_cilindro) |
+| `desv_pico_cil` | % | (pico del cilindro − media de los picos) / media de los pulsos × 100 (por_cilindro). Base = pulso medio, para que no se dispare si los picos rondan 0 |
 | `duracion_t1t2` | ms | Intervalo T1–T2 (p. ej. duración de inyección) |
 | `avance` | ° | A.Enc / A.Iny respecto al PMS (`k`: `enc`/`iny`) |
 | `aaa`, `rce`, `aae`, `rca`, `cruce` | ° | Distribución |
 | `can_dominante`, `can_recesivo` | V | Mediana del diferencial CAN |
 | `can_fuera_pct` | % | Muestras fuera de rango (dominante 1,5–3 V; recesivo −0,5–0,05 V) |
+
+Ventana de cada cilindro: ±(360°/n) alrededor de su PMS de compresión según la identificación de cilindros de la app, más el «Desfase» elegido en la pestaña (p. ej. un transductor de admisión ve el pulso del cilindro antes de su compresión). Se promedian todos los ciclos completos de la vista.
 
 Ampliar el catálogo = añadir una fila aquí (y el cálculo en la app). Una regla con una medida desconocida simplemente no se evalúa.
 
@@ -204,3 +206,14 @@ El workflow que compila `notas.json` copia `reglas` tal cual (validando: `id` ú
 3. `diagnostico` con el ejemplo de §4.1 → hallazgo `ADM-TRANS-R01` en el **cilindro 4**, con «{cil}» sustituido.
 4. Sin sesión ni token → `no_autenticado`; token caducado → `no_autorizado`.
 5. Medida desconocida en la petición → se ignora, sin error.
+
+---------------------------------------------------------------------------------------------------
+
+## 8. Integración de la versión portal (para la sesión del portal)
+
+* Archivo: `analyzer-scope/dist/analyzer-scope-portal.html` (lo genera `node build.js`; no editar a mano). Copiarlo al proyecto Apps Script como página HTML (p. ej. `analyzer-scope.html`).
+* Servirlo: `HtmlService.createHtmlOutputFromFile('analyzer-scope').setTitle('Analyzer Scope').setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)` desde la ruta que elija el portal (p. ej. `?pagina=scope`).
+* Función de servidor que llama la app (vía A): `function apiDiagnostico(peticion) { … return respuesta; }` — mismo objeto que `?api=diagnostico` (§1–4). Que compruebe la sesión igual que la ruta GET.
+* La app usa: `apiDiagnostico` (op `buscar`, `nt`, `diagnostico`). Nada más del servidor.
+* **Por verificar en el portal** (Inferido, no probado aquí): tamaño del archivo (~1,1 MB) dentro del proyecto Apps Script; descargas (PDF, CSV, GIF) desde el iframe de HtmlService/Sites.
+* Lo que la app ya hace (probado con un `google.script.run` simulado, `tests/smoke.js` §16): arma la petición v1, pinta hallazgos/causas/comprobaciones con casillas, `buscar` → `nt`, y añade la página de diagnóstico al PDF. Todo el contenido del portal se pinta como **texto** (sin HTML ejecutable).

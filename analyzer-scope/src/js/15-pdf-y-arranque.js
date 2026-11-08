@@ -38,6 +38,14 @@ async function report(){
     doc.setFontSize(13);doc.setTextColor(...hc);doc.text('Diagrama de distribución',180,42);
     let yy=52;doc.setFontSize(9);dr.forEach(([k,v])=>{const L=doc.splitTextToSize(cl(k),70);doc.setTextColor(...tc);doc.text(L,180,yy);doc.setTextColor(...hc);doc.text(cl(v),284,yy,{align:'right'});yy+=L.length*4.2+2.5});
     doc.setFontSize(7.5);doc.setTextColor(...mc);doc.text(doc.splitTextToSize('Referencia: la regla PMS marca los 0 grados. AAA y RCE se miden respecto al PMS; AAE y RCA, respecto al PMI. Ángulos siempre positivos.',105),180,yy+4)}
+  if(typeof DXR!=='undefined'&&DXR&&DXR.ok&&DXR.op==='diagnostico'&&(DXR.hallazgos||[]).length){foot();doc.addPage();page++;head();
+    doc.setFontSize(13);doc.setTextColor(...hc);doc.text('Diagnóstico · posibles causas y comprobaciones',10,34);let yy=42;
+    const line=(t,sz,colr,ind)=>{doc.setFontSize(sz);const L=doc.splitTextToSize(cl(t),270-(ind||0));if(yy+L.length*sz*.42>199){foot();doc.addPage();page++;head();yy=36}doc.setTextColor(...colr);doc.text(L,10+(ind||0),yy);yy+=L.length*sz*.42+1.5};
+    DXR.hallazgos.forEach(h=>{line(h.sintoma+' · confianza '+h.confianza+(h.nt_titulo?' · NT: '+h.nt_titulo:''),10,hc);
+      (h.evidencia||[]).forEach(e=>line(e.medida+(e.canal?' · '+e.canal:'')+(e.cilindro!=null?' · cilindro '+e.cilindro:'')+': '+e.valor+' ('+e.condicion+') · '+(e.etiqueta||'Medido'),8.5,tc,4));
+      (h.causas||[]).forEach(c=>line('- '+c.texto+' ('+c.etiqueta+')'+(c.como_separar?' - '+c.como_separar:''),8.5,tc,4));
+      (h.comprobaciones||[]).forEach(c=>line((c._ok?'[x] ':'[ ] ')+c.orden+'. '+c.texto+(c.esperado?' -> '+c.esperado:''),8.5,tc,8));yy+=2});
+    if(DXR.aviso)line(DXR.aviso,8,mc)}
   foot();
   await saveFile('informe_osciloscopio.pdf',doc.output('blob'));
 }

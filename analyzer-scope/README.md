@@ -4,7 +4,7 @@ Aplicación web de **análisis de señales de osciloscopio (hasta 8 canales) par
 Autores/créditos que deben aparecer: **J.A.Ortúñez y Fran Rosales**. Marca del taller: **Ortu Automoción** (logo en `assets/`).
 Idioma de trabajo con el usuario: **español**. La interfaz es bilingüe (español/inglés).
 
-Se distribuye como **un único archivo HTML autocontenido** (`dist/analyzer-scope.html`, ~520 KB con jsPDF incrustado). Funciona **sin internet**.
+Dos versiones del mismo código: **libre** `dist/analyzer-scope.html` (fuera del portal) y **portal** `dist/analyzer-scope-portal.html` (servida por la web app; pestaña «Diagnóstico» conectada a las NT, ver `docs/API_DIAGNOSTICO.md`). Cada una es **un único archivo HTML autocontenido** (`dist/analyzer-scope.html`, ~520 KB con jsPDF incrustado). Funciona **sin internet**.
 Se **edita** en módulos (`src/`) y se **construye** con `node build.js` (sin dependencias). `dist/` se sube a git: es lo que se entrega.
 Era un artefacto publicado de claude.ai (`https://claude.ai/artifact/Mo32r74KB8kD9ih1SZevHw`); en otro proyecto hay que **publicarlo de nuevo** (será otra URL).
 
@@ -71,6 +71,7 @@ Un archivo por sección, en este orden (cada uno empieza con `/* ---------- … 
 * `12-interaccion.js` – `hit()`, `lockMove()`, manejadores de puntero/rueda, CSV/sesión.
 * `13-ejemplos.js` – desplegable «Ejemplos…» (capturas de `src/ejemplos/`, que `build.js` incrusta en `EJEMPLOS`).
 * `14-matematicos.js` – **canales matemáticos** (`MK` plantillas, `mathCalc`, `mEdges` flancos con histéresis, `mResamp`): frecuencia, RPM desde CKP (hueco de rueda automático), ciclo útil, CAN-H−CAN-L con niveles, A±B, A×B, escala. Envuelve `proc` (recalcula si cambia el origen) y `ui` (`fillMath`). Definición en `c.m` (se guarda en el CSV con ajustes, índices remapeados).
+* `16-diagnostico.js` – pestaña **«Diagnóstico»**: `dxPeticion` (medidas del catálogo, por cilindro con `dxCyl`), `dxCall` (portal: `google.script.run.apiDiagnostico`; libre: GET opcional a `apiUrl` o aviso), pintado seguro con `T()` (texto, sin traductor), página en el PDF (`DXR`). `APP_CFG.modo` = `libre`|`portal` (lo fija `build.js`; `src/config.json` para `portalUrl`/`apiUrl` de la libre).
 * `15-pdf-y-arranque.js` – `saveFile()`, `report()` (PDF), cableado de botones y `ui();sync();draw();…`.
 
 ### Estado global (los nombres importan)
@@ -148,7 +149,7 @@ ancla por defecto `ph.t0 + T/2` (el cilindro 1 a 360° de INICIO) hasta que se a
 **Editar**: el archivo de `src/` que toque (JS en `src/js/`, estilos en `src/css/`, interfaz en `src/index.html`). Después:
 ```
 node --check src/js/<archivo>.js
-cd tests && npm install && npx playwright install chromium && npm test   # construye dist/ y pasa 59 comprobaciones
+cd tests && npm install && npx playwright install chromium && npm test   # construye las dos versiones y pasa 67 comprobaciones
 ```
 Antes de subir a git: `node build.js --check` (falla si `dist/` no se reconstruyó).
 `smoke.js` abre la página en Chromium real, carga los CSV de `tests/data` (con la red bloqueada), y comprueba carga, páginas, fondo, ajustes, sincronización, distribución, idioma (busca español sobrante en inglés), instrucciones, unión, conversión, GIF y errores JS.
