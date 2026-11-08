@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Analyzer Scope · by J.A.Ortúñez y Fran Rosales</title>
+<script>/* jsPDF 2.5.1 (MIT) incrustado: el PDF funciona sin internet */
+{{vendor/jspdf.umd.min.js}}
+</script>
+<style>
+{{css/styles.css}}</style></head><body>
+<header>
+<div class="logo"><img id="logo" alt="Ortu Automoción Diagnosis" src="data:image/jpeg;base64,{{base64:img/logo.jpg}}"></div>
+<div class="ttl"><h1>Analyzer Scope</h1><span>by J.A.Ortúñez y Fran Rosales</span></div>
+<span style="flex:1"></span>
+<button id="bPan" class="tog" title="Mostrar u ocultar el panel de canales">Canales</button>
+<button class="p" id="bOpen">Abrir archivos…</button>
+<input type="file" id="fi" multiple accept=".csv,.txt,.tsv,.psdata,.dat" hidden>
+<button id="bFit">Ajustar</button><button id="bClr">Limpiar</button>
+<select id="ex" title="Capturas de ejemplo incluidas en la aplicación"><option value="">Ejemplos…</option></select>
+<div class="lang" role="group" aria-label="Idioma / Language"><button id="lES" class="on" title="Español">Español</button><button id="lEN" title="English">English</button></div>
+</header>
+<main>
+<section class="card" id="leftp"><div class="chtop"><b>Canales</b><button id="bSet" class="tog on" title="Mostrar u ocultar los ajustes de todos los canales">Ajustes</button></div>
+<div class="ch hd"><span>Ver</span><span>Canal (clic = regla de amplitud)</span><span class="st">Escala</span><span class="st">Pos.</span><span class="st" title="Reglas de amplitud">Reglas</span></div>
+<div id="chs"></div>
+<p class="hint st">Fila inferior de cada canal: filtro (Hz, editables; doble pasada sin desfase) e Invertir. Usuario = paso bajo con corte de 500 Hz por defecto.</p>
+<hr>
+<label class="sec"><input type="checkbox" id="oPh" checked> <b>Regla de fase</b></label>
+<div id="bPh">
+<p class="hint">INICIO marca los 0° de la regla de fase; arrastra FIN para ajustar el ciclo y elige el rango y las divisiones. La regla PMS es independiente: señala el PMS real y es la referencia (0°) del diagrama de distribución y del avance.</p>
+<div style="display:grid;gap:6px;margin-top:6px">
+<label>RPM del motor <input type="number" id="rpm" min="1" style="width:84px" placeholder="p. ej. 800"></label>
+<label>Rango de grados <select id="phR"><option value="720">0 – 720°</option><option value="360">0 – 360°</option></select></label>
+<label>Divisiones <select id="phD"><option value="2">2</option><option value="4" selected>4</option><option value="8">8</option></select></label>
+<div style="display:flex;gap:6px;flex-wrap:wrap"><button id="bO">0° = T1</button><button id="bP" title="Copia una vez la posición del PMS al INICIO; después siguen siendo independientes">INICIO = PMS</button><button id="bAB">T1→T2 = 720°</button><button id="bAu">Vista = 720°</button></div>
+</div>
+<p class="hint" id="phi"></p>
+</div>
+<hr>
+<label class="sec"><input type="checkbox" id="oCy" checked> <b>Identificación de cilindros</b></label>
+<div id="bCy">
+<div style="display:grid;gap:6px;margin-top:6px">
+<label>Cilindros <select id="gN"></select></label>
+<label>Orden <select id="gO"></select></label>
+<label>Orden usuario <input type="text" id="gU" style="width:150px" placeholder="1-3-4-2"></label>
+<label>Mostrar <select id="gS"></select></label>
+<div id="cVisBox"><span style="color:var(--mu);font-size:12px">Cilindros a mostrar (círculos y tiempos):</span><div id="cVis" class="cvis"></div></div>
+<label><input type="checkbox" id="cPk"> Picos de compresión del canal seleccionado</label>
+</div>
+<p class="hint">Con «Cilindros» activado, los números (círculos dorados) están siempre visibles: arrastra cualquiera para deslizar todos a la vez, con el orden de encendido y una separación equidistante de 720°/n (n = número de cilindros). Si eliges «Cilindro n · 4 tiempos» en «Mostrar», se añaden sus cuatro tiempos sin quitar la numeración. Los órdenes son de referencia: confirma el de tu motor.</p>
+</div>
+<div id="tBox" hidden><b>Tiempos por cilindro (orden de encendido)</b><div id="tCy" class="tcy"></div></div>
+<hr>
+<label class="sec"><input type="checkbox" id="oAv"> <b>Avance</b></label>
+<div id="bAv" hidden>
+<label style="display:block;margin-top:6px">Regla <select id="advk"><option value="enc">A.Enc · avance de encendido</option><option value="iny">A.Iny · avance de inyección</option></select></label>
+<p class="hint">El avance se mide en grados respecto a la regla PMS: positivo (APMS) si la regla de avance está antes del PMS, negativo (DPMS) si está después. Al activarlo se activa la regla PMS si no lo estaba. Como el PMS se repite cada 360°, se toma el PMS más cercano a la regla de avance. Las reglas AAE, AAA, RCE y RCA se leen en ese orden de izquierda a derecha, con la regla PMS (0°) entre AAA y RCE como referencia; arrástrala hasta el PMS real. Candado 🔓/🔒 junto a cada grupo: bloqueado, al arrastrar una regla se mueve todo el grupo conservando la distancia.</p>
+</div>
+<hr>
+<label class="sec"><input type="checkbox" id="sOn"> <b>Sincronización por disparo</b></label>
+<div id="sBox" hidden>
+<div style="display:grid;gap:6px;margin-top:6px">
+<label>Canal de disparo <select id="sC"></select></label>
+<label>Señal <select id="sK"><option value="gas">Gasolina · encendido</option><option value="die">Diésel · inyección</option></select></label>
+<label>Pulsos del canal <select id="sM"><option value="one">De un solo cilindro (1 por ciclo)</option><option value="all">De todos los cilindros (n por ciclo)</option></select></label>
+<label>Umbral (% del pico) <input type="number" id="sU" value="35" min="5" max="90" step="5" style="width:70px" title="Sensibilidad de la detección de pulsos respecto al pico de la señal"></label>
+<label>Flanco <select id="sE"><option value="down" selected>Bajada</option><option value="up">Subida</option></select></label>
+<label>Disparo del cilindro <select id="sY"></select></label>
+<label>Avance (°) <input type="number" id="sA" value="0" step="0.5" style="width:70px" title="Grados entre el disparo y el PMS de compresión"></label>
+<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="p" id="bSy">Sincronizar</button><button id="bDx" title="Vuelve a colocar el primer cilindro a 360° del INICIO">Restablecer posición</button></div>
+</div>
+<p class="hint">El primer disparo detectado se asigna al cilindro elegido y los siguientes siguen el orden de encendido. «Pulsos del canal»: elige «De un solo cilindro» si el canal es la inyección o el encendido de un único cilindro (un grupo de pulsos por ciclo; el piloto y el principal cuentan como un solo disparo) o «De todos» si trae los disparos de todos los cilindros.</p>
+</div>
+<hr>
+<label class="sec"><input type="checkbox" id="oMa"> <b>Canales matemáticos</b></label>
+<div id="bMa" hidden>
+<div style="display:grid;gap:6px;margin-top:6px">
+<label>Plantilla <select id="mK" style="max-width:100%"></select></label>
+<label>Canal A <select id="mA"></select></label>
+<label id="mBl">Canal B <select id="mB"></select></label>
+<label id="mZl">Dientes de la rueda (contando los que faltan) <input type="number" id="mZ" value="60" min="1" style="width:70px"></label>
+<div id="mSl" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><label>Factor <input type="number" id="mF" value="1" step="any" style="width:76px"></label><label>Desplazamiento <input type="number" id="mO" value="0" step="any" style="width:76px"></label><label>Unidad <input type="text" id="mU" maxlength="8" style="width:60px"></label></div>
+<label>Resultado en <select id="mD"></select></label>
+<div><button class="p" id="mGo">Crear canal</button></div>
+</div>
+<p class="hint" id="mH"></p>
+<div id="mL" class="tcy"></div>
+</div>
+</section>
+<section class="card">
+<div id="tabs"><button class="tab on" id="tabS">Osciloscopio</button><button class="tab" id="tabD">Diagrama de distribución</button><button class="tab" id="tabX">Diagnóstico</button><button class="tab" id="tabF">Unir y convertir CSV</button><button class="tab" id="tabG">GIF</button><button class="tab" id="tabI">Instrucciones</button><button class="tab" id="tabO">Objetivo</button></div>
+<div id="viewS">
+<div id="tb">
+<button class="tog on" id="tPh" title="Conectar o desconectar las reglas de fase">Reglas de fase</button><button class="tog lk" id="kPh" title="Bloquear el ciclo: al arrastrar FIN (o INICIO) se desplaza el ciclo entero">🔓</button>
+<button class="tog" id="tPms" title="Regla vertical de PMS">PMS</button>
+<button class="tog" id="tT" title="Dos reglas verticales para medir tiempo">Reglas T1/T2</button><button class="tog lk" id="kT" title="Bloquear el intervalo T1–T2: al arrastrar una regla se mueven las dos">🔓</button>
+<button class="tog" id="tT2" title="Otras dos reglas verticales para un segundo intervalo">Reglas T3/T4</button><button class="tog lk" id="kT2" title="Bloquear el intervalo T3–T4: al arrastrar una regla se mueven las dos">🔓</button>
+<button class="tog on" id="tAmp" title="Reglas horizontales de amplitud por canal">Amplitud</button>
+<button class="tog" id="tGr" title="Identificación de cilindros sobre la señal (overlay)">Cilindros</button>
+<button class="tog" id="tVv" title="AAA avance apertura admisión, RCE retraso cierre escape, AAE avance apertura escape, RCA retraso cierre admisión">AAA·RCE·AAE·RCA</button><button class="tog lk" id="kVv" title="Bloquear el conjunto AAA·RCE·AAE·RCA: al arrastrar una regla se mueven las cuatro">🔓</button>
+<button class="tog" id="tAdv" title="Regla de avance de encendido o de inyección">Avance</button>
+<button class="tog" id="tAn" title="Mostrar u ocultar las herramientas de anotación">Anotar</button>
+<label class="bgl" title="Color de fondo de la ventana de gráficas (de negro a blanco)">Fondo <input type="range" id="bgR" min="0" max="100" value="0"></label>
+<span class="sp"></span>
+<button id="bExp">Exportar CSV</button>
+<select id="pdfBg" title="Fondo del informe PDF"><option value="w">PDF fondo blanco</option><option value="k">PDF fondo negro</option></select>
+<button class="p" id="bPdf">Informe PDF</button>
+</div>
+<div id="at" hidden>
+<span style="color:var(--mu);font-size:12px">Anotar:</span><label style="font-size:12px"><input type="checkbox" id="aVis" checked> ver anotaciones</label>
+<button class="tog on" id="a_none" title="Volver a mover reglas y medir">Cursor</button>
+<button class="tog" id="a_text">Texto</button>
+<button class="tog" id="a_arrow">Flecha</button>
+<button class="tog" id="a_line">Línea</button>
+<button class="tog" id="a_pen">Lápiz</button>
+<button class="tog" id="a_rect">Rectángulo</button>
+<button class="tog" id="a_ell">Elipse</button>
+<button class="tog" id="a_del" title="Clic sobre una anotación para borrarla">Borrar</button>
+<select id="aCol" title="Color"><option value="#ffd24d">Amarillo</option><option value="#ff5c5c">Rojo</option><option value="#5ddc8a">Verde</option><option value="#4da3ff">Azul</option><option value="#ffffff">Blanco</option><option value="#ff7bf1">Magenta</option></select>
+<select id="aW" title="Grosor"><option value="1">Fino</option><option value="2" selected>Medio</option><option value="4">Grueso</option></select>
+<button id="aUn" title="Ctrl+Z">Deshacer</button><button id="aClr">Quitar todo</button>
+</div>
+<div class="pg" id="pgbar" hidden><b>Páginas</b><button id="pgP" title="Página anterior">◀</button><input type="range" id="pgR" min="1" max="1" value="1"><button id="pgN" title="Página siguiente">▶</button><span id="pgL"></span><span id="pgNm" style="color:var(--mu);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:34%"></span></div>
+<div id="wrap"><canvas id="cv"></canvas></div>
+<div id="rd"></div>
+<div id="st">Arrastra el fondo para desplazar, rueda para zoom. Clic = T1, Mayús+clic = T2. Arrastra cualquier regla para moverla. La flecha de color del borde izquierdo es el cursor de cada canal: arrástrala para subir o bajar su gráfica.</div>
+</div>
+<div id="viewD" hidden>
+<div class="dg"><canvas id="cv2"></canvas><div id="dd"></div></div>
+</div>
+<div id="viewF" hidden>
+<div class="fgrid">
+<div class="fbox">
+<b>1 · Archivos en orden de carga</b>
+<div class="drop" id="fdrop">Arrastra aquí archivos <b>.csv</b><br><button id="fAdd" style="margin-top:8px">Añadir archivos…</button><input type="file" id="fIn" multiple accept=".csv,.txt,.tsv,.dat" hidden></div>
+<ol id="fList"></ol>
+<div class="row"><button id="fClr">Vaciar lista</button></div>
+</div>
+<div class="fbox">
+<b>2 · Acciones</b>
+<div class="row"><button class="p" id="fMerge" title="Une los archivos uno detrás de otro, en el orden de la lista, en un solo CSV">Unir en un solo CSV</button><label><input type="checkbox" id="fLoadM" checked> cargar el resultado en el osciloscopio</label></div>
+<div class="row"><button id="fConv" title="Convierte cada archivo a su propio CSV">Convertir cada archivo a CSV</button></div>
+<div class="row"><button id="fPages" title="Cada archivo pasa a ser una página que puedes recorrer con el cursor">Cargar como páginas en el osciloscopio</button></div>
+<hr>
+<label>Al usar «Abrir archivos…» con varios archivos <select id="fmode"><option value="pages">una página por archivo</option><option value="channels">canales (CH1, CH2…)</option></select></label>
+</div>
+</div>
+<p class="hint" id="fSt"></p>
+</div>
+<div id="viewX" hidden><div class="fgrid">
+<div class="fbox"><b>1 · Contexto</b>
+<label>Combustible <select id="xF"><option value="diesel">Diésel</option><option value="gasolina">Gasolina</option></select></label>
+<label>Código de motor (opcional) <input type="text" id="xC" maxlength="12" style="width:110px"></label>
+<label>Síntoma (opcional) <input type="text" id="xS" maxlength="120" placeholder="p. ej. ralentí irregular"></label>
+<label>Desfase de la señal respecto al PMS de compresión (°) <input type="number" id="xO" value="0" step="10" style="width:80px"></label>
+<div id="xSig"></div>
+</div>
+<div class="fbox"><b>2 · Medidas</b><div id="xMed" class="tcy"></div></div>
+<div class="fbox"><b>3 · Consulta al portal</b>
+<div class="row"><button class="p" id="xGo">Consultar diagnóstico</button></div>
+<div class="row"><input type="text" id="xQ" placeholder="Buscar notas técnicas…" style="flex:1;min-width:0"><button id="xBu">Buscar</button></div>
+<p class="hint" id="xSt"></p><div id="xRes" class="tcy dxr"></div>
+</div>
+</div></div>
+<div id="viewI" hidden><div id="docI" class="doc"></div></div>
+<div id="viewO" hidden><div id="docO" class="doc"></div></div>
+<div id="viewG" hidden>
+<div class="fgrid">
+<div class="fbox">
+<b>Crear un GIF con las capturas</b>
+<p class="hint" id="gInfo"></p>
+<div class="row"><label>Desde la página <input type="number" id="gA" value="1" min="1" style="width:72px"></label><label>hasta la <input type="number" id="gB" value="1" min="1" style="width:72px"></label></div>
+<div class="row"><label>Retardo (ms) <input type="number" id="gD" value="600" min="50" step="50" style="width:80px"></label><label>Ancho <select id="gW"><option value="640">640 px</option><option value="800" selected>800 px</option><option value="1000">1000 px</option></select></label></div>
+<div class="row"><label>Fondo <select id="gT"><option value="dark">oscuro</option><option value="light">claro</option></select></label><label><input type="checkbox" id="gL" checked> repetir en bucle</label></div>
+<div class="row"><button class="p" id="gMk">Crear GIF</button><button id="gDl" disabled>Descargar GIF</button></div>
+<p class="hint" id="gSt"></p>
+</div>
+<div class="fbox"><b>Vista previa</b><img id="gImg" alt="" style="max-width:100%;border-radius:8px;display:none"></div>
+</div>
+</div>
+</section>
+</main>
+<footer>Ortu Automoción · ortuautomocion.com</footer>
+<script>const EJEMPLOS={{ejemplos:ejemplos}};const APP_CFG={{appcfg}};</script>
+<script>
+{{js/*.js}}</script></body></html>
