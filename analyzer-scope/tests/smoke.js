@@ -204,7 +204,11 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   await click('#tabX'); await p.waitForTimeout(150);
   check('libre: calcula medidas y avisa de que la consulta está en el portal', await E(() => APP_CFG.modo === 'libre' && $('xMed').children.length > 0 && /portal/.test($('xSt').textContent)));
   await click('#xGo'); await p.waitForTimeout(100);
-  check('libre: «Consultar» no falla y remite al portal', /portal/.test(await p.textContent('#xSt')));
+  check('libre: «Consultar» da el diagnóstico local (o dice que no hay uno programado)', await E(() => $('xRes').querySelectorAll('.dxh').length > 0 || /programado/.test($('xSt').textContent)));
+  const dxl = await E(() => dxLocal({ contexto: { senales: [{ canal: 'CH1', entidad: 'transductor admisión' }] },
+    medidas: [{ id: 'desv_pulso_cil', canal: 'CH1', por_cilindro: { 1: 2.1, 2: -1, 3: 0.5, 4: -14.2 } }] }));
+  check('libre: comparación local → el 4 es el más débil, con ranking (mejor = 100 %) y aviso',
+    dxl.hallazgos.length === 1 && dxl.hallazgos[0].evidencia[0].cilindro === 4 && dxl.hallazgos[0].evidencia[0].comparacion[3].pct_mejor === 100 && /peor/.test(dxl.aviso), JSON.stringify(dxl.hallazgos[0] && dxl.hallazgos[0].evidencia));
   await click('#tabS');
 
   console.log('\nErrores JS durante la sesión:', errs.length);

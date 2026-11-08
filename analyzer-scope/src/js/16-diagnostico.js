@@ -42,6 +42,25 @@ function dxPeticion(){
   const p={v:1,op:'diagnostico',lang:LANG,cliente:{app:'analyzer-scope',ver:APP_CFG.ver},contexto:{motor,senales},medidas,limite:5};
   const sy=$('xS').value.trim();if(sy)p.sintoma_texto=sy;p._cil=cil;return p;
 }
+/* ---------- Diagnóstico programado (local, también sin portal) ----------
+   Transductor de pulso = COMPARACIÓN: no hay mV ni % de «motor bueno/malo». Se dice qué cilindro está peor
+   (el mejor = 100 %) y se pasa a pruebas de confirmación. Si todos fallan igual, la comparación no lo ve. */
+const DX_PULSO={'transductor admisión':'admisión','transductor escape':'escape','transductor cárter':'cárter'};
+function dxRank(pc){const ks=Object.keys(pc||{}).filter(k=>isFinite(pc[k]));if(ks.length<2)return null;
+  const o=ks.map(k=>({cilindro:+k,valor:+pc[k]})).sort((a,b)=>a.valor-b.valor),mejor=100+o[o.length-1].valor;
+  o.forEach(x=>{if(mejor>0)x.pct_mejor=Math.round((100+x.valor)/mejor*1000)/10});return o}
+function dxLocal(p){const H=[];
+  p.contexto.senales.forEach(s=>{const lugar=DX_PULSO[s.entidad];if(!lugar)return;
+    const m=p.medidas.find(x=>x.id==='desv_pulso_cil'&&x.canal===s.canal);const r=m&&dxRank(m.por_cilindro);if(!r)return;const c=r[0].cilindro;
+    H.push({regla:'LOCAL-PULSO',local:true,comparativa:true,confianza:'media',
+      sintoma:i18('El cilindro')+' '+c+' '+i18('es el más débil en')+' '+i18(lugar)+(r[0].pct_mejor!=null?' ('+r[0].pct_mejor+' % '+i18('del mejor')+')':''),
+      evidencia:[{medida:'desv_pulso_cil',canal:s.canal,cilindro:c,valor:r[0].valor,condicion:i18('el menor de todos los cilindros'),etiqueta:'Medido',comparacion:r}],
+      causas:[{texto:i18('Bloque: segmentos o camisas'),etiqueta:'Inferido'},{texto:i18('Culata: junta, guías o asientos de válvula, obstrucción del colector'),etiqueta:'Inferido'}],
+      comprobaciones:[{orden:1,texto:i18('Repetir: que salga el más débil en varios ciclos completos (720°)')},
+        {orden:2,texto:i18('Transductor en el cárter: si su pulso también destaca, bloque; si es normal, culata')},
+        {orden:3,texto:i18('Confirmar en el cilindro')+' '+c+': '+i18('presión absoluta, estanqueidad o máquina de humo')}]})});
+  return{ok:true,v:1,op:'diagnostico',hallazgos:H,relacionadas:[],local:true,
+    aviso:i18('Comparación entre cilindros: dice cuál está peor, no si el motor está bien. Si todos fallan por igual, no se ve.')}}
 /* transporte: dentro del portal google.script.run; fuera, GET al puente si está configurado */
 function dxCall(req){return new Promise((ok,ko)=>{
   const g=window.google&&google.script&&google.script.run;
@@ -77,6 +96,7 @@ function dxShow(res){
   const H=res.hallazgos||[];$('xSt').textContent=H.length?H.length+' hallazgo(s)':(res.sin_reglas?'Esta señal aún no tiene reglas en el portal: mira las notas relacionadas.':'Ninguna regla se cumple con estas medidas.');
   H.forEach((h,hi)=>{const d=T('div',null,'cy dxh');d.appendChild(T('b',h.sintoma+' · '+i18('confianza')+' '+h.confianza));
     (h.evidencia||[]).forEach(e=>d.appendChild(T('div',mlb(e.medida)+(e.canal?' · '+e.canal:'')+(e.cilindro!=null?' · '+i18('cilindro')+' '+e.cilindro:'')+': '+e.valor+' ('+e.condicion+') · '+(e.etiqueta||'Medido'),'s')));
+    (h.evidencia||[]).forEach(e=>{if(e.comparacion)d.appendChild(T('div',i18('Comparación (mejor = 100 %)')+': '+e.comparacion.map(x=>x.cilindro+': '+(x.pct_mejor!=null?x.pct_mejor+' %':x.valor)).join(' · '),'s'))});
     if(h.causas&&h.causas.length){d.appendChild(T('h4',i18('Posibles causas')));h.causas.forEach(c=>d.appendChild(T('div','• '+c.texto+' ('+c.etiqueta+')'+(c.como_separar?' — '+c.como_separar:''),'hint')))}
     if(h.comprobaciones&&h.comprobaciones.length){d.appendChild(T('h4',i18('Comprobaciones')));
       h.comprobaciones.forEach((c,ci)=>{const l=T('label',null,'dxc'),cb=document.createElement('input');cb.type='checkbox';cb.checked=!!c._ok;cb.onchange=()=>{c._ok=cb.checked};
@@ -86,9 +106,13 @@ function dxShow(res){
   if(res.aviso)box.appendChild(T('p','⚠ '+res.aviso,'hint'));
 }
 const dxBusy=m=>{$('xSt').textContent=m;$('xRes').innerHTML=''};
-function dxGo(){const p=dxMedidas();delete p._cil;if(!p.medidas.length)return;dxBusy('Consultando…');dxCall(p).then(dxShow,dxErr)}
+function dxGo(){const p=dxMedidas();delete p._cil;if(!p.medidas.length)return;const loc=dxLocal(p);
+  if(APP_CFG.modo!=='portal'&&!APP_CFG.apiUrl){dxShow(loc);if(!loc.hallazgos.length)$('xSt').textContent=i18('Sin diagnóstico programado para estas señales (transductor de admisión, escape o cárter con «Cilindros» activado).');return}
+  dxBusy('Consultando…');
+  // El portal añade cómo comprobarlo; si no tiene regla para la señal, queda el diagnóstico local.
+  dxCall(p).then(r=>{if(r&&r.ok&&!(r.hallazgos||[]).length&&loc.hallazgos.length){r.hallazgos=loc.hallazgos;r.aviso=loc.aviso+' '+(r.aviso||'')}dxShow(r)},e=>{dxShow(loc);dxErr(e)})}
 function dxBuscar(){const t=$('xQ').value.trim();if(!t)return;dxBusy('Buscando…');dxCall({v:1,op:'buscar',lang:LANG,cliente:{app:'analyzer-scope',ver:APP_CFG.ver},texto:t,filtros:{solo_osciloscopio:true},limite:10}).then(dxShow,dxErr)}
 function dxNt(id){dxBusy('Cargando…');dxCall({v:1,op:'nt',lang:LANG,cliente:{app:'analyzer-scope',ver:APP_CFG.ver},id,formato:'md'}).then(dxShow,dxErr)}
-function dxTab(){dxMedidas();if(APP_CFG.modo!=='portal'&&!APP_CFG.apiUrl&&!DXR){$('xSt').textContent='Versión libre: las medidas se calculan aquí; la consulta de notas técnicas y comprobaciones está en el portal.';if(APP_CFG.portalUrl){$('xRes').innerHTML='';$('xRes').appendChild(lnk(APP_CFG.portalUrl,i18('Abrir en el portal')))}}}
+function dxTab(){dxMedidas();if(APP_CFG.modo!=='portal'&&!APP_CFG.apiUrl&&!DXR){$('xSt').textContent=i18('Versión libre: aquí se compara cilindro a cilindro; cómo comprobarlo, valores y notas técnicas, en el portal.');if(APP_CFG.portalUrl){$('xRes').innerHTML='';$('xRes').appendChild(lnk(APP_CFG.portalUrl,i18('Abrir en el portal')))}}}
 $('xGo').onclick=dxGo;$('xBu').onclick=dxBuscar;$('xQ').onkeydown=e=>{if(e.key==='Enter')dxBuscar()};$('xO').onchange=dxMedidas;$('tabX').onclick=()=>showTab('X');
 if(APP_CFG.modo==='portal')document.body.classList.add('portal');
