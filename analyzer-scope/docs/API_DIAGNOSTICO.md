@@ -225,3 +225,4 @@ El workflow que compila `notas.json` copia `reglas` (archivo `reglas/<clave>.yml
 * `id` de NT = `"NT<número>"`; también se acepta la clave de entidad. `comprobaciones[].nt` en las reglas = clave de entidad (se resuelve a `NT<número>`).
 * `valores_referencia` sale de las líneas del apartado «Valores…» como `{magnitud, valor, etiqueta, fuente}` (sin `min`/`max` todavía).
 * Regla piloto: `ADM-TRANS-R01` en `reglas/diagnostico-vacio-admision.yml` (pendiente de revisión técnica).
+* **Vía B no operativa todavía:** la web app del portal está desplegada con acceso «solo dominio», así que Google pide sesión antes de llegar a `doGet` y el token no basta para la app suelta. Para habilitarla hace falta un despliegue aparte con acceso «cualquiera» (decisión del profe). La vía A (dentro del portal) no se ve afectada.
