@@ -141,6 +141,15 @@
 <div class="row"><button id="fConv" title="Convierte cada archivo a su propio CSV">Convertir cada archivo a CSV</button></div>
 <div class="row"><button id="fPages" title="Cada archivo pasa a ser una página que puedes recorrer con el cursor">Cargar como páginas en el osciloscopio</button></div>
 <hr>
+<b>Superponer por el cilindro 1</b>
+<p class="hint">Capturas del mismo motor en distintos puntos (admisión, escape, cárter…), todas con la referencia del cilindro 1 en el mismo canal. Se alinean por esa referencia y se pasan a grados (720° por ciclo). No son simultáneas: usa el motor estable.</p>
+<label>Canal de referencia del cilindro 1 <select id="sRef"><option value="0">CH1</option><option value="1">CH2</option><option value="2">CH3</option><option value="3">CH4</option><option value="4">CH5</option><option value="5">CH6</option><option value="6">CH7</option><option value="7">CH8</option></select></label>
+<label>Flanco <select id="sRe"><option value="down">Bajada</option><option value="up">Subida</option></select></label>
+<label>Avance del disparo respecto al PMS (°) <input type="number" id="sRa" value="0" step="0.5" style="width:70px"></label>
+<label>Ciclos <input type="number" id="sRk" value="2" min="1" max="6" style="width:60px"></label>
+<label><input type="checkbox" id="sRi" checked> incluir la referencia (de la 1.ª captura)</label>
+<div class="row"><button class="p" id="fSup">Superponer por el cilindro 1</button></div>
+<hr>
 <label>Al usar «Abrir archivos…» con varios archivos <select id="fmode"><option value="pages">una página por archivo</option><option value="channels">canales (CH1, CH2…)</option></select></label>
 </div>
 </div>

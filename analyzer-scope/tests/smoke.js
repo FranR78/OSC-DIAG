@@ -214,6 +214,23 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   console.log('\nErrores JS durante la sesión:', errs.length);
   errs.forEach(e => console.log('  !', e));
   check('sin errores JS', errs.length === 0);
+  console.log('\n17 · Superponer por el cilindro 1');
+  await click('#bClr'); await click('#tabF'); await E(() => { QF.length = 0; fRender(); });
+  await E(async () => { const mk = (rpm, off, name) => { const T = 120 / rpm, fs = 20000, dur = 5.2 * T, N = Math.floor(dur * fs), L = ['Tiempo;Ref;Transductor', '(ms);(V);(V)', ''];
+      for (let i = 0; i < N; i++) { const t = i / fs; let ref = 0, tr = 0;
+        for (let k = -1; k < 8; k++) { const E = off + k * T; if (t >= E && t < E + 0.001) ref = 5;
+          const tb = E + 140 / 720 * T, tc = E - 160 / 720 * T; tr += 3 * Math.exp(-(((t - tb) / (0.01 * T)) ** 2)) + 1 * Math.exp(-(((t - tc) / (0.01 * T)) ** 2)); }
+        L.push([(t * 1000).toFixed(5), ref, tr.toFixed(4)].join(';').replace(/\./g, ',')); }
+      return new File([L.join('\n')], name); };
+    await fAddFiles([mk(780, 0.031, 'admision.csv'), mk(820, 0.017, 'escape.csv'), mk(860, 0.052, 'carter.csv')]); });
+  await p.selectOption('#sRef', '0'); await p.selectOption('#sRe', 'up'); await p.fill('#sRk', '2'); await click('#fSup'); await p.waitForTimeout(300);
+  const sup = await E(() => { const pg = PG[pgI], r = { name: pg.name, n: pg.chs.length, T: ph.T, A: eng.A, peaks: [] };
+    pg.chs.slice(1).forEach(c => { let im = 0; for (let i = 0; i < 3000; i++) if (c.y[i] > c.y[im]) im = i; r.peaks.push(im / 3000 * 720); }); return r; });
+  check('superposición: 1 referencia + 3 transductores en una página', sup.n === 4 && /Superposición · 3 capturas/.test(sup.name), JSON.stringify(sup));
+  check('superposición: el pulso cae en 500° en las 3 capturas (±3°), aunque las rpm difieran', sup.peaks.length === 3 && sup.peaks.every(v => Math.abs(v - 500) < 3), JSON.stringify(sup.peaks));
+  check('superposición: regla de fase en 720° y cilindro 1 a 360°', Math.abs(sup.A / sup.T * 720 - 360) < 0.01 && await E(() => !ph.auto && ph.t0 === 0));
+  check('superposición: avisa de que no son simultáneas', /No son simultáneas/.test(await p.textContent('#st')));
+
   console.log('\n16 · Versión portal (google.script.run simulado, contrato v1)');
   {
     const pp = await ctx.newPage(); const perr = []; pp.on('pageerror', e => perr.push(String(e)));

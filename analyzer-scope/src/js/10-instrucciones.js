@@ -60,7 +60,8 @@ sec:[
 '«Informe PDF» (con fondo blanco o negro) incluye la captura, las lecturas y el diagrama; «Exportar CSV» guarda el archivo completo con todos tus ajustes (escalas, reglas, cilindros, filtros, anotaciones): al volver a abrirlo aquí aparece tal como lo dejaste.',
 'En la pestaña «GIF» eliges desde qué página hasta cuál, el retardo y el ancho, y creas una animación con las capturas.']},
 {h:'10 · Unir y convertir archivos',t:[
-'En «Unir y convertir CSV» añade los archivos en el orden que quieras: «Unir en un solo CSV» los concatena en el tiempo, «Convertir cada archivo a CSV» los convierte uno a uno y «Cargar como páginas en el osciloscopio» los abre para compararlos.']},
+'En «Unir y convertir CSV» añade los archivos en el orden que quieras: «Unir en un solo CSV» los concatena en el tiempo, «Convertir cada archivo a CSV» los convierte uno a uno y «Cargar como páginas en el osciloscopio» los abre para compararlos.',
+'«Superponer por el cilindro 1»: añade capturas del mismo motor tomadas en distintos puntos (admisión, escape, cárter…) que lleven la referencia del cilindro 1 en el mismo canal. Se alinean por esa referencia y se pasan a grados, ciclo a ciclo, aunque las rpm cambien algo. No son simultáneas: mide con el motor estable. El eje de tiempo es el de un ciclo medio; lee los grados en la regla de fase.']},
 {h:'11 · Canales matemáticos',t:[
 'Despliega «Canales matemáticos», elige la «Plantilla», el «Canal A» (y el «Canal B» si hace falta) y pulsa «Crear canal». El resultado aparece en un canal libre y se escala, filtra e invierte como cualquier otro; se guarda con «Exportar CSV».',
 '<b>Frecuencia</b>: convierte un sensor digital de frecuencia (MAF o MAP de frecuencia) en una curva continua, parecida a la de un transductor de presión. Con la curva del sensor puedes pasar a la magnitud real (valor = Hz × factor + desplazamiento).',
@@ -134,7 +135,8 @@ sec:[
 '“PDF report” (with a white or black background) includes the capture, the readings and the diagram; “Export CSV” saves the whole file with all your settings (scales, rulers, cylinders, filters, annotations): when you open it here again it looks exactly as you left it.',
 'In the “GIF” tab you choose from which page to which, the delay and the width, and create an animation of the captures.']},
 {h:'10 · Join and convert files',t:[
-'In “Join and convert CSV” add the files in the order you want: “Join into a single CSV” concatenates them in time, “Convert each file to CSV” converts them one by one, and “Load as pages in the oscilloscope” opens them for comparison.']},
+'In “Join and convert CSV” add the files in the order you want: “Join into a single CSV” concatenates them in time, “Convert each file to CSV” converts them one by one, and “Load as pages in the oscilloscope” opens them for comparison.',
+'“Overlay by cylinder 1”: add captures of the same engine taken at different points (intake, exhaust, crankcase…) that carry the cylinder 1 reference on the same channel. They are aligned by that reference and converted to degrees, cycle by cycle, even if the rpm change slightly. They are not simultaneous: measure with the engine steady. The time axis is that of an average cycle; read the degrees on the phase ruler.']},
 {h:'11 · Math channels',t:[
 'Open “Math channels”, choose the “Template”, “Channel A” (and “Channel B” if needed) and press “Create channel”. The result appears in a free channel and is scaled, filtered and inverted like any other; it is saved with “Export CSV”.',
 '<b>Frequency</b>: turns a digital frequency sensor (frequency MAF or MAP) into a continuous curve, similar to that of a pressure transducer. With the sensor curve you can get the real quantity (value = Hz × factor + offset).',
