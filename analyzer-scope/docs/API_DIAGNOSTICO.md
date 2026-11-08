@@ -37,7 +37,7 @@ Respuesta con error:
 Reglas: campos desconocidos se ignoran (compatibilidad hacia delante); un cambio incompatible sube `v`.
 `lang`: las NT están en español; `en` queda reservado (la app traduce solo su interfaz).
 
-**Fuentes privadas**: en cualquier respuesta se publican como `"Material del curso · PRV-XXXX"`, sin nombre ni enlace (igual que en el portal).
+**Fuentes privadas**: en cualquier respuesta salen igual que en el portal: el alumnado ve `"Material del curso"` (sin nombre, enlace ni código); el profesorado ve el código `PRV-XXXX`.
 
 ---------------------------------------------------------------------------------------------------
 
@@ -166,7 +166,9 @@ Ampliar el catálogo = añadir una fila aquí (y el cálculo en la app). Una reg
 
 ---------------------------------------------------------------------------------------------------
 
-## 5. Campo `reglas` en el YAML de las maestras de osciloscopio
+## 5. Reglas por entidad (`notas-tecnicas/reglas/<clave>.yml` en el repo del portal)
+
+Van en un archivo por entidad (nombre = clave de la maestra) y no dentro de la maestra, para que la regeneración de maestras no las pise. `construir.py` las copia al campo `reglas` de `notas.json` y descarta (con aviso) las mal escritas.
 
 ```yaml
 reglas:
@@ -193,7 +195,7 @@ reglas:
       - texto: Prueba de fugas en el cilindro {cil}
         tipo: prueba
 ```
-El workflow que compila `notas.json` copia `reglas` tal cual (validando: `id` único, `medida` del catálogo §4.2, `op` válido).
+El workflow que compila `notas.json` copia `reglas` (archivo `reglas/<clave>.yml`, lista bajo `reglas:`) (validando: `id` único, `medida` del catálogo §4.2, `op` válido).
 
 ## 6. Notas para la implementación (portal)
 * Caché: `CacheService` admite ~100 KB por clave (Teórico): guardar un **índice ligero** (id, título, tipo, entidad, sistema, palabras clave, resumen, reglas) troceado, y leer el cuerpo completo de `notas.json` solo en `op: "nt"`.
@@ -217,3 +219,9 @@ El workflow que compila `notas.json` copia `reglas` tal cual (validando: `id` ú
 * La app usa: `apiDiagnostico` (op `buscar`, `nt`, `diagnostico`). Nada más del servidor.
 * **Por verificar en el portal** (Inferido, no probado aquí): tamaño del archivo (~1,1 MB) dentro del proyecto Apps Script; descargas (PDF, CSV, GIF) desde el iframe de HtmlService/Sites.
 * Lo que la app ya hace (probado con un `google.script.run` simulado, `tests/smoke.js` §16): arma la petición v1, pinta hallazgos/causas/comprobaciones con casillas, `buscar` → `nt`, y añade la página de diagnóstico al PDF. Todo el contenido del portal se pinta como **texto** (sin HTML ejecutable).
+
+## 9. Estado en el portal (08/11)
+* Hecho: `portal/Diagnostico.gs` (`apiDiagnostico`, `?api=diagnostico` con token `DIAG_TOKENS`, `diagCrearToken(correo, dias)`), `?pagina=scope` sirve `AnalyzerScope.html`, `?nt=NNNN` abre la NT en el portal.
+* `id` de NT = `"NT<número>"`; también se acepta la clave de entidad. `comprobaciones[].nt` en las reglas = clave de entidad (se resuelve a `NT<número>`).
+* `valores_referencia` sale de las líneas del apartado «Valores…» como `{magnitud, valor, etiqueta, fuente}` (sin `min`/`max` todavía).
+* Regla piloto: `ADM-TRANS-R01` en `reglas/diagnostico-vacio-admision.yml` (pendiente de revisión técnica).
