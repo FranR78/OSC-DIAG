@@ -179,7 +179,7 @@ reglas:
       combustible: [diesel, gasolina]
     si:                       # todas se cumplen (Y)
       - medida: desv_pulso_cil
-        op: "<"               # <  <=  >  >=  entre  fuera
+        op: "<"               # <  <=  >  >=  entre  fuera  peor (ver §5.1)
         valor: -10            # «entre»/«fuera»: valor: [a, b]
         por_cilindro: true    # evalúa cada cilindro; cada uno que cumpla = un hallazgo
     confianza: media          # alta | media | baja
@@ -196,6 +196,17 @@ reglas:
         tipo: prueba
 ```
 El workflow que compila `notas.json` copia `reglas` (archivo `reglas/<clave>.yml`, lista bajo `reglas:`) (validando: `id` único, `medida` del catálogo §4.2, `op` válido).
+
+### 5.1 Transductor de pulso = comparación (criterio del profe, 08/11)
+Con transductores de pulso no existe un mV ni un % que diga «motor bueno / malo», ni entre motores iguales.
+Solo se dice **qué cilindro está peor que el resto** y se pasa a **pruebas de confirmación** (presión absoluta,
+estanqueidad, máquina de humo…). Si todos fallan por igual (p. ej. 4 inyectores mal), la comparación no lo ve.
+* Condición `op: peor` + `sentido: menor | mayor` + `por_cilindro: true` (sin `valor`): cumple solo el cilindro
+  con el valor más bajo/alto. Hace falta comparar ≥ 2 cilindros.
+* La regla lleva `comparativa: true`; el hallazgo sale con `comparativa: true` y su evidencia con
+  `comparacion: [{cilindro, valor}, …]` de peor a mejor (es lo que se enseña, no un umbral).
+* `aviso` añade: «Comparación entre cilindros: dice cuál está peor, no si el motor está bien. Si todos fallan por igual, no se ve.»
+* Causas típicas por grupos: **bloque** (segmentos, camisas) / **culata** (junta, guías, asientos, obstrucción del colector).
 
 ## 6. Notas para la implementación (portal)
 * Caché: `CacheService` admite ~100 KB por clave (Teórico): guardar un **índice ligero** (id, título, tipo, entidad, sistema, palabras clave, resumen, reglas) troceado, y leer el cuerpo completo de `notas.json` solo en `op: "nt"`.
@@ -226,3 +237,7 @@ El workflow que compila `notas.json` copia `reglas` (archivo `reglas/<clave>.yml
 * `valores_referencia` sale de las líneas del apartado «Valores…» como `{magnitud, valor, etiqueta, fuente}` (sin `min`/`max` todavía).
 * Regla piloto: `ADM-TRANS-R01` en `reglas/diagnostico-vacio-admision.yml` (pendiente de revisión técnica).
 * **Vía B no operativa todavía:** la web app del portal está desplegada con acceso «solo dominio», así que Google pide sesión antes de llegar a `doGet` y el token no basta para la app suelta. Para habilitarla hace falta un despliegue aparte con acceso «cualquiera» (decisión del profe). La vía A (dentro del portal) no se ve afectada.
+* **Reparto app ⇄ portal (criterio del profe, 08/11):** las dos versiones hacen el mismo diagnóstico programado
+  (señalar el cilindro peor por comparación, §5.1). La versión libre lo calcula en local y lo muestra sin consultar;
+  la del portal añade lo que vive en las NT: cómo comprobarlo, valores, fuentes, vídeos y, más adelante,
+  señales de referencia (.psdata). **Pendiente en la app:** el diagnóstico comparativo local de la versión libre.
