@@ -1,6 +1,6 @@
 /* ---------- Diagnóstico: consulta al portal (contrato v1, docs/API_DIAGNOSTICO.md) ----------
    Versión libre: mide y prepara la consulta; «Consultar» avisa de que está en el portal.
-   Versión portal (build --portal): google.script.run.apiDiagnostico(peticion). */
+   Versión portal (build --portal): apiDiagnostico(peticion) por google.script.run. */
 let DXR=null;   // último diagnóstico (para el PDF)
 const DX_ENT=[[/admisi[oó]n|colector/i,'transductor admisión'],[/escape/i,'transductor escape'],[/c[aá]rter/i,'transductor cárter'],[/cilindro|compresi[oó]n/i,'transductor cilindro'],
   [/inyector|inyecci[oó]n/i,'inyector'],[/cig[uü]e[nñ]al|ckp|r[uú]eda f[oó]nica/i,'sensor cigüeñal'],[/[aá]rbol|cmp|levas|fase/i,'sensor árbol de levas'],

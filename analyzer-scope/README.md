@@ -32,7 +32,7 @@ analyzer-scope/
 
 ## 1. Qué hace la aplicación (estado actual)
 
-Pestañas: **Osciloscopio · Diagrama de distribución · Convertir archivos · GIF · Instrucciones · Objetivo**.
+Pestañas: **Osciloscopio · Diagrama de distribución · Compresión relativa · Diagnóstico · Convertir archivos · GIF · Instrucciones · Objetivo**.
 Selector **Español | English** arriba a la derecha (cambia TODO el contenido).
 
 | Área | Funciones |
@@ -44,6 +44,7 @@ Selector **Español | English** arriba a la derecha (cambia TODO el contenido).
 | **Sincronización por disparo** | Elegir canal de disparo, gasolina/diésel, «un cilindro (1 por ciclo)» o «todos (n por ciclo)», umbral % del pico, flanco, cilindro del disparo, avance. Detecta pulsos (agrupa rebotes y piloto+principal), calcula ciclo y rpm, numera desde el cilindro elegido. |
 | **Avance** | Regla A.Enc / A.Iny medida en grados **respecto a la regla PMS** (positivo = antes; se toma el PMS más cercano porque se repite cada 360°). |
 | **Distribución** | Reglas **AAA·RCE·AAE·RCA** (botón), tabla y diagrama circular. Ángulos **siempre en positivo**: AAA y RCE respecto al PMS; AAE y RCA respecto al PMI; ⚠ si la regla está al otro lado de su referencia (se muestra el valor absoluto, pero duraciones y cruce usan el valor con signo). |
+| **Compresión relativa** | Pinza en el motor de arranque + sincronismo de un cilindro (inyector o bobina, uno por ciclo). Media móvil de 4 ms, pico por cilindro en ±360°/n alrededor de su PMS (orden de encendido de «Identificación de cilindros»), promedio de los ciclos y barras en % del mejor; línea al 90 %. Colores fijos: 1 azul, 2 rojo, 3 verde, 4 amarillo, 5 morado, 6 naranja, 7 cian, 8 rosa (`17-compresion.js`). |
 | **Anotar** | Botón «Anotar» muestra/oculta la barra: texto, flecha, línea, lápiz, rectángulo, elipse, borrar, deshacer (Ctrl+Z), color, grosor, «ver anotaciones». Se anclan al tiempo (siguen zoom/desplazamiento). |
 | **Documentar** | Informe **PDF** (fondo blanco/negro; captura + lecturas + diagrama; logo pequeño), **CSV** de la vista, **GIF** animado por rango de páginas. |
 | **Convertir archivos** | Lista en orden de carga; **unir en un solo CSV** (concatena en el tiempo), **convertir cada archivo a CSV**, cargar como páginas |
@@ -171,4 +172,4 @@ Para depurar visualmente: `page.screenshot()` con Playwright y mirar la imagen (
 ## 8. Referencia rápida de IDs de la interfaz
 
 Cabecera: `fi` (selector de archivos), `bFit`, `bClr`, `src`, `bRun`, `lES`/`lEN`. Panel: `leftp`, `bSet`, `chs`, `oPh/oCy/oAv/sOn` (casillas de sección) y `bPh/bCy/bAv/sBox` (bloques), `rpm`, `phR`, `phD`, `gN`, `gO`, `gU`, `gS`, `cVis`, `cPk`, `tBox/tCy`, `advk`, `sC/sM/sU/sE/sY/sA`, `bSy`, `bDx`.
-Barra de herramientas: `tPh,tPms,tT,tT2,tAmp,tGr,tVv,tAdv,tAn`, candados `kPh,kT,kT2,kVv`, `bgR` (fondo), `bExp`, `pdfBg`, `bPdf`; anotación `at`, `a_none…a_del`, `aCol`, `aW`, `aVis`, `aUn`, `aClr`. Visor: `cv`, `pgbar/pgR/pgP/pgN/pgL/pgNm`, `rd` (lecturas), `st` (estado). Pestañas: `tabS/D/F/G/I/O` y vistas `viewS/D/F/G/I/O`; `cv2` y `dd` (diagrama); `fIn,fList,fMerge,fConv,fPages,rfM,rfD`; `gA,gB,gD,gW,gT,gL,gMk,gDl,gSt,gImg`; `docI`, `docO`.
+Barra de herramientas: `tPh,tPms,tT,tT2,tAmp,tGr,tVv,tAdv,tAn`, candados `kPh,kT,kT2,kVv`, `bgR` (fondo), `bExp`, `pdfBg`, `bPdf`; anotación `at`, `a_none…a_del`, `aCol`, `aW`, `aVis`, `aUn`, `aClr`. Visor: `cv`, `pgbar/pgR/pgP/pgN/pgL/pgNm`, `rd` (lecturas), `st` (estado). Pestañas: `tabS/D/C/X/F/G/I/O` y vistas `viewS/D/C/X/F/G/I/O`; compresión `cv3,crS,crY,crI,crGo,crSt,crM`; `cv2` y `dd` (diagrama); `fIn,fList,fMerge,fConv,fPages,rfM,rfD`; `gA,gB,gD,gW,gT,gL,gMk,gDl,gSt,gImg`; `docI`, `docO`.

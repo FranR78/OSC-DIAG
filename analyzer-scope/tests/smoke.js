@@ -27,7 +27,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
 
   console.log('\n1 · Arranque');
   check('título con los créditos', (await p.title()).includes('J.A.Ortúñez') && (await p.title()).includes('Fran Rosales'));
-  check('siete pestañas', (await p.$$eval('#tabs .tab', e => e.map(x => x.textContent))).join('|') === 'Osciloscopio|Diagrama de distribución|Diagnóstico|Unir y convertir CSV|GIF|Instrucciones|Objetivo');
+  check('ocho pestañas', (await p.$$eval('#tabs .tab', e => e.map(x => x.textContent))).join('|') === 'Osciloscopio|Diagrama de distribución|Compresión relativa|Diagnóstico|Unir y convertir CSV|GIF|Instrucciones|Objetivo');
   check('ajustes de canales visibles por defecto', await E(() => !document.getElementById('leftp').classList.contains('nos')));
   check('sección «Sincronización» plegada por defecto', await E(() => document.getElementById('sBox').hidden));
   check('«Regla de fase» e «Identificación de cilindros» desplegadas al iniciar', await E(() => !$('bPh').hidden && !$('bCy').hidden && $('oPh').checked && $('oCy').checked));
@@ -96,7 +96,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   await click('#lEN'); await p.waitForTimeout(300);
   const left = [];
   const tabTxt = () => E(() => { let bt = document.body.innerText; [...document.querySelectorAll('#ex option')].slice(1).forEach(op => { bt = bt.split(op.textContent).join(''); }); const o = [bt]; document.querySelectorAll('[title],[placeholder]').forEach(e => { ['title', 'placeholder'].forEach(a => { const v = e.getAttribute(a); if (v) o.push(v); }); }); return o.join('\n'); });
-  for (const t of ['#tabS', '#tabD', '#tabX', '#tabF', '#tabG', '#tabI', '#tabO']) { await click(t); await p.waitForTimeout(150); left.push(...spanish(await tabTxt())); }
+  for (const t of ['#tabS', '#tabD', '#tabC', '#tabX', '#tabF', '#tabG', '#tabI', '#tabO']) { await click(t); await p.waitForTimeout(150); left.push(...spanish(await tabTxt())); }
   check('sin texto en español en inglés (todas las pestañas)', left.length === 0, JSON.stringify([...new Set(left)]));
   check('mensajes de estado traducidos', await E(() => { st('Nada que exportar.'); return document.getElementById('st').textContent; }) === 'Nothing to export.');
   await click('#tabS'); await click('#lES'); await p.waitForTimeout(200);
@@ -209,6 +209,17 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     medidas: [{ id: 'desv_pulso_cil', canal: 'CH1', por_cilindro: { 1: 2.1, 2: -1, 3: 0.5, 4: -14.2 } }] }));
   check('libre: comparación local → el 4 es el más débil, con ranking (mejor = 100 %) y aviso',
     dxl.hallazgos.length === 1 && dxl.hallazgos[0].evidencia[0].cilindro === 4 && dxl.hallazgos[0].evidencia[0].comparacion[3].pct_mejor === 100 && /peor/.test(dxl.aviso), JSON.stringify(dxl.hallazgos[0] && dxl.hallazgos[0].evidencia));
+  await click('#tabS');
+
+  console.log('\n15b · Compresión relativa (pinza de arranque + inyector 1, C4 1.6 HDi con 2 cilindros lavados)');
+  await p.setInputFiles('#fi', D('arranque_inyector_1_c4_hdi.csv')); await p.waitForTimeout(800);
+  await E(() => { eng.n = 4; eng.order = [1, 3, 4, 2]; });
+  await click('#tabC'); await p.waitForTimeout(150);
+  await p.selectOption('#crS', '0'); await p.selectOption('#crI', '1'); await p.selectOption('#crY', '1');
+  await click('#crGo'); await p.waitForTimeout(200);
+  const cr = await E(() => crRes && crRes.R.map(r => ({ c: r.cyl, pc: r.pc })));
+  const crLow = cr ? cr.filter(r => r.pc < 90).map(r => r.c).join(',') : '';
+  check('compresión relativa: ~183 rpm y los cilindros 1 y 3 por debajo del 90 %', cr && crLow === '1,3' && Math.abs(await E(() => crRes.rpm) - 183) < 10 && cr.some(r => r.pc === 100), JSON.stringify(cr));
   await click('#tabS');
 
   console.log('\nErrores JS durante la sesión:', errs.length);

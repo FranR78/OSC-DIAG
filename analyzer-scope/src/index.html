@@ -87,7 +87,7 @@
 </div>
 </section>
 <section class="card">
-<div id="tabs"><button class="tab on" id="tabS">Osciloscopio</button><button class="tab" id="tabD">Diagrama de distribución</button><button class="tab" id="tabX">Diagnóstico</button><button class="tab" id="tabF">Unir y convertir CSV</button><button class="tab" id="tabG">GIF</button><button class="tab" id="tabI">Instrucciones</button><button class="tab" id="tabO">Objetivo</button></div>
+<div id="tabs"><button class="tab on" id="tabS">Osciloscopio</button><button class="tab" id="tabD">Diagrama de distribución</button><button class="tab" id="tabC">Compresión relativa</button><button class="tab" id="tabX">Diagnóstico</button><button class="tab" id="tabF">Unir y convertir CSV</button><button class="tab" id="tabG">GIF</button><button class="tab" id="tabI">Instrucciones</button><button class="tab" id="tabO">Objetivo</button></div>
 <div id="viewS">
 <div id="tb">
 <button class="tog on" id="tPh" title="Conectar o desconectar las reglas de fase">Reglas de fase</button><button class="tog lk" id="kPh" title="Bloquear el ciclo: al arrastrar FIN (o INICIO) se desplaza el ciclo entero">🔓</button>
@@ -126,6 +126,18 @@
 </div>
 <div id="viewD" hidden>
 <div class="dg"><canvas id="cv2"></canvas><div id="dd"></div></div>
+</div>
+<div id="viewC" hidden>
+<div class="dg"><canvas id="cv3"></canvas><div class="fbox">
+<b>Compresión relativa con la pinza en el motor de arranque</b>
+<label>Sincronismo (inyección o encendido) <select id="crS"></select></label>
+<label>Cilindro del sincronismo <select id="crY"></select></label>
+<label>Corriente del motor de arranque <select id="crI"></select></label>
+<p class="hint" id="crM"></p>
+<div class="row"><button class="p" id="crGo">Analizar</button></div>
+<p class="hint" id="crSt"></p>
+<p class="hint">Motor arrastrado sin arrancar. Cada compresión frena el motor de arranque y sube la corriente: el pico de cada cilindro, comparado con el mejor (100 %), indica su compresión relativa. Dice qué cilindro está peor, no si el motor está bien.</p>
+</div></div>
 </div>
 <div id="viewF" hidden>
 <div class="fgrid">
