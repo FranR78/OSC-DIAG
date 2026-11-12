@@ -34,7 +34,7 @@ function setLang(l){
   $('st').textContent=ST0;$('fSt').textContent='';$('gSt').textContent='';
   applyStatic();draw();
 }
-const COL=['#f5d90a','#35d0ff','#ff5ec4','#4cf08c','#ff9a3c','#b48cff','#ff5c5c','#d0d0d0'];
+const COL=['#3d8bff','#ff4d4d','#2ee66b','#ffd400','#b07cff','#ff9a3c','#22d3ee','#ff6fb5'];  // 1 azul · 2 rojo · 3 verde · 4 amarillo · 5 morado · 6 naranja · 7 cian · 8 rosa
 const VD=[];[1e-3,1e-2,1e-1,1,10,100,1000].forEach(d=>[1,2,5].forEach(m=>VD.push(m*d)));
 const CH=COL.map((c,i)=>({n:'CH'+(i+1),c,on:false,x:null,y:null,vd:1,off:0,u:'V',hr:true,h:null,y0:null,fl:'off',f1:500,f2:1000,inv:false,p:'',m:null,mi:''}));
 let view={t0:0,span:1},cur={a:null,b:null},sel=0,ph={on:true,t0:null,T:null,auto:true,deg:720,div:4},pms={on:false,t:null},tr={on:false},tr2={on:false},amp={on:true},adv={on:false,t:null,k:'enc'},vv={on:false,ia:null,fa:null,ie:null,fe:null},eng={on:true,n:4,order:[1,3,4,2],show:-1,pk:false,A:null,c0:1,sync:null,vis:null};
