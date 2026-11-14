@@ -168,6 +168,7 @@ function draw(theme){
   if(adv.on&&adv.t!=null){const x=X(adv.t),col=AC[0];g.strokeStyle=col;g.lineWidth=2.4;g.setLineDash([8,4]);
     g.beginPath();g.moveTo(x,M.t);g.lineTo(x,yb);g.stroke();g.setLineDash([]);
     tag('A.Enc'+(dc&&dc.adv!=null?' '+dtxt(dc.adv,'APMS','DPMS'):''),x+5,M.t+128,col)}
+  if(anOn()){anPanel();const c=CH[sel];if(c&&c.x)anDraw(g,X,yb,tag,pkc,c,v=>M.t+hh/2-(v/c.vd+c.off)*hh/8)}
   /* leyenda de parámetros */
   let ly=M.t+14;CH.forEach(c=>{if(c.on&&c.x&&c.p){tag('● '+c.n+' · '+c.p,M.l+8,ly,cc(c));ly+=16}});
   if(eng.on)tag('Cil. '+(eng.show>0?eng.show:'1-'+eng.n)+' · orden '+eng.order.join('-'),M.l+8,ly,pkc('#ffd24d','#9a6b00'));

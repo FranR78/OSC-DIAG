@@ -75,14 +75,14 @@ const CHK=['n','p','on','vd','off','hr','h','fl','f1','f2','inv','m'];
 function cfgOf(A){
   const cp=o=>JSON.parse(JSON.stringify(o));
   return{v:1,ch:A.map(c=>{const o={};CHK.forEach(k=>o[k]=c[k]);if(c.m)o.m=Object.assign({},c.m,{a:A.indexOf(CH[c.m.a]),b:c.m.b!=null?A.indexOf(CH[c.m.b]):null});return o}),sel:Math.max(0,A.indexOf(CH[sel])),view:cp(view),cur:cp(cur),
-    ph:cp(ph),pms:cp(pms),tr:cp(tr),tr2:cp(tr2),amp:cp(amp),adv:cp(adv),iny:cp(iny),vv:cp(vv),eng:cp(eng),bg:bgV,ann:cp(ann.list),
-    sec:['oPh','oCy','oAv','sOn','oMa'].filter(id=>$(id).checked)};
+    ph:cp(ph),pms:cp(pms),tr:cp(tr),tr2:cp(tr2),amp:cp(amp),adv:cp(adv),iny:cp(iny),an:AN.k,vv:cp(vv),eng:cp(eng),bg:bgV,ann:cp(ann.list),
+    sec:['oPh','oCy','oAv','oSa','sOn','oMa'].filter(id=>$(id).checked)};
 }
 function applyCfg(j){
   (j.ch||[]).forEach((q,k)=>{const c=CH[k];if(!c||!c.x)return;CHK.forEach(f=>{if(q[f]!==undefined)c[f]=q[f]});proc(c);c._set=true});
-  [[view,j.view],[cur,j.cur],[ph,j.ph],[pms,j.pms],[tr,j.tr],[tr2,j.tr2],[amp,j.amp],[adv,j.adv],[iny,j.iny],[vv,j.vv],[eng,j.eng]].forEach(([o,v])=>v&&Object.assign(o,v));advIny();
+  [[view,j.view],[cur,j.cur],[ph,j.ph],[pms,j.pms],[tr,j.tr],[tr2,j.tr2],[amp,j.amp],[adv,j.adv],[iny,j.iny],[vv,j.vv],[eng,j.eng]].forEach(([o,v])=>v&&Object.assign(o,v));advIny();if(j.an){AN.k=j.an;$('saK').value=j.an}
   if(j.sel!=null&&CH[j.sel]&&CH[j.sel].x)sel=j.sel;if(j.bg!=null){bgV=j.bg;$('bgR').value=Math.round(bgV*100)}if(j.ann)ann.list=j.ann;
-  if(j.sec)['oPh','oCy','oAv','sOn','oMa'].forEach(id=>{$(id).checked=j.sec.includes(id);$(id).onchange()});
+  if(j.sec)['oPh','oCy','oAv','oSa','sOn','oMa'].forEach(id=>{$(id).checked=j.sec.includes(id);$(id).onchange()});
   $('phR').value=ph.deg;$('phD').value=ph.div;$('gN').value=eng.n;$('rpm').value=ph.T>0&&!ph.auto?Math.round(120/ph.T):'';
   $('cPk').checked=!!eng.pk;fillG();fillSC();if(eng.sync)$('sC').value=eng.sync.ch;cylList();mathAll();
 }

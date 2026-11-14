@@ -7,7 +7,7 @@ const DX_ENT=[[/admisi[oó]n|colector/i,'transductor admisión'],[/escape/i,'tra
   [/maf|caudal[ií]metro/i,'caudalímetro'],[/\bmap\b|presi[oó]n absoluta/i,'sensor MAP'],[/can[\s-]?(h|l|bus)?\b/i,'CAN'],[/bobina|encendido|secundario|primario/i,'encendido'],[/lambda|sonda/i,'sonda lambda']];
 const dxEnt=c=>{const s=(c.p||'')+' '+(c.n||'')+' '+(c.m?c.m.k:'');for(const[r,e]of DX_ENT)if(r.test(s))return e;return''};
 const MLB={rpm:'RPM',frecuencia:'Frecuencia',ciclo_util:'Ciclo útil',pico_pico:'Pico a pico',maximo:'Máx',minimo:'Mín',media:'Media',desv_pulso_cil:'Desviación del pulso por cilindro',desv_pico_cil:'Desviación del pico por cilindro',
-  duracion_t1t2:'T1→T2',avance:'Avance',aaa:'AAA',rce:'RCE',aae:'AAE',rca:'RCA',cruce:'Cruce',can_dominante:'CAN dominante',can_recesivo:'CAN recesivo',can_fuera_pct:'CAN fuera de rango'};
+  duracion_t1t2:'T1→T2',avance:'Avance',aaa:'AAA',rce:'RCE',aae:'AAE',rca:'RCA',cruce:'Cruce',can_dominante:'CAN dominante',can_recesivo:'CAN recesivo',can_fuera_pct:'CAN fuera de rango',t_carga:'Tiempo de carga',tension_induccion:'Tensión de inducción',t_quemado:'Tiempo de quemado',tension_quemado:'Tensión de quemado',oscilaciones:'Oscilaciones (rebotes)',corriente_max:'Corriente máxima',t_limitacion:'Tiempo de limitación de corriente',t_inyeccion:'Tiempo de inyección'};
 const mlb=id=>MLB[id]?i18(MLB[id]):id;
 const r4=v=>v==null||!isFinite(v)?null:+(+v).toPrecision(4);
 /* medidas por cilindro: ventana de cada cilindro centrada en su PMS de compresión (+ desfase) y media de los ciclos de la vista */
@@ -36,6 +36,8 @@ function dxPeticion(){
     const q=dxCyl(c,off);if(q){medidas.push({id:'desv_pico_cil',canal:cn,unidad:'%',por_cilindro:q.pico},{id:'desv_pulso_cil',canal:cn,unidad:'%',por_cilindro:q.pulso});cil.push(cn+': '+q.ciclos)}});
   if(ph.T>0&&!ph.auto&&!medidas.some(m=>m.id==='rpm'))medidas.push({id:'rpm',valor:r4(120/ph.T),unidad:'rpm'});
   if(tr.on&&cur.a!=null&&cur.b!=null)medidas.push({id:'duracion_t1t2',valor:r4(Math.abs(cur.b-cur.a)*1000),unidad:'ms'});
+  if(anOn()){const R=anCalc();if(R&&R.ev.length){const cn='CH'+(sel+1);AN_ROWS[R.k].forEach(([id,,f,t])=>{const s=anAvg(R.ev,f);
+    if(s)medidas.push({id,canal:cn,valor:r4(t==='s'?s.me*1000:s.me),unidad:t==='s'?'ms':t==='n'?'n':R.u,tipo:R.k,eventos:s.n})})}}
   const d=distCalc();if(d){if(adv.on&&d.adv!=null)medidas.push({id:'avance',valor:r4(d.adv),unidad:'°',k:'enc'});
     if(d.iny)d.iny.forEach((v,i)=>medidas.push({id:'avance',valor:r4(v),unidad:'°',k:'iny',n:i+1}));
     if(vv.on&&d.ok)['aaa','rce','aae','rca','cruce'].forEach(k=>medidas.push({id:k,valor:r4(d[k]),unidad:'°'}))}

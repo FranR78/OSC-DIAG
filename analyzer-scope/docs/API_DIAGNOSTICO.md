@@ -134,6 +134,14 @@ Respuesta:
 | `aaa`, `rce`, `aae`, `rca`, `cruce` | ° | Distribución |
 | `can_dominante`, `can_recesivo` | V | Mediana del diferencial CAN |
 | `can_fuera_pct` | % | Muestras fuera de rango (dominante 1,5–3 V; recesivo −0,5–0,05 V) |
+| `t_carga` | ms | «Valores digitales»: tiempo de carga de la bobina (primario: tramo bajo antes del pico; corriente: pulso > 5 % del máx.) |
+| `tension_induccion` | unidad del canal | Pico de inducción (bobina) o pico de cierre (inyector) |
+| `t_quemado`, `tension_quemado` | ms, unidad del canal | Duración y tensión media de la línea de quemado |
+| `oscilaciones` | n | Oscilaciones (rebotes) tras el quemado, histéresis 15 % de (quemado − reposo) |
+| `corriente_max`, `t_limitacion` | A, ms | Corriente máxima del pulso y tiempo por encima del 95 % (limitación) |
+| `t_inyeccion` | ms | Tiempo de inyección (tensión) o duración de cada pulso (corriente) |
+
+Las medidas de «Valores digitales» son la media de los eventos de la vista en el canal seleccionado y llevan además `tipo` (`bp` primario, `bs` secundario, `bi` corriente de bobina, `iv`/`ii` inyector tensión/corriente) y `eventos` (nº medido).
 
 Ventana de cada cilindro: ±(360°/n) alrededor de su PMS de compresión según la identificación de cilindros de la app, más el «Desfase» elegido en la pestaña (p. ej. un transductor de admisión ve el pulso del cilindro antes de su compresión). Se promedian todos los ciclos completos de la vista.
 

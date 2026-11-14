@@ -229,6 +229,34 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   check('compresión relativa: ~183 rpm y los cilindros 1 y 3 por debajo del 90 %', cr && crLow === '1,3' && Math.abs(await E(() => crRes.rpm) - 183) < 10 && cr.some(r => r.pc === 100), JSON.stringify(cr));
   await click('#tabS');
 
+  console.log('\n15c · Valores digitales (bobina primario, corriente de bobina, inyector) con señales sintéticas');
+  {
+    const L = ['Tiempo;CH1;CH2;CH3', '(ms);(V);(A);(V)'], dt = 0.002, TK = [5, 25, 45, 65];
+    for (let t = 0; t < 80; t += dt) {
+      let p = 13.5, i = 0, v = 14;
+      for (const k of TK) {
+        if (t >= k - 3 && t < k) { p = 0.8; const r = 7.5 * (1 - Math.exp(-(t - (k - 3)) / 1)); i = Math.min(r, 6.5); }
+        else if (t >= k && t < k + 1.5) p = 40 + 320 * Math.exp(-(t - k) / 0.015);
+        else if (t >= k + 1.5 && t < k + 3.5) { const q = t - k - 1.5; p = 13.5 - 50 * Math.exp(-q / 0.4) * Math.sin(2 * Math.PI * 5 * q); }
+        if (t >= k - 2.5 && t < k) v = 0.5; else if (t >= k && t < k + 0.5) v = 14 + 51 * Math.exp(-(t - k) / 0.08);
+      }
+      L.push([t, p + 0.3 * Math.sin(t * 977), i, v].map(x => x.toFixed(4).replace('.', ',')).join(';'));
+    }
+    const tf = path.join(require('os').tmpdir(), 'as_valores_digitales.csv'); fs.writeFileSync(tf, L.join('\n'));
+    await click('#bClr'); await p.setInputFiles('#fi', [tf]); await p.waitForTimeout(600);
+    await E(() => { const c = document.getElementById('oSa'); c.checked = true; c.dispatchEvent(new Event('change')); sel = 0; draw(); });
+    const r1 = await E(() => { const R = anCalc(); const m = f => anAvg(R.ev, f); return { k: R.k, n: R.ev.length, c: m('dur').me * 1e3, pk: m('pk').me, q: m('qT').me * 1e3, qv: m('qV').me, o: m('osc').me }; });
+    check('bobina primario: 4 eventos, carga 3 ms, inducción 360 V', r1.k === 'bp' && r1.n === 4 && Math.abs(r1.c - 3) < 0.05 && r1.pk > 330 && r1.pk < 365, JSON.stringify(r1));
+    check('bobina primario: quemado 1,5 ms a ~40 V y 5 oscilaciones', Math.abs(r1.q - 1.5) < 0.06 && Math.abs(r1.qv - 40) < 2 && r1.o === 5, JSON.stringify(r1));
+    check('valores digitales en el panel y en mediciones', /Tiempo de carga/.test(await p.textContent('#saR')) && /Tiempo de quemado/.test(await p.textContent('#rd')));
+    const r2 = await E(() => { sel = 1; draw(); const R = anCalc(); const m = f => anAvg(R.ev, f); return { k: R.k, n: R.ev.length, c: m('dur').me * 1e3, pk: m('pk').me, lim: m('lim').me * 1e3 }; });
+    check('corriente de bobina: carga ~3 ms, 6,5 A y limitación (>95 % del máx.) ~1,27 ms', r2.k === 'bi' && r2.n === 4 && Math.abs(r2.c - 3) < 0.1 && Math.abs(r2.pk - 6.5) < 0.05 && Math.abs(r2.lim - 1.27) < 0.06, JSON.stringify(r2));
+    const r3 = await E(() => { sel = 2; $('saK').value = 'iv'; $('saK').onchange(); const R = anCalc(); const m = f => anAvg(R.ev, f); return { k: R.k, n: R.ev.length, c: m('dur').me * 1e3, pk: m('pk').me }; });
+    check('inyector (tensión): 2,5 ms y pico de cierre 65 V', r3.k === 'iv' && r3.n === 4 && Math.abs(r3.c - 2.5) < 0.05 && Math.abs(r3.pk - 65) < 1, JSON.stringify(r3));
+    await E(() => { $('saK').value = 'auto'; $('saK').onchange(); const c = document.getElementById('oSa'); c.checked = false; c.dispatchEvent(new Event('change')); });
+    fs.unlinkSync(tf);
+  }
+
   console.log('\nErrores JS durante la sesión:', errs.length);
   errs.forEach(e => console.log('  !', e));
   check('sin errores JS', errs.length === 0);

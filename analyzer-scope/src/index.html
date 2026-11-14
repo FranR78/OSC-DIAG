@@ -55,6 +55,13 @@
 <p class="hint">El avance se mide en grados respecto a la regla PMS: positivo (APMS) si la regla de avance está antes del PMS, negativo (DPMS) si está después. Al activarlo se activa la regla PMS si no lo estaba. Como el PMS se repite cada 360°, se toma el PMS más cercano a la regla de avance. Las reglas AAE, AAA, RCE y RCA se leen en ese orden de izquierda a derecha, con la regla PMS (0°) entre AAA y RCE como referencia; arrástrala hasta el PMS real. Candado 🔓/🔒 junto a cada grupo: bloqueado, al arrastrar una regla se mueve todo el grupo conservando la distancia.</p>
 </div>
 <hr>
+<label class="sec"><input type="checkbox" id="oSa"> <b>Valores digitales de la señal</b></label>
+<div id="bSa" hidden>
+<label style="display:block;margin-top:6px">Tipo de señal <select id="saK" style="max-width:100%"></select></label>
+<div id="saR" class="tcy"></div>
+<p class="hint">Convierte la gráfica del canal seleccionado en valores: mide cada evento de la vista y da la media y el rango. Bobina: tiempo de carga, tensión de inducción, tiempo y tensión de quemado y oscilaciones (rebotes). Inyector: tiempo de inyección y pico de cierre (o corriente máxima). Sobre la gráfica se marcan la carga (amarillo) y el quemado (rosa). Encuadra varios disparos completos y comprueba las marcas: son mediciones automáticas.</p>
+</div>
+<hr>
 <label class="sec"><input type="checkbox" id="sOn"> <b>Sincronización por disparo</b></label>
 <div id="sBox" hidden>
 <div style="display:grid;gap:6px;margin-top:6px">

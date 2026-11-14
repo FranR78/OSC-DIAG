@@ -27,6 +27,7 @@ function measure(){
   if(dc&&dc.ok&&vv.on)R.push(['AAA',Math.abs(dc.aaa).toFixed(1)+'°'],['RCE',Math.abs(dc.rce).toFixed(1)+'°'],['AAE',Math.abs(dc.aae).toFixed(1)+'°'],['RCA',Math.abs(dc.rca).toFixed(1)+'°'],['Cruce',dc.cruce.toFixed(1)+'°']);
   if(dc&&dc.adv!=null&&adv.on)R.push(['A.Enc',dc.adv.toFixed(1)+'°']);
   if(dc&&dc.iny)dc.iny.forEach((v,i)=>R.push([inyL(i),v.toFixed(1)+'°']));
+  if(anOn())R.push(...anRows(AN.R));
   $('rd').innerHTML=R.map(([k,x])=>'<div><b>'+k+'</b> '+x+'</div>').join('');
   return R;
 }
