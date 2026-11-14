@@ -130,7 +130,7 @@ Respuesta:
 | `desv_pulso_cil` | % | (pulso pico a pico del cilindro − media) / media de los pulsos × 100 (por_cilindro) |
 | `desv_pico_cil` | % | (pico del cilindro − media de los picos) / media de los pulsos × 100 (por_cilindro). Base = pulso medio, para que no se dispare si los picos rondan 0 |
 | `duracion_t1t2` | ms | Intervalo T1–T2 (p. ej. duración de inyección) |
-| `avance` | ° | A.Enc / A.Iny respecto al PMS (`k`: `enc`/`iny`) |
+| `avance` | ° | A.Enc / A.Iny respecto al PMS (`k`: `enc`/`iny`; con `iny`, `n` = nº de inyección 1…5, una medida por regla) |
 | `aaa`, `rce`, `aae`, `rca`, `cruce` | ° | Distribución |
 | `can_dominante`, `can_recesivo` | V | Mediana del diferencial CAN |
 | `can_fuera_pct` | % | Muestras fuera de rango (dominante 1,5–3 V; recesivo −0,5–0,05 V) |

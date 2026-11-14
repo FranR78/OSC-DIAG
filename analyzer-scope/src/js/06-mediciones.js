@@ -25,7 +25,8 @@ function measure(){
   if(PK.length){const u=CH[sel].u;R.push(['Pico medio '+CH[sel].n,fmt(PK.avg,u)]);PK.slice(0,16).forEach(p=>R.push(['Pico cil. '+p.cyl,fmt(p.v,u)+' ('+(p.dev>=0?'+':'')+p.dev.toFixed(1)+' %)']))}
   const dc=distCalc();
   if(dc&&dc.ok&&vv.on)R.push(['AAA',Math.abs(dc.aaa).toFixed(1)+'°'],['RCE',Math.abs(dc.rce).toFixed(1)+'°'],['AAE',Math.abs(dc.aae).toFixed(1)+'°'],['RCA',Math.abs(dc.rca).toFixed(1)+'°'],['Cruce',dc.cruce.toFixed(1)+'°']);
-  if(dc&&dc.adv!=null&&adv.on)R.push([adv.k==='enc'?'A.Enc':'A.Iny',dc.adv.toFixed(1)+'°']);
+  if(dc&&dc.adv!=null&&adv.on)R.push(['A.Enc',dc.adv.toFixed(1)+'°']);
+  if(dc&&dc.iny)dc.iny.forEach((v,i)=>R.push([inyL(i),v.toFixed(1)+'°']));
   $('rd').innerHTML=R.map(([k,x])=>'<div><b>'+k+'</b> '+x+'</div>').join('');
   return R;
 }

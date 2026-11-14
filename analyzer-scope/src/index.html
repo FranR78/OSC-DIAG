@@ -50,9 +50,8 @@
 </div>
 <div id="tBox" hidden><b>Tiempos por cilindro (orden de encendido)</b><div id="tCy" class="tcy"></div></div>
 <hr>
-<label class="sec"><input type="checkbox" id="oAv"> <b>Avance</b></label>
+<label class="sec"><input type="checkbox" id="oAv"> <b>AE · Inyección</b></label>
 <div id="bAv" hidden>
-<label style="display:block;margin-top:6px">Regla <select id="advk"><option value="enc">A.Enc · avance de encendido</option><option value="iny">A.Iny · avance de inyección</option></select></label>
 <p class="hint">El avance se mide en grados respecto a la regla PMS: positivo (APMS) si la regla de avance está antes del PMS, negativo (DPMS) si está después. Al activarlo se activa la regla PMS si no lo estaba. Como el PMS se repite cada 360°, se toma el PMS más cercano a la regla de avance. Las reglas AAE, AAA, RCE y RCA se leen en ese orden de izquierda a derecha, con la regla PMS (0°) entre AAA y RCE como referencia; arrástrala hasta el PMS real. Candado 🔓/🔒 junto a cada grupo: bloqueado, al arrastrar una regla se mueve todo el grupo conservando la distancia.</p>
 </div>
 <hr>
@@ -97,7 +96,8 @@
 <button class="tog on" id="tAmp" title="Reglas horizontales de amplitud por canal">Amplitud</button>
 <button class="tog" id="tGr" title="Identificación de cilindros sobre la señal (overlay)">Cilindros</button>
 <button class="tog" id="tVv" title="AAA avance apertura admisión, RCE retraso cierre escape, AAE avance apertura escape, RCA retraso cierre admisión">AAA·RCE·AAE·RCA</button><button class="tog lk" id="kVv" title="Bloquear el conjunto AAA·RCE·AAE·RCA: al arrastrar una regla se mueven las cuatro">🔓</button>
-<button class="tog" id="tAdv" title="Regla de avance de encendido o de inyección">Avance</button>
+<button class="tog" id="tAdv" title="Regla de avance de encendido (AE) respecto al PMS">AE</button>
+<button class="tog" id="tIny" title="Reglas de avance de inyección respecto al PMS (una por inyección)">Inyección</button><select id="inyN" title="Número de inyecciones por ciclo (piloto/s, principal, post)"><option value="1">1 iny.</option><option value="2" selected>2 iny.</option><option value="3">3 iny.</option><option value="4">4 iny.</option><option value="5">5 iny.</option></select><button class="tog lk" id="kIny" title="Bloquear las reglas de inyección: al arrastrar una se mueven todas">🔓</button>
 <button class="tog" id="tAn" title="Mostrar u ocultar las herramientas de anotación">Anotar</button>
 <label class="bgl" title="Color de fondo de la ventana de gráficas (de negro a blanco)">Fondo <input type="range" id="bgR" min="0" max="100" value="0"></label>
 <span class="sp"></span>

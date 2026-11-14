@@ -89,6 +89,13 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   check('regla al otro lado: valor positivo con ⚠', /5\.0° ⚠/.test(await p.$eval('#dd', e => e.innerText)));
   check('PMS en compresión (360° del de cruce): mismos valores, sin desfase de 360°', await E(() => { vv.ia = pms.t - ph.T * 15 / 720; const k = () => { const d = distCalc(); return ['aaa', 'rce', 'aae', 'rca', 'cruce'].map(q => d[q].toFixed(3)).join(','); }; const a = k(); pms.t += ph.T / 2; const b = k(); pms.t -= ph.T; const c = k(); pms.t += ph.T / 2; return a === b && a === c && distCalc().aaa.toFixed(1) === '15.0' || [a, b, c].join(' | '); }) === true, await E(() => [distCalc().aaa, distCalc().rce, distCalc().aae, distCalc().rca].map(v => v.toFixed(1)).join(',')));
   check('avance respecto a la regla PMS', await E(() => { adv.t = pms.t - ph.T * 12 / 720; return Math.abs(distCalc().adv - 12) < 1e-9; }));
+  check('botón AE', (await p.textContent('#tAdv')).trim() === 'AE');
+  await click('#tabS'); await p.selectOption('#inyN', '3'); await click('#tIny');
+  check('inyección: 3 reglas respecto al PMS', await E(() => { iny.t = [18, 8, -6].map(a => pms.t - ph.T * a / 720); const d = distCalc(); return d.iny.length === 3 && d.iny.map(v => v.toFixed(1)).join(',') === '18.0,8.0,-6.0' || JSON.stringify(d.iny); }) === true);
+  await click('#tabD'); await p.waitForTimeout(150);
+  check('inyección en el diagrama de distribución', /A\.Iny 3[\s\S]*?-6\.0°/.test(await p.$eval('#dd', e => e.innerText)));
+  await click('#tabS'); await click('#tIny');
+  check('inyección desactivada: fuera del diagrama', await E(() => !distCalc().iny));
   await click('#tabS');
 
   console.log('\n7 · Idioma (revisión de textos sin traducir en inglés)');

@@ -6,7 +6,7 @@ const ST4=[['ADM','#3da5ff'],['COMP','#ffd24d'],['EXP','#ff6b4d'],['ESC','#9aa6b
 const ORD={1:['1'],2:['1-2'],3:['1-2-3','1-3-2'],4:['1-3-4-2','1-2-4-3'],5:['1-2-4-5-3'],6:['1-5-3-6-2-4','1-4-2-5-3-6','1-2-3-4-5-6'],
   8:['1-8-4-3-6-5-7-2','1-5-4-2-6-3-7-8','1-5-4-8-6-3-7-2','1-6-2-5-8-3-7-4'],10:['1-6-5-10-2-7-3-8-4-9','1-6-2-7-3-8-4-9-5-10'],
   12:['1-7-5-11-3-9-6-12-2-8-4-10'],16:['1-8-9-2-3-10-11-4-5-12-13-6-7-14-15-16']};
-function sync(){[['tPh',ph.on],['tPms',pms.on],['tT',tr.on],['tT2',tr2.on],['tAmp',amp.on],['tGr',eng.on],['tVv',vv.on],['tAdv',adv.on]].forEach(([i,v])=>$(i).classList.toggle('on',v));[['kPh',ph],['kT',tr],['kT2',tr2],['kVv',vv]].forEach(([i,o])=>{$(i).textContent=o.lk?'🔒':'🔓';$(i).classList.toggle('on',!!o.lk)});$('tBox').hidden=!eng.on}
+function sync(){[['tPh',ph.on],['tPms',pms.on],['tT',tr.on],['tT2',tr2.on],['tAmp',amp.on],['tGr',eng.on],['tVv',vv.on],['tAdv',adv.on],['tIny',iny.on]].forEach(([i,v])=>$(i).classList.toggle('on',v));[['kPh',ph],['kT',tr],['kT2',tr2],['kVv',vv],['kIny',iny]].forEach(([i,o])=>{$(i).textContent=o.lk?'🔒':'🔓';$(i).classList.toggle('on',!!o.lk)});$('tBox').hidden=!eng.on}
 function ensureH(c){if(!c.h){const m=-c.off*c.vd;c.h=[m+c.vd,m-c.vd]}}
 const w720=x=>((x+360)%720+720)%720-360;
 const w360=x=>((x+180)%360+360)%360-180;
@@ -21,13 +21,15 @@ const pkc=(b,d)=>cr(b)>=cr(d)?b:d,pkca=(a,b)=>a.map((v,i)=>pkc(v,b[i]));
 const mixc=(a,b,t)=>{const x=toRGB(a),y=toRGB(b);return'rgb('+x.map((v,i)=>Math.round(v+(y[i]-v)*t))+')'};
 const ann={tool:'none',col:'#ffd24d',w:2,list:[],cur:null};
 const dtxt=(v,a,b)=>Math.abs(v).toFixed(1)+'° '+(v>=0?a:b);
+const inyL=i=>'A.Iny'+(iny.n>1?' '+(i+1):'');
 function distCalc(){
   if(!(ph.T>0))return null;const R={};
   if([vv.ia,vv.fa,vv.ie,vv.fe].every(v=>v!=null)){
     // w360: la regla PMS puede estar en el PMS de compresión o en el de cruce (separados 360°); cada regla se mide al PMS/PMI más cercano
     R.aae=-w360(rel(vv.ie)+180);R.aaa=-w360(rel(vv.ia));R.rce=w360(rel(vv.fe));R.rca=w360(rel(vv.fa)-180);
     R.dadm=180+R.aaa+R.rca;R.desc=180+R.aae+R.rce;R.cruce=R.aaa+R.rce;R.ok=true}
-  if(adv.t!=null){R.adv=w360(-rel(adv.t));R.advk=adv.k}
+  if(adv.t!=null){R.adv=w360(-rel(adv.t));R.advk='enc'}
+  if(iny.on&&iny.t.length)R.iny=iny.t.slice(0,iny.n).map(t=>w360(-rel(t)));
   return R;
 }
 function distRows(){
@@ -36,7 +38,8 @@ function distRows(){
   if(c&&c.ok)r.push(['AAA · avance apertura admisión (antes del PMS)',pos(c.aaa)],['RCE · retraso cierre escape (después del PMS)',pos(c.rce)],
     ['AAE · avance apertura escape (antes del PMI)',pos(c.aae)],['RCA · retraso cierre admisión (después del PMI)',pos(c.rca)],
     ['Duración de la admisión',f(c.dadm)],['Duración del escape',f(c.desc)],['Cruce de válvulas (AAA + RCE)',f(c.cruce)]);
-  if(c&&c.adv!=null)r.push([(c.advk==='enc'?'A.Enc · avance de encendido':'A.Iny · avance de inyección')+' (respecto a la regla PMS)',f(c.adv)]);
+  if(c&&c.adv!=null)r.push(['A.Enc · avance de encendido (respecto a la regla PMS)',f(c.adv)]);
+  if(c&&c.iny)c.iny.forEach((v,i)=>r.push([inyL(i)+' · avance de inyección (respecto a la regla PMS)',f(v)]));
   return r;
 }
 function draw(theme){
@@ -48,7 +51,7 @@ function draw(theme){
   const cc=c=>pkc(c.c,LIGHT[CH.indexOf(c)]),txc=pkc('#b4c0cc','#2a3442'),rk=pkc('#8795a1','#5b6773'),OR=pkc('#ffb347','#c26a00'),OR2=pkc('#b8782a','#dba765');
   const TC=pkca(['#7cc4ff','#ff9ec7','#7dffb0','#ffe27d'],['#0a6fc2','#c2185b','#15803d','#a16207']);
   const VC=pkca(['#ff9a5c','#2ee6a0','#ff5c5c','#5ddc8a'],['#c2530a','#0f9d6c','#c92a2a','#15803d']);
-  const AC=pkca(['#ff7bf1','#7bffe3'],['#b3199e','#0f8f7a']),PMC=pkc('#ff4d6d','#d11a40');
+  const AC=pkca(['#ff7bf1','#7bffe3'],['#b3199e','#0f8f7a']),IC=pkca(['#7bffe3','#4dd2ff','#b6ff6b','#ffb84d','#c9a0ff'],['#0f8f7a','#1a6fb0','#3c8c1a','#b36b00','#6b3fc9']),PMC=pkc('#ff4d6d','#d11a40');
   const GRID=mixc(BGP,txc,.18),GRIDB=mixc(BGP,txc,.32);
   g.font='11px system-ui';
   const tag=(t,x,y,col,al)=>{g.textAlign=al||'left';const w=g.measureText(t).width,x0=al==='right'?x-w:al==='center'?x-w/2:x;
@@ -159,9 +162,12 @@ function draw(theme){
     if(vv[k]==null)return;const x=X(vv[k]);if(x<M.l-2||x>M.l+pw+2)return;
     g.strokeStyle=VC[i];g.lineWidth=2;g.beginPath();g.moveTo(x,M.t);g.lineTo(x,yb);g.stroke();
     tag(l+(dc&&dc.ok?' '+dtxt(dc[f],p,n):'')+(vv.lk?' 🔒':''),x+5,M.t+58+i*16,VC[i])});
-  if(adv.on&&adv.t!=null){const x=X(adv.t),col=adv.k==='enc'?AC[0]:AC[1];g.strokeStyle=col;g.lineWidth=2.4;g.setLineDash([8,4]);
+  if(iny.on)iny.t.slice(0,iny.n).forEach((t,i)=>{const x=X(t),col=IC[i%IC.length];if(x<M.l-2||x>M.l+pw+2)return;g.strokeStyle=col;g.lineWidth=2.2;g.setLineDash([3,3]);
     g.beginPath();g.moveTo(x,M.t);g.lineTo(x,yb);g.stroke();g.setLineDash([]);
-    tag((adv.k==='enc'?'A.Enc':'A.Iny')+(dc&&dc.adv!=null?' '+dtxt(dc.adv,'APMS','DPMS'):''),x+5,M.t+128,col)}
+    tag(inyL(i)+(dc&&dc.iny?' '+dtxt(dc.iny[i],'APMS','DPMS'):'')+(iny.lk?' 🔒':''),x+5,M.t+146+i*16,col)});
+  if(adv.on&&adv.t!=null){const x=X(adv.t),col=AC[0];g.strokeStyle=col;g.lineWidth=2.4;g.setLineDash([8,4]);
+    g.beginPath();g.moveTo(x,M.t);g.lineTo(x,yb);g.stroke();g.setLineDash([]);
+    tag('A.Enc'+(dc&&dc.adv!=null?' '+dtxt(dc.adv,'APMS','DPMS'):''),x+5,M.t+128,col)}
   /* leyenda de parámetros */
   let ly=M.t+14;CH.forEach(c=>{if(c.on&&c.x&&c.p){tag('● '+c.n+' · '+c.p,M.l+8,ly,cc(c));ly+=16}});
   if(eng.on)tag('Cil. '+(eng.show>0?eng.show:'1-'+eng.n)+' · orden '+eng.order.join('-'),M.l+8,ly,pkc('#ffd24d','#9a6b00'));

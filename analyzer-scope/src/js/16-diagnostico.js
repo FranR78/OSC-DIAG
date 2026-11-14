@@ -36,7 +36,8 @@ function dxPeticion(){
     const q=dxCyl(c,off);if(q){medidas.push({id:'desv_pico_cil',canal:cn,unidad:'%',por_cilindro:q.pico},{id:'desv_pulso_cil',canal:cn,unidad:'%',por_cilindro:q.pulso});cil.push(cn+': '+q.ciclos)}});
   if(ph.T>0&&!ph.auto&&!medidas.some(m=>m.id==='rpm'))medidas.push({id:'rpm',valor:r4(120/ph.T),unidad:'rpm'});
   if(tr.on&&cur.a!=null&&cur.b!=null)medidas.push({id:'duracion_t1t2',valor:r4(Math.abs(cur.b-cur.a)*1000),unidad:'ms'});
-  const d=distCalc();if(d){if(adv.on&&d.adv!=null)medidas.push({id:'avance',valor:r4(d.adv),unidad:'°',k:d.advk});
+  const d=distCalc();if(d){if(adv.on&&d.adv!=null)medidas.push({id:'avance',valor:r4(d.adv),unidad:'°',k:'enc'});
+    if(d.iny)d.iny.forEach((v,i)=>medidas.push({id:'avance',valor:r4(v),unidad:'°',k:'iny',n:i+1}));
     if(vv.on&&d.ok)['aaa','rce','aae','rca','cruce'].forEach(k=>medidas.push({id:k,valor:r4(d[k]),unidad:'°'}))}
   const motor={combustible:$('xF').value,cilindros:eng.n,orden:eng.order.slice()};const cod=$('xC').value.trim();if(cod)motor.codigo=cod;
   const p={v:1,op:'diagnostico',lang:LANG,cliente:{app:'analyzer-scope',ver:APP_CFG.ver},contexto:{motor,senales},medidas,limite:5};

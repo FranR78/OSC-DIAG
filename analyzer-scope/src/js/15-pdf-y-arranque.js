@@ -88,10 +88,17 @@ $('tVv').onclick=()=>{if(!(ph.T>0))return st('Carga una señal primero.');vv.on=
 $('tAdv').onclick=()=>{if(!(ph.T>0))return st('Carga una señal primero.');adv.on=!adv.on;
   if(adv.on){if(!pms.on||pms.t==null){pms.on=true;if(pms.t==null)pms.t=view.t0+view.span/2}
     if(adv.t==null)adv.t=pms.t-ph.T*10/720}sync();draw()};
-$('advk').onchange=()=>{adv.k=$('advk').value;draw();if(!$('viewD').hidden)distTab()};
+/* Avance de encendido antiguo con k='iny' (sesiones guardadas antes de separar AE e Inyección) → pasa a la 1.ª inyección */
+function advIny(){if(adv.k==='iny'){if(adv.t!=null&&!iny.t.length){iny.t=[adv.t];iny.n=1;iny.on=adv.on;adv.on=false;adv.t=null}adv.k='enc'}
+  iny.n=Math.max(1,Math.min(5,iny.n|0||1));$('inyN').value=iny.n}
+function inyFill(){const p=pms.t,s=ph.T/720;while(iny.t.length<iny.n){const L=iny.t.length;iny.t.push(L?iny.t[L-1]+8*s:p-ph.T*(4+8*(iny.n-1))/720)}}
+$('tIny').onclick=()=>{if(!(ph.T>0))return st('Carga una señal primero.');iny.on=!iny.on;
+  if(iny.on){if(!pms.on||pms.t==null){pms.on=true;if(pms.t==null)pms.t=view.t0+view.span/2}inyFill()}sync();draw();if(!$('viewD').hidden)distTab()};
+$('inyN').onchange=()=>{iny.n=+$('inyN').value;if(iny.on&&ph.T>0)inyFill();draw();if(!$('viewD').hidden)distTab()};
+$('kIny').onclick=()=>{iny.lk=!iny.lk;sync();draw()};
 function distTab(){drawDist($('cv2'),'dark',700,700);
   const r=distRows(),c0=distCalc(),warn=c0&&c0.ok&&[c0.aaa,c0.rce,c0.aae,c0.rca].some(v=>v<0);$('dd').innerHTML=r.length?r.map(([k,v])=>'<div class="r"><span>'+k+'</span><b>'+v+'</b></div>').join('')+'<p class="hint">'+(warn?'⚠ Una o más reglas están al otro lado de su referencia (se muestra el valor absoluto). ':'')+'Referencias: AAA y RCE respecto al PMS; AAE y RCA respecto al PMI. Todos los ángulos se muestran en positivo.</p>':
-  '<p class="hint">Activa «AAA·RCE·AAE·RCA» y «Avance» en la pestaña Osciloscopio y colócalas sobre la señal. La regla PMS marca los 0°.</p>'}
+  '<p class="hint">Activa «AAA·RCE·AAE·RCA», «AE» e «Inyección» en la pestaña Osciloscopio y colócalas sobre la señal. La regla PMS marca los 0°.</p>'}
 $('tabS').onclick=()=>showTab('S');$('tabD').onclick=()=>showTab('D');
 fillG();
 [['kPh',ph],['kT',tr],['kT2',tr2],['kVv',vv]].forEach(([id,o])=>$(id).onclick=()=>{o.lk=!o.lk;sync();draw()});
