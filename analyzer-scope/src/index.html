@@ -96,6 +96,7 @@
 <div id="viewS">
 <div id="tb">
 <div id="chips" class="nu"></div>
+<button id="bFic" hidden title="Datos del vehículo y de la prueba, y estado del motor">Ficha</button>
 <span class="sp"></span>
 <div class="grp" id="gRu"><button class="gb" title="Reglas de tiempo, fase y amplitud">Reglas</button><div class="gp">
 <span class="pr"><button class="tog on" id="tPh" title="Conectar o desconectar las reglas de fase">Reglas de fase</button><button class="tog lk" id="kPh" title="Bloquear el ciclo: al arrastrar FIN (o INICIO) se desplaza el ciclo entero">🔓</button></span>
@@ -207,6 +208,24 @@
 </div>
 </section>
 </main>
+<div id="fic" hidden><div class="ficB" role="dialog" aria-labelledby="ficT">
+<h2 id="ficT">Ficha de la captura</h2>
+<p class="hint">Estos datos acompañan a la señal en el CSV y en el informe. No escribas matrícula, bastidor ni datos del cliente.</p>
+<div class="ficG">
+<label>Marca y modelo <input type="text" id="fcM" maxlength="60" placeholder="p. ej. Peugeot 306 1.6 HDi"></label>
+<label>Código de motor <input type="text" id="fcC" maxlength="12"></label>
+<label>Combustible <select id="fcF"><option value="diesel">Diésel</option><option value="gasolina">Gasolina</option></select></label>
+<label>Condición de la prueba <select id="fcK"><option value="">Elige…</option><option value="arranque">Arranque (motor arrastrado)</option><option value="ralenti">Ralentí</option><option value="aceleracion">Aceleración en vacío</option><option value="carga">En carga o en marcha</option><option value="otra">Otra</option></select></label>
+<label>Temperatura del motor <select id="fcT"><option value="">Elige…</option><option value="frio">Frío</option><option value="caliente">Caliente</option></select></label>
+<label>Observaciones <input type="text" id="fcO" maxlength="200"></label>
+</div>
+<b class="ficS">Qué mide cada canal</b><div id="fcCh"></div>
+<b class="ficS">Estado del motor</b>
+<div class="ficE"><button id="fcOk" class="tog">Motor sin fallos</button><button id="fcKo" class="tog">Motor con fallo</button></div>
+<label class="ficW" id="fcAl" hidden>Avería o síntoma <input type="text" id="fcA" maxlength="120" placeholder="p. ej. ralentí irregular"></label>
+<p class="hint" id="fcSt"></p>
+<div class="ficE ficF"><button id="fcNo">Ahora no</button><button id="fcSv" class="p">Guardar ficha</button><button id="fcTx" class="p" hidden>Guardar y enviar a verificación</button></div>
+</div></div>
 <footer>Ortu Automoción · ortuautomocion.com</footer>
 <script>const EJEMPLOS={{ejemplos:ejemplos}};const APP_CFG={{appcfg}};</script>
 <script>

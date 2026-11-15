@@ -1412,6 +1412,162 @@
   [
    "Cerrar",
    "Close"
+  ],
+  [
+   "Estos datos acompañan a la señal en el CSV y en el informe. No escribas matrícula, bastidor ni datos del cliente.",
+   "These details travel with the signal in the CSV and in the report. Do not enter the number plate, VIN or any customer data."
+  ],
+  [
+   "Datos del vehículo y de la prueba, y estado del motor",
+   "Vehicle and test details, and engine condition"
+  ],
+  [
+   "Ficha de la captura",
+   "Capture sheet"
+  ],
+  [
+   "Marca y modelo",
+   "Make and model"
+  ],
+  [
+   "Código de motor",
+   "Engine code"
+  ],
+  [
+   "Condición de la prueba",
+   "Test condition"
+  ],
+  [
+   "Arranque (motor arrastrado)",
+   "Cranking (engine not started)"
+  ],
+  [
+   "Aceleración en vacío",
+   "Free revving"
+  ],
+  [
+   "En carga o en marcha",
+   "Under load or driving"
+  ],
+  [
+   "Temperatura del motor",
+   "Engine temperature"
+  ],
+  [
+   "Qué mide cada canal",
+   "What each channel measures"
+  ],
+  [
+   "Estado del motor",
+   "Engine condition"
+  ],
+  [
+   "Motor sin fallos",
+   "Engine without faults"
+  ],
+  [
+   "Motor con fallo",
+   "Engine with a fault"
+  ],
+  [
+   "Avería o síntoma",
+   "Fault or symptom"
+  ],
+  [
+   "Guardar y enviar a verificación",
+   "Save and send for verification"
+  ],
+  [
+   "Guardar ficha",
+   "Save sheet"
+  ],
+  [
+   "Ahora no",
+   "Not now"
+  ],
+  [
+   "Elige el estado del motor: sin fallos o con fallo.",
+   "Choose the engine condition: without faults or with a fault."
+  ],
+  [
+   "Ficha guardada: irá en el CSV con ajustes y en el informe PDF.",
+   "Sheet saved: it will go in the CSV with settings and in the PDF report."
+  ],
+  [
+   "Ficha: sin completar",
+   "Sheet: not filled in"
+  ],
+  [
+   "Enviando a verificación…",
+   "Sending for verification…"
+  ],
+  [
+   "Enviada a verificación: queda pendiente de revisión.",
+   "Sent for verification: pending review."
+  ],
+  [
+   "No se pudo enviar:",
+   "Could not send:"
+  ],
+  [
+   "Observaciones",
+   "Remarks"
+  ],
+  [
+   "Ralentí",
+   "Idle"
+  ],
+  [
+   "Frío",
+   "Cold"
+  ],
+  [
+   "Caliente",
+   "Hot"
+  ],
+  [
+   "Elige…",
+   "Choose…"
+  ],
+  [
+   "Otra",
+   "Other"
+  ],
+  [
+   "Ficha",
+   "Sheet"
+  ],
+  [
+   "aceleración en vacío",
+   "free revving"
+  ],
+  [
+   "en carga o en marcha",
+   "under load or driving"
+  ],
+  [
+   "otra condición",
+   "other condition"
+  ],
+  [
+   "motor frío",
+   "engine cold"
+  ],
+  [
+   "motor caliente",
+   "engine hot"
+  ],
+  [
+   "ralentí",
+   "idle"
+  ],
+  [
+   "arranque",
+   "cranking"
+  ],
+  [
+   "Estado:",
+   "Condition:"
   ]
  ]
 }

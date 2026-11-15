@@ -24,7 +24,7 @@ async function report(){
   doc.addImage(img,'PNG',10,33,w,h);
   const fd={usuario:'usuario',bajo:'paso bajo',alto:'paso alto',banda:'ancho de banda'};
   const items=[...CH.filter(c=>c.x&&c.on).map(c=>c.n+(c.p?' ('+c.p+')':'')+' ['+c.u+'] escala '+fmt(c.vd,c.u)+'/div'+(c.fl!=='off'?' · filtro '+fd[c.fl]+' '+c.f1+(c.fl==='banda'?'-'+c.f2:'')+' Hz':'')+(c.inv?' · invertido':'')),
-    'Vista: '+fmt(view.span,'s')+' desde '+fmt(view.t0,'s')].concat(PG.length>1?['Página '+(pgI+1)+' de '+PG.length+': '+PG[pgI].name]:[])
+    'Vista: '+fmt(view.span,'s')+' desde '+fmt(view.t0,'s')].concat(ficLines()).concat(PG.length>1?['Página '+(pgI+1)+' de '+PG.length+': '+PG[pgI].name]:[])
     .concat(ph.T>0&&ph.on?['Fase: 720° = '+fmt(ph.T,'s')+' ('+Math.round(120/ph.T)+' rpm)']:[])
     .concat(eng.on?['Motor: '+eng.n+' cilindros · orden de encendido '+eng.order.join('-')]:[]).concat(cylData().map(d=>'Orden '+d.j+' · Cil. '+d.cyl+': disparo '+fmt(d.trig,'s')+' · PMS compresión '+fmt(d.tdc,'s')+' ('+d.deg+')')).concat(R.map(([k,v])=>k+': '+v));
   const base=33+h+6;let col=0,y=base;doc.setFontSize(8);doc.setTextColor(...tc);

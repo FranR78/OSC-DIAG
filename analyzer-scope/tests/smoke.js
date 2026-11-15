@@ -19,7 +19,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   const b = await pw.chromium.launch({ headless: true });
   const ctx = await b.newContext({ viewport: { width: 1500, height: 950 }, acceptDownloads: true });
   await ctx.route(/^https?:/, r => r.abort()); // sin internet: todo debe funcionar en local
-  await ctx.addInitScript(() => { try { localStorage.setItem('as_ui', 'fix'); } catch (e) { } }); // esta batería recorre la vista clásica (todo a la vista); la vista nueva se prueba en F1
+  await ctx.addInitScript(() => { try { localStorage.setItem('as_ui', 'fix'); localStorage.setItem('as_ficha', 'off'); } catch (e) { } }); // esta batería recorre la vista clásica (todo a la vista); la vista nueva se prueba en F1
   const p = await ctx.newPage(); p.setDefaultTimeout(6000);
   const errs = []; p.on('pageerror', e => errs.push(String(e)));
   const E = (fn, ...a) => p.evaluate(fn, ...a);
@@ -322,6 +322,36 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('móvil: sin desplazamiento horizontal y gráfica ≥ 45 % del alto', await q.evaluate(() => document.documentElement.scrollWidth <= innerWidth && cv.clientHeight / innerHeight >= 0.45), JSON.stringify(await q.evaluate(() => [document.documentElement.scrollWidth, cv.clientHeight])));
     check('vista nueva: sin errores JS', qe.length === 0, qe.join(' | '));
     await c2.close();
+  }
+
+  console.log('\nF2 · Ficha de la captura (vehículo, prueba y estado del motor)');
+  {
+    const c3 = await b.newContext({ viewport: { width: 1400, height: 820 }, acceptDownloads: true }); await c3.route(/^https?:/, r => r.abort());
+    const q = await c3.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(400);
+    const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
+    await q.click('#bMore'); await q.selectOption('#ex', '0'); await q.waitForTimeout(600);
+    check('un ejemplo no pide ficha, pero se puede rellenar', !(await vis('#fic')) && (await q.evaluate(() => $('bFic').textContent)) === 'Ficha: sin completar');
+    await q.evaluate(() => $('bClr').click());
+    await q.setInputFiles('#fi', D('seat_altea_fase_pms_y_inyector_1.csv')); await q.waitForTimeout(700);
+    check('al abrir un archivo se pide la ficha', await vis('#fic') && await q.evaluate(() => document.querySelectorAll('#fcCh input').length === 3));
+    await q.fill('#fcM', 'Seat Altea 2.0 TDI'); await q.fill('#fcC', 'BKD'); await q.selectOption('#fcK', 'ralenti'); await q.selectOption('#fcT', 'caliente');
+    await q.fill('#fcCh input', 'Inyector 1'); await q.click('#fcSv');
+    check('sin estado del motor no se guarda', await vis('#fic') && /estado del motor/.test(await q.evaluate(() => $('fcSt').textContent)));
+    await q.click('#fcKo'); check('«Motor con fallo» pide la avería', await vis('#fcA'));
+    await q.click('#fcOk'); await q.click('#fcSv');
+    check('guardada: pastilla, parámetro del canal y código para el diagnóstico', !(await vis('#fic')) && await q.evaluate(() => $('bFic').textContent === '✓ Motor sin fallos · BKD' && CH[0].p === 'Inyector 1' && $('xC').value === 'BKD'));
+    check('la ficha va en el CSV con ajustes y en el PDF', await q.evaluate(() => cfgOf(CH.filter(c => c.x)).fic.estado === 'ok' && ficLines().join('|') === 'Ficha: Seat Altea 2.0 TDI · motor BKD · diésel · ralentí · motor caliente|Estado: Motor sin fallos'));
+    const csv = await q.evaluate(() => ficCsv(400).csv);
+    check('CSV reducido para la biblioteca (≤ 400 filas, con ajustes)', csv.startsWith('#analyzer-scope-ajustes;') && csv.split('\r\n').length <= 404 && csv.split('\r\n').length > 300, String(csv.split('\r\n').length));
+    await q.evaluate(() => $('bClr').click());
+    await q.setInputFiles('#fi', { name: 'ref.csv', mimeType: 'text/csv', buffer: Buffer.from(csv) }); await q.waitForTimeout(700);
+    check('al reabrirlo se recupera la ficha sin volver a preguntar', !(await vis('#fic')) && await q.evaluate(() => FIC && FIC.codigo === 'BKD' && $('bFic').textContent.startsWith('✓')));
+    check('fuera del portal no se ofrece el envío', await q.evaluate(() => { ficOpen(); const h = $('fcTx').hidden; $('fic').hidden = true; return h; }));
+    await q.evaluate(() => { window.google = { script: { run: { withSuccessHandler(f) { this.s = f; return this; }, withFailureHandler() { return this; }, apiDiagnostico(r) { window._req = r; this.s({ ok: true, v: 1, op: 'referencia', id: 'R1', estado: 'pendiente' }); } } } }; });
+    await q.click('#bFic'); await q.click('#fcKo'); await q.fill('#fcA', 'tirones'); await q.click('#fcTx'); await q.waitForTimeout(300);
+    check('portal: envío a verificación (op referencia, ficha, señales y CSV)', await q.evaluate(() => { const r = window._req; return r && r.op === 'referencia' && r.ficha.estado === 'fallo' && r.ficha.averia === 'tirones' && r.ficha.senales.length === 3 && r.ficha.senales[0].parametro === 'Inyector 1' && r.archivo.csv.startsWith('#analyzer-scope-ajustes;') && /pendiente/.test($('st').textContent) && FIC.enviada === 'R1'; }));
+    check('ficha: sin errores JS', qe.length === 0, qe.join(' | '));
+    await c3.close();
   }
 
   console.log(`\nRESULTADO: ${ok} correctas, ${bad} fallidas`);
