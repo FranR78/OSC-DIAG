@@ -182,3 +182,4 @@ body.light #ldCv{background:#fff;box-shadow:0 20px 50px rgba(18,38,58,.16)}
 body.light .ldHero h1,body.light .ldFt b{color:#14558f}
 @media(max-width:820px){.ldHero{grid-template-columns:minmax(0,1fr)}.ldFt{grid-template-columns:minmax(0,1fr)}.ldIn{padding-left:16px;padding-right:16px}#ldIn{padding:5px 9px}}
 #ldIn{white-space:nowrap}@media(max-width:480px){.ldTop{gap:6px}.ldTop img{height:26px;padding:2px 5px}.ldTop .lang button{padding:5px 8px;font-size:12.5px}#ldIn{font-size:12.5px}}
+body:not(.fix) #tabD,body:not(.fix) #tabC{display:none}

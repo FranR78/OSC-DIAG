@@ -310,8 +310,11 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await q.click('#gMo .gb'); await q.click('#bDrw');
     check('«Configurar fase y cilindros…» abre el panel lateral', await vis('#leftp') && await vis('#gN') && !(await vis('#tPms')));
     await q.click('#bDrX'); check('✕ lo cierra', !(await vis('#leftp')));
-    await q.click('#bVw'); await q.click('#tabD');
-    check('selector de vista: cambia de pestaña y se recoge', await q.evaluate(() => curTab === 'D' && $('bVw').textContent.startsWith('Diagrama')) && !(await vis('#tabS')));
+    await q.click('#gMo .gb'); await q.click('#bMD');
+    check('«Motor» abre el diagrama de distribución (ya no está en el selector de vista)', await q.evaluate(() => curTab === 'D' && $('bVw').textContent.startsWith('Diagrama')) && !(await vis('#tPms')));
+    await q.click('#bVw');
+    check('selector de vista: sin diagrama ni compresión, que van en «Motor»', await vis('#tabS') && !(await vis('#tabD')) && !(await vis('#tabC')));
+    await q.keyboard.press('Escape');
     await q.click('#bVw'); await q.click('#tabS');
     await q.click('#bMore'); await q.click('#bThm');
     check('tema claro: interfaz y fondo de la gráfica', await q.evaluate(() => document.body.classList.contains('light') && BGL > 0.99));
@@ -319,7 +322,8 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('textos nuevos traducidos', await q.evaluate(() => $('bVw').textContent.startsWith('Oscilloscope') && $('bThm').textContent === 'Dark theme' && document.querySelector('#gMo .gb').textContent === 'Engine'));
     await q.click('#lES'); await q.click('#bThm'); await q.click('#bUi');
     check('«Vista clásica»: paneles a la vista y canales de vuelta en su panel', await q.evaluate(() => document.body.classList.contains('fix') && $('chBox').parentElement.id === 'leftp') && await vis('#leftp') && await vis('#tPms'));
-    await q.reload(); await q.waitForFunction(() => typeof landShow === 'function'); await q.waitForTimeout(300);
+    await q.waitForTimeout(500); // el navegador confirma localStorage de forma asíncrona: recargar al instante puede leer el valor anterior
+    await q.waitForTimeout(500); await q.reload(); await q.waitForFunction(() => typeof landShow === 'function'); await q.waitForTimeout(300);
     check('la vista elegida se recuerda', await q.evaluate(() => document.body.classList.contains('fix')));
     await q.click('#bUi');
     await q.setViewportSize({ width: 400, height: 780 }); await q.click('#bMore'); await q.selectOption('#ex', '0'); await q.waitForTimeout(600);
@@ -366,7 +370,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('primera visita: guía en el paso 1 señalando «Abrir archivos…»', await vis('#gd') && await q.evaluate(() => $('gdN').textContent === '1 / 3' && $('bOpen').classList.contains('gdT')));
     await q.click('#gdG'); await q.click('#gdG');
     check('paso 3 y botón «Entendido»', await q.evaluate(() => $('gdN').textContent === '3 / 3' && $('gdG').textContent === 'Entendido'));
-    await q.click('#gdG'); await q.reload(); await q.waitForTimeout(300);
+    await q.click('#gdG'); await q.waitForTimeout(500); await q.reload(); await q.waitForTimeout(300);
     check('terminada, no vuelve a salir', !(await vis('#gd')) && await q.evaluate(() => !document.querySelector('.gdT')));
     await q.click('#emEx'); await q.waitForTimeout(900);
     const v0 = await q.evaluate(() => [view.t0, view.span]);
@@ -405,7 +409,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('los pasos usan las herramientas de verdad: cilindros, T1/T2 y anotación', await q.evaluate(() => $('tGr').classList.contains('on') && tr.on && cur.a != null && cur.b > cur.a && ann.list.length === 2 && $('gdN').textContent === '5 / 6'));
     await q.click('#gdG'); await q.click('#gdG');
     check('fin del caso', !(await vis('#gd')));
-    await q.reload(); await q.waitForTimeout(400);
+    await q.waitForTimeout(500); await q.reload(); await q.waitForTimeout(400);
     check('segunda visita: directo a la app (la portada sigue en ☰)', !(await vis('#land')) && await q.evaluate(() => !!$('bLd')));
     await q.click('#gdS'); await q.click('#bMore'); await q.click('#bLd');
     await q.setViewportSize({ width: 400, height: 780 }); await q.waitForTimeout(300);

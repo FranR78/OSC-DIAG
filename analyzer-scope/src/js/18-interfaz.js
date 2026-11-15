@@ -44,3 +44,5 @@ $('emOp').onclick=()=>$('fi').click();
 $('emEx').onclick=()=>{$('ex').value='0';$('ex').dispatchEvent(new Event('change',{bubbles:true}))};
 {let dn=0;const w=$('wrap');addEventListener('dragenter',()=>{dn++;w.classList.add('drag')});addEventListener('dragleave',()=>{if(--dn<=0){dn=0;w.classList.remove('drag')}});addEventListener('drop',()=>{dn=0;w.classList.remove('drag')})}
 $('empty').hidden=CH.some(c=>c.x);
+/* En la vista nueva, el diagrama de distribución y la compresión relativa se abren desde «Motor» */
+$('bMD').onclick=()=>{closePops();showTab('D')};$('bMC').onclick=()=>{closePops();showTab('C')};
