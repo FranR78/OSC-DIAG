@@ -244,6 +244,11 @@ estanqueidad, máquina de humo…). Si todos fallan por igual (p. ej. 4 inyector
 
 ---------------------------------------------------------------------------------------------------
 
+## 9b. Medida `avance` con varias reglas (2026.11.15)
+
+La app puede enviar varias medidas `avance`: una con `k: "enc"` y hasta dos con `k: "iny"`, que llevan además `inyeccion: 1 | 2`
+(Inyec.1, Inyec.2). Quien no conozca `inyeccion` lo ignora (§1) y verá dos avances de inyección.
+
 ## 10. `referencia` · fuera del portal
 
 Las señales para la biblioteca verificada **no** pasan por el portal (es del alumnado). Van a un servidor propio de

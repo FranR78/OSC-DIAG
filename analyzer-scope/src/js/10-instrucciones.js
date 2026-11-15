@@ -50,7 +50,7 @@ sec:[
 'Abre «Sincronización por disparo» y elige el canal que lleva el pulso de encendido (gasolina) o de inyección (diésel), el cilindro al que corresponde el disparo y si el canal trae un solo cilindro o todos.',
 'Si hace falta, ajusta el umbral y el flanco. Pulsa «Sincronizar»: la aplicación calcula el ciclo y las rpm y numera los cilindros a partir de ese disparo.']},
 {h:'7 · Avance de encendido o de inyección',t:[
-'Pulsa «Avance» y elige A.Enc o A.Iny en la sección «Avance». Arrastra la regla: los grados se miden respecto a la regla PMS (positivo = antes del PMS).']},
+'Pulsa «Avance» y, en la sección «Avance», marca las reglas que necesites: A.Enc (encendido) y avance de inyección con una o dos inyecciones (Inyec.1 e Inyec.2). Arrastra cada regla: los grados se miden respecto a la regla PMS (positivo = antes del PMS). Todas salen en el diagrama de distribución y en el informe PDF.']},
 {h:'8 · Diagrama de distribución',t:[
 'Pulsa «AAA·RCE·AAE·RCA» y arrastra las cuatro reglas a los puntos de apertura y cierre de válvulas de la señal, con la regla PMS entre AAA y RCE.',
 'Abre la pestaña «Diagrama de distribución»: verás el diagrama circular, los avances y retrasos, las duraciones y el cruce de válvulas.',

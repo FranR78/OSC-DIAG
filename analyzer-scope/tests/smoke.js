@@ -8,6 +8,8 @@ const path = require('path'), fs = require('fs');
 let pw; try { pw = require('playwright'); } catch (e) { if (!process.env.PLAYWRIGHT_PATH) throw e; pw = require(process.env.PLAYWRIGHT_PATH); }
 const APP = 'file://' + path.resolve(process.env.APP || path.join(__dirname, '..', 'dist', 'analyzer-scope.html'));
 const D = f => path.join(__dirname, 'data', f);
+// Origen http simulado para las pruebas que recargan: en Chromium sin pantalla, localStorage de file:// se pierde a veces al recargar
+const APP_H = 'http://app.test/', serve = c => c.route(APP_H, r => r.fulfill({ path: APP.replace('file://', ''), contentType: 'text/html; charset=utf-8' }));
 const CAPS = ['seat_altea_fase_pms_y_inyector_1.csv', 'fase_pms_inyecctor_2.csv', 'fase_pms_inyector_3.csv', 'fase_pms_inyector_4.csv'].map(D);
 
 let ok = 0, bad = 0;
@@ -90,6 +92,10 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   check('regla al otro lado: valor positivo con ⚠', /5\.0° ⚠/.test(await p.$eval('#dd', e => e.innerText)));
   check('PMS en compresión (360° del de cruce): mismos valores, sin desfase de 360°', await E(() => { vv.ia = pms.t - ph.T * 15 / 720; const k = () => { const d = distCalc(); return ['aaa', 'rce', 'aae', 'rca', 'cruce'].map(q => d[q].toFixed(3)).join(','); }; const a = k(); pms.t += ph.T / 2; const b = k(); pms.t -= ph.T; const c = k(); pms.t += ph.T / 2; return a === b && a === c && distCalc().aaa.toFixed(1) === '15.0' || [a, b, c].join(' | '); }) === true, await E(() => [distCalc().aaa, distCalc().rce, distCalc().aae, distCalc().rca].map(v => v.toFixed(1)).join(',')));
   check('avance respecto a la regla PMS', await E(() => { adv.t = pms.t - ph.T * 12 / 720; return Math.abs(distCalc().adv - 12) < 1e-9; }));
+  await E(() => { $('avI').checked = true; $('avI').onchange(); $('avN').value = '2'; $('avN').onchange(); adv.i1 = pms.t - ph.T * 20 / 720; adv.i2 = pms.t + ph.T * 3 / 720; draw(); });
+  check('sección Avance: A.Enc + dos inyecciones crean tres reglas respecto al PMS', await E(() => { const a = distCalc().advs; return adv.on && a.length === 3 && a.map(x => x.lab).join() === 'A.Enc,Inyec.1,Inyec.2' && Math.abs(a[1].deg - 20) < 1e-9 && Math.abs(a[2].deg + 3) < 1e-9; }));
+  check('las tres salen en el diagrama/informe, en las lecturas y son arrastrables', await E(() => { const r = distRows().map(x => x[0]).join('|'), rd = $('rd').textContent; return /A\.Enc · avance de encendido/.test(r) && /Inyec\.1 · avance de la 1\.ª inyección/.test(r) && /Inyec\.2 · avance de la 2\.ª inyección/.test(r) && /Inyec\.1/.test(rd) && /Inyec\.2/.test(rd) && dxPeticion().medidas.filter(m => m.id === 'avance').map(m => m.k + (m.inyeccion || '')).join() === 'enc,iny1,iny2'; }));
+  check('una sola inyección quita Inyec.2; ajustes antiguos (A.Iny) se convierten en Inyec.1', await E(() => { $('avN').value = '1'; $('avN').onchange(); const one = distCalc().advs.map(x => x.lab).join(); const keep = JSON.stringify(adv); advLoad({ on: true, t: pms.t - ph.T * 7 / 720, k: 'iny' }); const leg = distCalc().advs; const ok = leg.length === 1 && leg[0].lab === 'Inyec.1' && Math.abs(leg[0].deg - 7) < 1e-9; Object.assign(adv, JSON.parse(keep)); $('avI').checked = false; $('avI').onchange(); return one === 'A.Enc,Inyec.1' && ok && distCalc().advs.length === 1; }));
   await click('#tabS');
 
   console.log('\n7 · Idioma (revisión de textos sin traducir en inglés)');
@@ -287,7 +293,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   console.log('\nF1 · Vista nueva: la señal manda, todo lo demás se despliega y se recoge');
   {
     const c2 = await b.newContext({ viewport: { width: 1400, height: 820 } }); await c2.route(/^https?:/, r => r.abort()); await c2.addInitScript(() => { try { localStorage.setItem('as_guia', '1'); localStorage.setItem('as_portada', '1'); } catch (e) { } });
-    const q = await c2.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(400);
+    const q = await c2.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await serve(c2); await q.goto(APP_H); await q.waitForTimeout(400);
     const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
     check('vista nueva por defecto, panel lateral recogido', await q.evaluate(() => !document.body.classList.contains('fix')) && !(await vis('#leftp')));
     check('sin señal: estado vacío con «Abrir archivos…» y «Ver un ejemplo»; iconos en los grupos', await vis('#empty') && await vis('#emOp') && await q.evaluate(() => !!document.querySelector('#gRu .gb svg') && !!document.querySelector('#bMore svg')));
@@ -371,7 +377,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   console.log('\nF3 · Usabilidad: guía de primer uso, atajos, deshacer y móvil');
   {
     const c4 = await b.newContext({ viewport: { width: 1400, height: 820 } }); await c4.route(/^https?:/, r => r.abort()); await c4.addInitScript(() => { try { localStorage.setItem('as_portada', '1'); } catch (e) { } });
-    const q = await c4.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(400);
+    const q = await c4.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await serve(c4); await q.goto(APP_H); await q.waitForTimeout(400);
     const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
     check('primera visita: guía en el paso 1 señalando «Abrir archivos…»', await vis('#gd') && await q.evaluate(() => $('gdN').textContent === '1 / 3' && $('bOpen').classList.contains('gdT')));
     await q.click('#gdG'); await q.click('#gdG');
@@ -403,7 +409,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   console.log('\nF4 · Portada con demo en vivo y caso real paso a paso');
   {
     const c5 = await b.newContext({ viewport: { width: 1400, height: 820 } }); await c5.route(/^https?:/, r => r.abort());
-    const q = await c5.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(1500);
+    const q = await c5.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await serve(c5); await q.goto(APP_H); await q.waitForTimeout(1500);
     const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
     check('primera visita: portada en español', await vis('#land') && await q.evaluate(() => document.querySelector('#land h1').textContent === 'La señal, sin ruido.' && LANG === 'es'));
     check('demo en vivo: la captura de ejemplo se está dibujando', await q.evaluate(() => { const c = $('ldCv'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 200) n++; return n > 500 && /Seat Altea/.test($('ldCap').textContent); }));

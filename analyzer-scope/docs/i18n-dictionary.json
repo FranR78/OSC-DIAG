@@ -1820,6 +1820,46 @@
   [
    "no hay conexión con la biblioteca.",
    "no connection to the library."
+  ],
+  [
+   "Marca las reglas que necesites: se crean junto a la regla PMS y se arrastran sobre la señal. Cada avance se mide en grados respecto a la regla PMS: positivo (APMS) si la regla está antes del PMS, negativo (DPMS) si está después. Como el PMS se repite cada 360°, se toma el PMS más cercano. Todas aparecen en el diagrama de distribución y en el informe PDF. Las reglas AAE, AAA, RCE y RCA se leen en ese orden de izquierda a derecha, con la regla PMS (0°) entre AAA y RCE como referencia; arrástrala hasta el PMS real. Candado 🔓/🔒 junto a cada grupo: bloqueado, al arrastrar una regla se mueve todo el grupo conservando la distancia.",
+   "Tick the rulers you need: they are created next to the TDC ruler and you drag them over the signal. Each advance is measured in degrees from the TDC ruler: positive (BTDC) if the ruler is before TDC, negative (ATDC) if it is after. Since TDC repeats every 360°, the nearest TDC is used. All of them appear in the valve timing diagram and in the PDF report. The EVO, IVO, EVC and IVC rulers are read in that order from left to right, with the TDC ruler (0°) between IVO and EVC as the reference; drag it to the real TDC. Padlock 🔓/🔒 next to each group: when locked, dragging one ruler moves the whole group keeping the distance."
+  ],
+  [
+   "Pulsa «Avance» y, en la sección «Avance», marca las reglas que necesites: A.Enc (encendido) y avance de inyección con una o dos inyecciones (Inyec.1 e Inyec.2). Arrastra cada regla: los grados se miden respecto a la regla PMS (positivo = antes del PMS). Todas salen en el diagrama de distribución y en el informe PDF.",
+   "Press “Advance” and, in the “Advance” section, tick the rulers you need: Ign.Adv (ignition) and injection advance with one or two injections (Inj.1 and Inj.2). Drag each ruler: degrees are measured from the TDC ruler (positive = before TDC). All of them appear in the valve timing diagram and in the PDF report."
+  ],
+  [
+   "Reglas de avance de encendido y de inyección (Inyec.1, Inyec.2)",
+   "Ignition and injection advance rulers (Inj.1, Inj.2)"
+  ],
+  [
+   "Inyec.1 · avance de la 1.ª inyección",
+   "Inj.1 · advance of the 1st injection"
+  ],
+  [
+   "Inyec.2 · avance de la 2.ª inyección",
+   "Inj.2 · advance of the 2nd injection"
+  ],
+  [
+   "2 · Inyec.1 e Inyec.2",
+   "2 · Inj.1 and Inj.2"
+  ],
+  [
+   "Número de inyecciones",
+   "Number of injections"
+  ],
+  [
+   "Avance de inyección",
+   "Injection advance"
+  ],
+  [
+   "Inyec.1",
+   "Inj.1"
+  ],
+  [
+   "Inyec.2",
+   "Inj.2"
   ]
  ]
 }

@@ -86,9 +86,11 @@ $('tVv').onclick=()=>{if(!(ph.T>0))return st('Carga una señal primero.');vv.on=
   if(vv.on){if(!pms.on||pms.t==null){pms.on=true;if(pms.t==null)pms.t=view.t0+view.span/2}
   const rt=refT(),a2=a=>rt+ph.T*a/720;if(vv.ie==null){vv.ie=a2(-225);vv.ia=a2(-15);vv.fe=a2(15);vv.fa=a2(225)}}sync();draw()};
 $('tAdv').onclick=()=>{if(!(ph.T>0))return st('Carga una señal primero.');adv.on=!adv.on;
-  if(adv.on){if(!pms.on||pms.t==null){pms.on=true;if(pms.t==null)pms.t=view.t0+view.span/2}
-    if(adv.t==null)adv.t=pms.t-ph.T*10/720}sync();draw()};
-$('advk').onchange=()=>{adv.k=$('advk').value;draw();if(!$('viewD').hidden)distTab()};
+  if(adv.on)advInit();advUI();sync();draw()};
+/* sección «Avance»: elegir qué reglas existen (encendido, y una o dos inyecciones) las crea respecto al PMS */
+['avE','avI','avN'].forEach(id=>$(id).onchange=()=>{adv.e=$('avE').checked;adv.n=$('avI').checked?+$('avN').value:0;
+  if(ph.T>0){if(adv.e||adv.n){adv.on=true;advInit()}else adv.on=false}advUI();sync();draw();if(!$('viewD').hidden)distTab()});
+advUI();
 function distTab(){drawDist($('cv2'),'dark',700,700);
   const r=distRows(),c0=distCalc(),warn=c0&&c0.ok&&[c0.aaa,c0.rce,c0.aae,c0.rca].some(v=>v<0);$('dd').innerHTML=r.length?r.map(([k,v])=>'<div class="r"><span>'+k+'</span><b>'+v+'</b></div>').join('')+'<p class="hint">'+(warn?'⚠ Una o más reglas están al otro lado de su referencia (se muestra el valor absoluto). ':'')+'Referencias: AAA y RCE respecto al PMS; AAE y RCA respecto al PMI. Todos los ángulos se muestran en positivo.</p>':
   '<p class="hint">Activa «AAA·RCE·AAE·RCA» y «Avance» en la pestaña Osciloscopio y colócalas sobre la señal. La regla PMS marca los 0°.</p>'}

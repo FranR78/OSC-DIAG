@@ -2,7 +2,7 @@
 function drawDist(cn,th,W,H){
   const D=th!=='light',g2=cn.getContext('2d');{const ft=g2.fillText.bind(g2);g2.fillText=(t,x,y)=>ft(i18(String(t)),x,y)}cn.width=W;cn.height=H;
   const bg=D?'#050a13':'#ffffff',tx=D?'#e6edf6':'#1b2430',mu=D?'#8fa2b8':'#6b7785',gr=D?'#22324a':'#d3dae3',
-    cI=D?'#3da5ff':'#1f78d1',cE=D?'#ff6b4d':'#d63a1f',cO=D?'#ffd24d':'#d99a00',cA=adv.k==='enc'?(D?'#ff7bf1':'#b3199e'):(D?'#7bffe3':'#0f8f7a');
+    cI=D?'#3da5ff':'#1f78d1',cE=D?'#ff6b4d':'#d63a1f',cO=D?'#ffd24d':'#d99a00',cA=D?['#ff7bf1','#7bffe3','#b6ff5c']:['#b3199e','#0f8f7a','#4d8f00'];
   g2.fillStyle=bg;g2.fillRect(0,0,W,H);
   const c=distCalc(),cx=W/2,cy=H/2+4,R=Math.min(W,H)*.285,wd=W*.045,f=v=>v.toFixed(1)+'°';
   const P=(r,t)=>[cx+r*Math.sin(t*Math.PI/180),cy-r*Math.cos(t*Math.PI/180)];
@@ -21,10 +21,12 @@ function drawDist(cn,th,W,H){
     ev(-c.aaa,'AAA '+f(Math.abs(c.aaa)),cI);ev(c.rce,'RCE '+f(Math.abs(c.rce)),cE);ev(180-c.aae,'AAE '+f(Math.abs(c.aae)),cE);ev(180+c.rca,'RCA '+f(Math.abs(c.rca)),cI);
     txt('Cruce '+f(c.cruce),cx,cy-R-wd*3.8,cO)}
   else txt('Coloca las reglas AAA, RCE, AAE y RCA en la pestaña Osciloscopio',cx,H-W*.06,mu);
-  if(c&&c.adv!=null){const t=-c.adv,[x0,y0]=P(R-wd*1.9,t),[x1,y1]=P(R+wd*2,t);
-    g2.strokeStyle=cA;g2.lineWidth=3.5;g2.beginPath();g2.moveTo(x0,y0);g2.lineTo(x1,y1);g2.stroke();
-    const [tx2,ty]=P(R+wd*3.3,t);txt((c.advk==='enc'?'A.Enc ':'A.Iny ')+f(c.adv),tx2,ty,cA,'right')}
-  [[cI,'Admisión'],[cE,'Escape'],[cO,'Cruce'],[cA,adv.k==='enc'?'A.Enc':'A.Iny']].forEach(([col,l],i)=>{const x=W*.08+i*W*.22;
+  const av=(c&&c.advs)||[];
+  av.forEach((a,j)=>{const t=-a.deg,[x0,y0]=P(R-wd*1.9,t),[x1,y1]=P(R+wd*2,t),col=cA[a.i];
+    g2.strokeStyle=col;g2.lineWidth=3.5;g2.beginPath();g2.moveTo(x0,y0);g2.lineTo(x1,y1);g2.stroke();
+    const [tx2,ty]=P(R+wd*(3.3+j*.75),t);txt(a.lab+' '+f(a.deg),tx2,ty,col,'right')});
+  const lg=[[cI,'Admisión'],[cE,'Escape'],[cO,'Cruce']].concat(av.length?av.map(a=>[cA[a.i],a.lab]):[[cA[0],'A.Enc']]);
+  lg.forEach(([col,l],i)=>{const x=W*.06+i*W*.9/lg.length;
     g2.fillStyle=col;g2.fillRect(x,H-W*.04,W*.025,W*.025);txt(l,x+W*.035,H-W*.02,tx,'left',W*.022)});
 }
 
