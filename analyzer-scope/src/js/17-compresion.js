@@ -3,6 +3,9 @@
 const CRC=['#2f7bff','#ff3b3b','#22c55e','#ffd400','#9b5cff','#ff8a00','#00c8d7','#ff5fb0','#a0703c','#9aa6b3','#7a9a01','#e8e8e8'];
 const crCol=c=>CRC[(c-1)%CRC.length];
 let crRes=null,crMsg='';
+// Umbrales (% de la joroba del mejor cilindro). NT: «un 90 % no es para alarmarse; de 70-80 % para abajo, sí» (vídeo It3_s7hHN1k);
+// caso Subaru ~50 % = falta de compresión (pico-post-1198). Por debajo de CR_MAL → confirmar con compresímetro o WPS500X.
+const CR_OK=90,CR_MAL=80,CR_COL={ok:'#e6edf6',vig:'#ffb020',mal:'#ff6b6b'};
 const crV=id=>{const v=$(id).value;return v===''||v==null?-1:+v};
 function crFill(){
   const opts=sel=>'<option value="-1">— elige canal —</option>'+CH.map((c,i)=>c.x?'<option value="'+i+'"'+(i===sel?' selected':'')+'>'+c.n+(c.u?' ('+c.u+')':'')+'</option>':'').join('');
@@ -19,19 +22,22 @@ function crCalc(si,ii,cyl){
   const E=trigEvents(S,'up',.35);if(E.length<2)return{err:'No se detectan al menos dos disparos en '+S.n+': hace falta un ciclo completo.'};
   const d=[];for(let k=1;k<E.length;k++)d.push(E[k]-E[k-1]);d.sort((a,b)=>a-b);const T=d[d.length>>1];
   if(d[0]<T*.6)return{err:'Los disparos de '+S.n+' no son de un solo cilindro (uno por ciclo). Usa la señal de un solo inyector o bobina.'};
-  const x=I.x,y=I.y,n=y.length,dt=(x[n-1]-x[0])/(n-1),k=Math.max(1,Math.round(.004/dt)),sm=new Float64Array(n);
+  const x=I.x,y=I.y,n=y.length,inv=/^V$/i.test(I.u||'')&&[...y].sort((a,b)=>a-b)[n>>1]>5,dt=(x[n-1]-x[0])/(n-1),k=Math.max(1,Math.round(.004/dt)),sm=new Float64Array(n);
   let acc=0;for(let i=0;i<n;i++){acc+=y[i];if(i>=k)acc-=y[i-k];sm[i]=acc/Math.min(i+1,k)}  // media móvil de 4 ms (quita el rizado de las delgas)
   const sh=Math.floor(k/2),at=t=>Math.min(n-1,Math.max(0,Math.round((t-x[0])/dt)+sh)),i0=ord.indexOf(cyl),P={};
   ord.forEach(c=>P[c]=[]);
   const kMin=Math.floor((x[0]-E[0])/T)-1,kMax=Math.ceil((x[n-1]-E[0])/T)+1;
   for(let kc=kMin;kc<=kMax;kc++)for(let j=0;j<N;j++){
     const tc=E[0]+kc*T+j*T/N,a=tc-T/N/2,b=tc+T/N/2;if(a<x[0]||b>x[n-1])continue;
-    let m=-Infinity;for(let i=at(a),e=at(b);i<=e;i++)if(sm[i]>m)m=sm[i];
-    P[ord[(i0+j)%N]].push(m)}
-  const R=ord.slice().sort((a,b)=>a-b).map(c=>{const v=P[c];return{cyl:c,n:v.length,pk:v.length?v.reduce((s,q)=>s+q,0)/v.length:null}});
+    let m=-Infinity,v=Infinity;for(let i=at(a),e=at(b);i<=e;i++){if(sm[i]>m)m=sm[i];if(sm[i]<v)v=sm[i]}
+    P[ord[(i0+j)%N]].push([inv?v:m,m-v])}
+  const av=(v,k)=>v.reduce((s,q)=>s+q[k],0)/v.length;
+  const R=ord.slice().sort((a,b)=>a-b).map(c=>{const v=P[c];return{cyl:c,n:v.length,pk:v.length?av(v,0):null,amp:v.length?av(v,1):null}});
   if(R.some(r=>!r.n))return{err:'La captura no cubre todos los cilindros: hace falta al menos un ciclo completo (720°) de arranque.'};
-  const mx=Math.max(...R.map(r=>r.pk));R.forEach(r=>r.pc=r.pk/mx*100);
-  return{R,T,rpm:120/T,u:I.u||'A',sN:S.n,iN:I.n,cyl};
+  // % = altura de la joroba (pico − valle) frente a la del mejor cilindro: la corriente base del arranque no cuenta
+  const mx=Math.max(...R.map(r=>r.amp));if(!(mx>0))return{err:'No se ven jorobas de compresión en '+I.n+'.'};
+  R.forEach(r=>{r.pc=r.amp/mx*100;r.est=r.pc>=CR_OK?'ok':r.pc>=CR_MAL?'vig':'mal'});
+  return{R,T,rpm:120/T,u:I.u||'A',sN:S.n,iN:I.n,cyl,inv};
 }
 function crGo(){
   const si=crV('crS'),ii=crV('crI'),cyl=+$('crY').value||1;
@@ -39,8 +45,11 @@ function crGo(){
   if(si===ii){crRes=null;crMsg='El sincronismo y la corriente deben ser canales distintos.';return crOut()}
   const r=crCalc(si,ii,cyl);
   if(r.err){crRes=null;crMsg=r.err}
-  else{crRes=r;const lo=r.R.filter(q=>q.pc<90).map(q=>q.cyl);
-    crMsg='Arranque a '+Math.round(r.rpm)+' rpm · '+Math.min(...r.R.map(q=>q.n))+' compresiones por cilindro promediadas. '+(lo.length?'Por debajo del 90 %: cilindro '+lo.join(', ')+'.':'Todos los cilindros por encima del 90 %.')}
+  else{crRes=r;const f=e=>r.R.filter(q=>q.est===e).map(q=>q.cyl).join(', '),mal=f('mal'),vig=f('vig');
+    crMsg='Arranque a '+Math.round(r.rpm)+' rpm · '+Math.min(...r.R.map(q=>q.n))+' compresiones por cilindro promediadas. '+
+      (mal?'Compresión baja (< 80 %): cilindro '+mal+'. Confirmar con compresímetro o transductor en cilindro. ':'')+
+      (vig?'Vigilar (80-90 %): cilindro '+vig+'. Repetir la prueba. ':'')+
+      (mal||vig?'':'Todos los cilindros por encima del 90 %: compresión pareja.')}
   crOut();
 }
 function crDraw(){
@@ -54,14 +63,14 @@ function crDraw(){
   g3.strokeStyle=gr;g3.lineWidth=1;
   for(let v=0;v<=100;v+=20){g3.beginPath();g3.moveTo(ml,Y(v)+.5);g3.lineTo(W-mr,Y(v)+.5);g3.stroke();txt(v+' %',ml-8,Y(v)+4,mu,'right',12)}
   if(!r){txt('Carga la captura, elige los canales y pulsa «Analizar»',W/2,H/2,mu);return}
-  txt('mejor cilindro = 100 % · '+Math.min(...r.R.map(q=>q.n))+' ciclos',W/2,48,mu,'center',12);
+  txt('joroba (pico − valle) del mejor cilindro = 100 % · '+Math.min(...r.R.map(q=>q.n))+' ciclos',W/2,48,mu,'center',12);
   const n=r.R.length,bw=pw/n;
   r.R.forEach((q,i)=>{const x0=ml+i*bw+bw*.18,w=bw*.64,c=crCol(q.cyl);
     g3.fillStyle=c;g3.fillRect(x0,Y(q.pc),w,Y(0)-Y(q.pc));
-    txt(q.pc.toFixed(1)+' %',x0+w/2,Y(q.pc)-8,q.pc<90?'#ff6b6b':tx,'center',14,1);
+    txt(q.pc.toFixed(1)+' %',x0+w/2,Y(q.pc)-8,CR_COL[q.est],'center',14,1);
     txt('Cil. '+q.cyl,x0+w/2,Y(0)+20,c,'center',14,1);
-    txt(fmt(q.pk,r.u),x0+w/2,Y(0)+38,mu,'center',11)});
-  g3.strokeStyle='#ff6b6b';g3.setLineDash([6,5]);g3.beginPath();g3.moveTo(ml,Y(90)+.5);g3.lineTo(W-mr,Y(90)+.5);g3.stroke();g3.setLineDash([]);
+    txt((r.inv?'mín ':'')+fmt(q.pk,r.u)+' · Δ '+fmt(q.amp,r.u),x0+w/2,Y(0)+38,mu,'center',11)});
+  [[CR_OK,CR_COL.vig],[CR_MAL,CR_COL.mal]].forEach(([v,c])=>{g3.strokeStyle=c;g3.setLineDash([6,5]);g3.beginPath();g3.moveTo(ml,Y(v)+.5);g3.lineTo(W-mr,Y(v)+.5);g3.stroke()});g3.setLineDash([]);
 }
 function crOut(){$('crSt').textContent=crMsg;crDraw()}
 function crTab(){crFill();crOut()}

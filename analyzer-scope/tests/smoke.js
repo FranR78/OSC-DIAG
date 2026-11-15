@@ -217,9 +217,9 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   await click('#tabC'); await p.waitForTimeout(150);
   await p.selectOption('#crS', '0'); await p.selectOption('#crI', '1'); await p.selectOption('#crY', '1');
   await click('#crGo'); await p.waitForTimeout(200);
-  const cr = await E(() => crRes && crRes.R.map(r => ({ c: r.cyl, pc: r.pc })));
-  const crLow = cr ? cr.filter(r => r.pc < 90).map(r => r.c).join(',') : '';
-  check('compresión relativa: ~183 rpm y los cilindros 1 y 3 por debajo del 90 %', cr && crLow === '1,3' && Math.abs(await E(() => crRes.rpm) - 183) < 10 && cr.some(r => r.pc === 100), JSON.stringify(cr));
+  const cr = await E(() => crRes && crRes.R.map(r => ({ c: r.cyl, pc: +r.pc.toFixed(1), est: r.est })));
+  const crLow = cr ? cr.filter(r => r.est === 'mal').map(r => r.c).join(',') : '';
+  check('compresión relativa: ~183 rpm y los cilindros 1 y 3 con compresión baja (< 80 %)', cr && crLow === '1,3' && Math.abs(await E(() => crRes.rpm) - 183) < 10 && cr.some(r => r.pc === 100), JSON.stringify(cr));
   await click('#tabS');
 
   console.log('\nErrores JS durante la sesión:', errs.length);
