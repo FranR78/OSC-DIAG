@@ -33,11 +33,10 @@ $('kb').addEventListener('pointerdown',e=>{if(e.target===$('kb'))kbOpen(false)})
 const GD=[['#bOpen','1 · Abre tu captura','Arrastra un CSV sobre la gráfica o pulsa «Abrir archivos…». Si no tienes ninguno a mano, prueba con «Ver un ejemplo».'],
   ['#chips','2 · Cada canal es una pastilla','Púlsala para cambiar la escala, la posición, el filtro o el nombre. Se recoge sola al pulsar fuera.'],
   ['#gRu','3 · Mide, anota y exporta','«Reglas» y «Motor» miden; «Anotar» dibuja sobre la señal; «Exportar» crea el informe PDF. Pulsa ? para ver los atajos de teclado.']];
-let gdI=-1;
+let gdI=-1,GDL=GD;
 function gdShow(i){document.querySelectorAll('.gdT').forEach(e=>e.classList.remove('gdT'));gdI=i;
-  if(i<0||i>=GD.length){$('gd').hidden=true;gdI=-1;LS.set('as_guia','1');return}
-  const[s,t,p]=GD[i];document.querySelector(s).classList.add('gdT');$('gdT').textContent=t;$('gdP').textContent=p;$('gdN').textContent=(i+1)+' / '+GD.length;
-  $('gdG').textContent=i===GD.length-1?'Entendido':'Siguiente';$('gd').hidden=false}
-$('gdG').onclick=()=>gdShow(gdI+1);$('gdS').onclick=()=>gdShow(-1);$('bGd').onclick=()=>{closePops();gdShow(0)};
+  if(i<0||i>=GDL.length){$('gd').hidden=true;gdI=-1;if(GDL===GD)LS.set('as_guia','1');return}
+  const[s,t,p,run]=GDL[i];if(run)run();document.querySelector(s).classList.add('gdT');$('gdT').textContent=t;$('gdP').textContent=p;$('gdN').textContent=(i+1)+' / '+GDL.length;
+  $('gdG').textContent=i===GDL.length-1?'Entendido':'Siguiente';$('gd').hidden=false}
+$('gdG').onclick=()=>gdShow(gdI+1);$('gdS').onclick=()=>gdShow(-1);$('bGd').onclick=()=>{closePops();GDL=GD;gdShow(0)};
 {const g=setLang;setLang=function(l){g(l);if(gdI>=0)gdShow(gdI)}}
-if(!isFix()&&!LS.get('as_guia'))gdShow(0);

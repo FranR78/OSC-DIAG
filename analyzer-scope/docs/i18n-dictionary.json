@@ -1692,6 +1692,122 @@
   [
    "Saltar",
    "Skip"
+  ],
+  [
+   "Abre la captura de tu osciloscopio y céntrate en lo que importa: fase, cilindros, medidas y un informe que se entiende.",
+   "Open your oscilloscope capture and focus on what matters: phase, cylinders, measurements and a report people understand."
+  ],
+  [
+   "La gráfica ocupa la pantalla. Canales, reglas y ajustes se despliegan al pulsarlos y se recogen solos.",
+   "The graph fills the screen. Channels, rulers and settings open when pressed and close by themselves."
+  ],
+  [
+   "Regla de 720°, orden de encendido y los cuatro tiempos de cada cilindro, dibujados sobre la señal.",
+   "720° ruler, firing order and the four strokes of each cylinder, drawn on the signal."
+  ],
+  [
+   "Flechas, círculos y texto sobre la señal, que salen tal cual en el informe PDF.",
+   "Arrows, circles and text on the signal, exactly as they appear in the PDF report."
+  ],
+  [
+   "Es una captura real de un Seat Altea (PMS e inyector 1) con tres canales. Cada pastilla es un canal: púlsala para ver su escala.",
+   "This is a real capture from a Seat Altea (TDC and injector 1) with three channels. Each chip is a channel: press it to see its scale."
+  ],
+  [
+   "Las marcas INICIO y FIN delimitan un ciclo completo del motor. Arrástralas para ajustarlo a tu señal.",
+   "The START and END marks bound one full engine cycle. Drag them to fit your signal."
+  ],
+  [
+   "Con «Cilindros» activado se ven los cuatro tiempos de cada cilindro, según el orden de encendido.",
+   "With “Cylinders” on you see the four strokes of each cylinder, following the firing order."
+  ],
+  [
+   "Las reglas T1 y T2 miden el tiempo entre dos puntos. La lectura aparece debajo de la gráfica.",
+   "Rulers T1 and T2 measure the time between two points. The reading appears below the graph."
+  ],
+  [
+   "Marca lo que quieras comentar: flechas, círculos y texto quedan sobre la señal.",
+   "Mark whatever you want to comment on: arrows, circles and text stay on the signal."
+  ],
+  [
+   "«Informe PDF» guarda la gráfica con las reglas, los cilindros y tus anotaciones.",
+   "“PDF report” saves the graph with the rulers, the cylinders and your annotations."
+  ],
+  [
+   "Se procesa en tu navegador. Sin instalar nada.",
+   "It is processed in your browser. Nothing to install."
+  ],
+  [
+   "Diagnosis con osciloscopio",
+   "Oscilloscope diagnosis"
+  ],
+  [
+   "La señal, sin ruido.",
+   "The signal, without the noise."
+  ],
+  [
+   "Abrir una captura",
+   "Open a capture"
+  ],
+  [
+   "Ver un caso real",
+   "See a real case"
+  ],
+  [
+   "Entrar a la app",
+   "Enter the app"
+  ],
+  [
+   "La señal manda",
+   "The signal comes first"
+  ],
+  [
+   "Fase y cilindros",
+   "Phase and cylinders"
+  ],
+  [
+   "Anota e informa",
+   "Annotate and report"
+  ],
+  [
+   "Caso real paso a paso",
+   "Real case step by step"
+  ],
+  [
+   "Caso real · La captura",
+   "Real case · The capture"
+  ],
+  [
+   "Caso real · El ciclo de 720°",
+   "Real case · The 720° cycle"
+  ],
+  [
+   "Caso real · Los cilindros",
+   "Real case · The cylinders"
+  ],
+  [
+   "Caso real · Medir",
+   "Real case · Measuring"
+  ],
+  [
+   "Caso real · Anotar",
+   "Real case · Annotating"
+  ],
+  [
+   "Caso real · El informe",
+   "Real case · The report"
+  ],
+  [
+   "Revisar este pulso",
+   "Check this pulse"
+  ],
+  [
+   "Captura real:",
+   "Real capture:"
+  ],
+  [
+   "Portada",
+   "Home"
   ]
  ]
 }

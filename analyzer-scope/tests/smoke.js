@@ -19,7 +19,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   const b = await pw.chromium.launch({ headless: true });
   const ctx = await b.newContext({ viewport: { width: 1500, height: 950 }, acceptDownloads: true });
   await ctx.route(/^https?:/, r => r.abort()); // sin internet: todo debe funcionar en local
-  await ctx.addInitScript(() => { try { localStorage.setItem('as_ui', 'fix'); localStorage.setItem('as_ficha', 'off'); localStorage.setItem('as_guia', '1'); } catch (e) { } }); // esta batería recorre la vista clásica (todo a la vista); la vista nueva se prueba en F1
+  await ctx.addInitScript(() => { try { localStorage.setItem('as_ui', 'fix'); localStorage.setItem('as_ficha', 'off'); localStorage.setItem('as_guia', '1'); localStorage.setItem('as_portada', '1'); } catch (e) { } }); // esta batería recorre la vista clásica (todo a la vista); la vista nueva se prueba en F1
   const p = await ctx.newPage(); p.setDefaultTimeout(6000);
   const errs = []; p.on('pageerror', e => errs.push(String(e)));
   const E = (fn, ...a) => p.evaluate(fn, ...a);
@@ -286,7 +286,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
 
   console.log('\nF1 · Vista nueva: la señal manda, todo lo demás se despliega y se recoge');
   {
-    const c2 = await b.newContext({ viewport: { width: 1400, height: 820 } }); await c2.route(/^https?:/, r => r.abort()); await c2.addInitScript(() => { try { localStorage.setItem('as_guia', '1'); } catch (e) { } });
+    const c2 = await b.newContext({ viewport: { width: 1400, height: 820 } }); await c2.route(/^https?:/, r => r.abort()); await c2.addInitScript(() => { try { localStorage.setItem('as_guia', '1'); localStorage.setItem('as_portada', '1'); } catch (e) { } });
     const q = await c2.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(400);
     const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
     check('vista nueva por defecto, panel lateral recogido', await q.evaluate(() => !document.body.classList.contains('fix')) && !(await vis('#leftp')));
@@ -330,7 +330,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
 
   console.log('\nF2 · Ficha de la captura (vehículo, prueba y estado del motor)');
   {
-    const c3 = await b.newContext({ viewport: { width: 1400, height: 820 }, acceptDownloads: true }); await c3.route(/^https?:/, r => r.abort()); await c3.addInitScript(() => { try { localStorage.setItem('as_guia', '1'); } catch (e) { } });
+    const c3 = await b.newContext({ viewport: { width: 1400, height: 820 }, acceptDownloads: true }); await c3.route(/^https?:/, r => r.abort()); await c3.addInitScript(() => { try { localStorage.setItem('as_guia', '1'); localStorage.setItem('as_portada', '1'); } catch (e) { } });
     const q = await c3.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(400);
     const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
     await q.click('#bMore'); await q.selectOption('#ex', '0'); await q.waitForTimeout(600);
@@ -360,7 +360,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
 
   console.log('\nF3 · Usabilidad: guía de primer uso, atajos, deshacer y móvil');
   {
-    const c4 = await b.newContext({ viewport: { width: 1400, height: 820 } }); await c4.route(/^https?:/, r => r.abort());
+    const c4 = await b.newContext({ viewport: { width: 1400, height: 820 } }); await c4.route(/^https?:/, r => r.abort()); await c4.addInitScript(() => { try { localStorage.setItem('as_portada', '1'); } catch (e) { } });
     const q = await c4.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(400);
     const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
     check('primera visita: guía en el paso 1 señalando «Abrir archivos…»', await vis('#gd') && await q.evaluate(() => $('gdN').textContent === '1 / 3' && $('bOpen').classList.contains('gdT')));
@@ -388,6 +388,30 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('móvil: el grupo se abre como hoja inferior a todo el ancho', await q.evaluate(() => { const r = document.querySelector('#gRu .gp').getBoundingClientRect(); return r.left === 0 && Math.round(r.right) === innerWidth && Math.abs(r.bottom - innerHeight) < 2; }));
     check('usabilidad: sin errores JS', qe.length === 0, qe.join(' | '));
     await c4.close();
+  }
+
+  console.log('\nF4 · Portada con demo en vivo y caso real paso a paso');
+  {
+    const c5 = await b.newContext({ viewport: { width: 1400, height: 820 } }); await c5.route(/^https?:/, r => r.abort());
+    const q = await c5.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(1500);
+    const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
+    check('primera visita: portada en español', await vis('#land') && await q.evaluate(() => document.querySelector('#land h1').textContent === 'La señal, sin ruido.' && LANG === 'es'));
+    check('demo en vivo: la captura de ejemplo se está dibujando', await q.evaluate(() => { const c = $('ldCv'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 200) n++; return n > 500 && /Seat Altea/.test($('ldCap').textContent); }));
+    await q.click('#ldEN'); await q.waitForTimeout(200);
+    check('portada en inglés', await q.evaluate(() => document.querySelector('#land h1').textContent === 'The signal, without the noise.' && $('ldCs').textContent === 'See a real case'));
+    await q.click('#ldES'); await q.click('#ldCs'); await q.waitForTimeout(900);
+    check('«Ver un caso real»: entra, carga la captura y abre el paso 1 de 6 sin pedir ficha', !(await vis('#land')) && !(await vis('#fic')) && await q.evaluate(() => CH.filter(c => c.x).length === 3 && $('gdN').textContent === '1 / 6'));
+    for (let i = 0; i < 4; i++) await q.click('#gdG');
+    check('los pasos usan las herramientas de verdad: cilindros, T1/T2 y anotación', await q.evaluate(() => $('tGr').classList.contains('on') && tr.on && cur.a != null && cur.b > cur.a && ann.list.length === 2 && $('gdN').textContent === '5 / 6'));
+    await q.click('#gdG'); await q.click('#gdG');
+    check('fin del caso', !(await vis('#gd')));
+    await q.reload(); await q.waitForTimeout(400);
+    check('segunda visita: directo a la app (la portada sigue en ☰)', !(await vis('#land')) && await q.evaluate(() => !!$('bLd')));
+    await q.click('#gdS'); await q.click('#bMore'); await q.click('#bLd');
+    await q.setViewportSize({ width: 400, height: 780 }); await q.waitForTimeout(300);
+    check('portada en móvil: sin desplazamiento horizontal', await vis('#land') && await q.evaluate(() => $('land').scrollWidth <= innerWidth && document.documentElement.scrollWidth <= innerWidth));
+    check('portada: sin errores JS', qe.length === 0, qe.join(' | '));
+    await c5.close();
   }
 
   console.log(`\nRESULTADO: ${ok} correctas, ${bad} fallidas`);

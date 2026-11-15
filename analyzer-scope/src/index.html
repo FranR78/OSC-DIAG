@@ -21,7 +21,7 @@
 <div id="hMore"><button id="bFit">Ajustar</button><button id="bClr">Limpiar</button>
 <select id="ex" title="Capturas de ejemplo incluidas en la aplicación"><option value="">Ejemplos…</option></select>
 <div class="lang" role="group" aria-label="Idioma / Language"><button id="lES" class="on" title="Español">Español</button><button id="lEN" title="English">English</button></div>
-<button id="bGd" class="nu">Guía rápida</button><button id="bKb" class="nu">Atajos de teclado</button>
+<button id="bLd" class="nu">Portada</button><button id="bCs" class="nu">Caso real paso a paso</button><button id="bGd" class="nu">Guía rápida</button><button id="bKb" class="nu">Atajos de teclado</button>
 <button id="bThm" title="Cambiar entre tema oscuro y tema claro">Tema claro</button><button id="bUi" title="Cambiar entre la vista nueva (la señal a pantalla completa) y la vista clásica (todos los paneles a la vista)">Vista clásica</button></div>
 </header>
 <main>
@@ -231,6 +231,24 @@
 <label class="ficW" id="fcAl" hidden>Avería o síntoma <input type="text" id="fcA" maxlength="120" placeholder="p. ej. ralentí irregular"></label>
 <p class="hint" id="fcSt"></p>
 <div class="ficE ficF"><button id="fcNo">Ahora no</button><button id="fcSv" class="p">Guardar ficha</button><button id="fcTx" class="p" hidden>Guardar y enviar a verificación</button></div>
+</div></div>
+<div id="land" hidden><div class="ldIn">
+<div class="ldTop"><img alt="Ortu Automoción Diagnosis" src="data:image/jpeg;base64,{{base64:img/logo.jpg}}"><span style="flex:1"></span><div class="lang" role="group" aria-label="Idioma / Language"><button id="ldES" class="on">Español</button><button id="ldEN">English</button></div><button id="ldIn">Entrar a la app</button></div>
+<div class="ldHero"><div>
+<span class="ldEy">Diagnosis con osciloscopio</span>
+<h1>La señal, sin ruido.</h1>
+<p>Abre la captura de tu osciloscopio y céntrate en lo que importa: fase, cilindros, medidas y un informe que se entiende.</p>
+<div class="ldCta"><button class="p" id="ldOp">Abrir una captura</button><button id="ldCs">Ver un caso real</button></div>
+<small>Se procesa en tu navegador. Sin instalar nada.</small>
+</div>
+<figure><canvas id="ldCv" role="img" aria-label="Gráfica de las señales"></canvas><figcaption id="ldCap"></figcaption></figure>
+</div>
+<div class="ldFt">
+<div><b>La señal manda</b><p>La gráfica ocupa la pantalla. Canales, reglas y ajustes se despliegan al pulsarlos y se recogen solos.</p></div>
+<div><b>Fase y cilindros</b><p>Regla de 720°, orden de encendido y los cuatro tiempos de cada cilindro, dibujados sobre la señal.</p></div>
+<div><b>Anota e informa</b><p>Flechas, círculos y texto sobre la señal, que salen tal cual en el informe PDF.</p></div>
+</div>
+<p class="ldBy">Analyzer Scope · by J.A.Ortúñez y Fran Rosales · Ortu Automoción</p>
 </div></div>
 <div id="kb" hidden><div class="ficB" role="dialog" aria-labelledby="kbT"><h2 id="kbT">Atajos de teclado</h2>
 <dl class="kbL"><dt>← →</dt><dd>Desplazar la señal (con Mayús, más rápido)</dd><dt>+ −</dt><dd>Acercar y alejar</dd><dt>0</dt><dd>Ajustar a la pantalla</dd>
