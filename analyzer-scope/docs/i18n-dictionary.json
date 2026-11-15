@@ -1580,6 +1580,118 @@
   [
    "Ver un ejemplo",
    "See an example"
+  ],
+  [
+   "Analyzer Scope: visor y analizador de capturas de osciloscopio de automoción (CSV). Reglas de fase, cilindros, compresión relativa, anotaciones e informe PDF, en el navegador.",
+   "Analyzer Scope: viewer and analyser for automotive oscilloscope captures (CSV). Phase rulers, cylinders, relative compression, annotations and PDF report, in the browser."
+  ],
+  [
+   "Arrastra un CSV sobre la gráfica o pulsa «Abrir archivos…». Si no tienes ninguno a mano, prueba con «Ver un ejemplo».",
+   "Drop a CSV on the graph or press “Open files…”. If you have none at hand, try “See an example”."
+  ],
+  [
+   "Púlsala para cambiar la escala, la posición, el filtro o el nombre. Se recoge sola al pulsar fuera.",
+   "Press it to change the scale, position, filter or name. It closes by itself when you press outside."
+  ],
+  [
+   "«Reglas» y «Motor» miden; «Anotar» dibuja sobre la señal; «Exportar» crea el informe PDF. Pulsa ? para ver los atajos de teclado.",
+   "“Rulers” and “Engine” measure; “Annotate” draws on the signal; “Export” creates the PDF report. Press ? to see the keyboard shortcuts."
+  ],
+  [
+   "1 · Abre tu captura",
+   "1 · Open your capture"
+  ],
+  [
+   "2 · Cada canal es una pastilla",
+   "2 · Each channel is a chip"
+  ],
+  [
+   "3 · Mide, anota y exporta",
+   "3 · Measure, annotate and export"
+  ],
+  [
+   "Desplazar la señal (con Mayús, más rápido)",
+   "Pan the signal (faster with Shift)"
+  ],
+  [
+   "Acercar y alejar",
+   "Zoom in and out"
+  ],
+  [
+   "Ajustar a la pantalla",
+   "Fit to screen"
+  ],
+  [
+   "Elegir canal y abrir sus ajustes",
+   "Select a channel and open its settings"
+  ],
+  [
+   "Página o buffer anterior y siguiente",
+   "Previous and next page or buffer"
+  ],
+  [
+   "Reglas T1/T2 · Cilindros · Anotar · Ficha",
+   "T1/T2 rulers · Cylinders · Annotate · Sheet"
+  ],
+  [
+   "Deshacer y rehacer",
+   "Undo and redo"
+  ],
+  [
+   "Recoger paneles",
+   "Close panels"
+  ],
+  [
+   "Esta ayuda",
+   "This help"
+  ],
+  [
+   "Re Pág · Av Pág",
+   "PgUp · PgDn"
+  ],
+  [
+   "Ctrl+Z · Ctrl+Mayús+Z",
+   "Ctrl+Z · Ctrl+Shift+Z"
+  ],
+  [
+   "Atajos de teclado",
+   "Keyboard shortcuts"
+  ],
+  [
+   "Guía rápida",
+   "Quick guide"
+  ],
+  [
+   "Gráfica de las señales",
+   "Signal graph"
+  ],
+  [
+   "Nada que deshacer.",
+   "Nothing to undo."
+  ],
+  [
+   "Nada que rehacer.",
+   "Nothing to redo."
+  ],
+  [
+   "Deshecho.",
+   "Undone."
+  ],
+  [
+   "Rehecho.",
+   "Redone."
+  ],
+  [
+   "Siguiente",
+   "Next"
+  ],
+  [
+   "Entendido",
+   "Got it"
+  ],
+  [
+   "Saltar",
+   "Skip"
   ]
  ]
 }

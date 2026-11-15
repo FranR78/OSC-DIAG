@@ -19,7 +19,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   const b = await pw.chromium.launch({ headless: true });
   const ctx = await b.newContext({ viewport: { width: 1500, height: 950 }, acceptDownloads: true });
   await ctx.route(/^https?:/, r => r.abort()); // sin internet: todo debe funcionar en local
-  await ctx.addInitScript(() => { try { localStorage.setItem('as_ui', 'fix'); localStorage.setItem('as_ficha', 'off'); } catch (e) { } }); // esta batería recorre la vista clásica (todo a la vista); la vista nueva se prueba en F1
+  await ctx.addInitScript(() => { try { localStorage.setItem('as_ui', 'fix'); localStorage.setItem('as_ficha', 'off'); localStorage.setItem('as_guia', '1'); } catch (e) { } }); // esta batería recorre la vista clásica (todo a la vista); la vista nueva se prueba en F1
   const p = await ctx.newPage(); p.setDefaultTimeout(6000);
   const errs = []; p.on('pageerror', e => errs.push(String(e)));
   const E = (fn, ...a) => p.evaluate(fn, ...a);
@@ -286,7 +286,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
 
   console.log('\nF1 · Vista nueva: la señal manda, todo lo demás se despliega y se recoge');
   {
-    const c2 = await b.newContext({ viewport: { width: 1400, height: 820 } }); await c2.route(/^https?:/, r => r.abort());
+    const c2 = await b.newContext({ viewport: { width: 1400, height: 820 } }); await c2.route(/^https?:/, r => r.abort()); await c2.addInitScript(() => { try { localStorage.setItem('as_guia', '1'); } catch (e) { } });
     const q = await c2.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(400);
     const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
     check('vista nueva por defecto, panel lateral recogido', await q.evaluate(() => !document.body.classList.contains('fix')) && !(await vis('#leftp')));
@@ -330,7 +330,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
 
   console.log('\nF2 · Ficha de la captura (vehículo, prueba y estado del motor)');
   {
-    const c3 = await b.newContext({ viewport: { width: 1400, height: 820 }, acceptDownloads: true }); await c3.route(/^https?:/, r => r.abort());
+    const c3 = await b.newContext({ viewport: { width: 1400, height: 820 }, acceptDownloads: true }); await c3.route(/^https?:/, r => r.abort()); await c3.addInitScript(() => { try { localStorage.setItem('as_guia', '1'); } catch (e) { } });
     const q = await c3.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(400);
     const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
     await q.click('#bMore'); await q.selectOption('#ex', '0'); await q.waitForTimeout(600);
@@ -356,6 +356,38 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('portal: envío a verificación (op referencia, ficha, señales y CSV)', await q.evaluate(() => { const r = window._req; return r && r.op === 'referencia' && r.ficha.estado === 'fallo' && r.ficha.averia === 'tirones' && r.ficha.senales.length === 3 && r.ficha.senales[0].parametro === 'Inyector 1' && r.archivo.csv.startsWith('#analyzer-scope-ajustes;') && /pendiente/.test($('st').textContent) && FIC.enviada === 'R1'; }));
     check('ficha: sin errores JS', qe.length === 0, qe.join(' | '));
     await c3.close();
+  }
+
+  console.log('\nF3 · Usabilidad: guía de primer uso, atajos, deshacer y móvil');
+  {
+    const c4 = await b.newContext({ viewport: { width: 1400, height: 820 } }); await c4.route(/^https?:/, r => r.abort());
+    const q = await c4.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(400);
+    const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
+    check('primera visita: guía en el paso 1 señalando «Abrir archivos…»', await vis('#gd') && await q.evaluate(() => $('gdN').textContent === '1 / 3' && $('bOpen').classList.contains('gdT')));
+    await q.click('#gdG'); await q.click('#gdG');
+    check('paso 3 y botón «Entendido»', await q.evaluate(() => $('gdN').textContent === '3 / 3' && $('gdG').textContent === 'Entendido'));
+    await q.click('#gdG'); await q.reload(); await q.waitForTimeout(300);
+    check('terminada, no vuelve a salir', !(await vis('#gd')) && await q.evaluate(() => !document.querySelector('.gdT')));
+    await q.click('#emEx'); await q.waitForTimeout(900);
+    const v0 = await q.evaluate(() => [view.t0, view.span]);
+    await q.keyboard.press('ArrowRight'); await q.keyboard.press('+');
+    const v1 = await q.evaluate(() => [view.t0, view.span]);
+    check('atajos: → desplaza y + acerca', v1[1] < v0[1] && v1[0] > v0[0], JSON.stringify([v0, v1]));
+    await q.keyboard.press('0');
+    check('atajo 0: ajusta a la pantalla', Math.abs((await q.evaluate(() => view.span)) - v0[1]) < 1e-9);
+    await q.keyboard.press('2'); check('atajo 2: abre los ajustes del canal 2', await q.evaluate(() => chOpen === 1 && sel === 1) && await vis('#chBox'));
+    await q.keyboard.press('Escape'); await q.waitForTimeout(500);
+    const vd0 = await q.evaluate(() => CH[0].vd);
+    await q.evaluate(() => { CH[0].vd = 10; ann.list.push({ k: 'line', col: '#ffd24d', w: 2, x1: 0, y1: .2, x2: .01, y2: .4 }); ui(); draw(); }); await q.waitForTimeout(500);
+    await q.keyboard.press('Control+z'); await q.waitForTimeout(100);
+    check('Ctrl+Z deshace escala y anotación', await q.evaluate(() => [CH[0].vd, ann.list.length]).then(r => r[0] === vd0 && r[1] === 0));
+    await q.keyboard.press('Control+Shift+Z'); await q.waitForTimeout(100);
+    check('Ctrl+Mayús+Z rehace', await q.evaluate(() => CH[0].vd === 10 && ann.list.length === 1));
+    await q.keyboard.press('?'); check('? abre los atajos de teclado', await vis('#kb')); await q.keyboard.press('Escape'); check('Esc los cierra', !(await vis('#kb')));
+    await q.setViewportSize({ width: 400, height: 780 }); await q.waitForTimeout(200); await q.click('#gRu .gb'); await q.waitForTimeout(300);
+    check('móvil: el grupo se abre como hoja inferior a todo el ancho', await q.evaluate(() => { const r = document.querySelector('#gRu .gp').getBoundingClientRect(); return r.left === 0 && Math.round(r.right) === innerWidth && Math.abs(r.bottom - innerHeight) < 2; }));
+    check('usabilidad: sin errores JS', qe.length === 0, qe.join(' | '));
+    await c4.close();
   }
 
   console.log(`\nRESULTADO: ${ok} correctas, ${bad} fallidas`);

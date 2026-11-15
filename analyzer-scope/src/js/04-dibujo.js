@@ -65,7 +65,7 @@ function draw(theme){
   for(let i=0;i<=10;i++){const x=Math.round(M.l+i*pw/10)+.5;g.moveTo(x,yb);g.lineTo(x,yb+7);
     if(i<10)for(let q=1;q<5;q++){const xs=Math.round(M.l+(i+q/5)*pw/10)+.5;g.moveTo(xs,yb);g.lineTo(xs,yb+3)}}
   g.stroke();
-  for(let i=0;i<=10;i++){g.textAlign=i===0?'left':i===10?'right':'center';g.fillText(fmt(view.t0+view.span*i/10,'s'),M.l+i*pw/10,H-4)}
+  for(let i=0,ls=pw<300?5:pw<560?2:1;i<=10;i+=ls){g.textAlign=i===0?'left':i===10?'right':'center';g.fillText(fmt(view.t0+view.span*i/10,'s'),M.l+i*pw/10,H-4)}
   /* regla de amplitud (izquierda) del canal seleccionado */
   const cs=CH[sel];
   if(cs&&cs.x){g.strokeStyle=g.fillStyle=cc(cs);g.textAlign='right';g.beginPath();

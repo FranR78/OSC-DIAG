@@ -65,5 +65,5 @@ $('aCol').onchange=()=>{ann.col=$('aCol').value};$('aW').onchange=()=>{ann.w=+$(
 $('aUn').onclick=()=>{ann.list.pop();draw()};$('aClr').onclick=()=>{ann.list=[];draw()};
 $('aVis').onchange=()=>{ann.vis=$('aVis').checked;draw()};
 $('tAn').onclick=()=>{const h=!$('at').hidden;$('at').hidden=h;$('tAn').classList.toggle('on',!h);if(h)setTool('none')};
-addEventListener('keydown',e=>{if(e.key==='Escape')setTool('none');else if((e.ctrlKey||e.metaKey)&&e.key==='z'&&document.activeElement===document.body){ann.list.pop();draw()}});
+addEventListener('keydown',e=>{if(e.key==='Escape')setTool('none')});
 

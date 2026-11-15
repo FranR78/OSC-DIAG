@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Analyzer Scope: visor y analizador de capturas de osciloscopio de automoción (CSV). Reglas de fase, cilindros, compresión relativa, anotaciones e informe PDF, en el navegador.">
+<meta name="theme-color" content="#0a1a35">
 <title>Analyzer Scope · by J.A.Ortúñez y Fran Rosales</title>
 <script>/* jsPDF 2.5.1 (MIT) incrustado: el PDF funciona sin internet */
 {{vendor/jspdf.umd.min.js}}
@@ -19,6 +21,7 @@
 <div id="hMore"><button id="bFit">Ajustar</button><button id="bClr">Limpiar</button>
 <select id="ex" title="Capturas de ejemplo incluidas en la aplicación"><option value="">Ejemplos…</option></select>
 <div class="lang" role="group" aria-label="Idioma / Language"><button id="lES" class="on" title="Español">Español</button><button id="lEN" title="English">English</button></div>
+<button id="bGd" class="nu">Guía rápida</button><button id="bKb" class="nu">Atajos de teclado</button>
 <button id="bThm" title="Cambiar entre tema oscuro y tema claro">Tema claro</button><button id="bUi" title="Cambiar entre la vista nueva (la señal a pantalla completa) y la vista clásica (todos los paneles a la vista)">Vista clásica</button></div>
 </header>
 <main>
@@ -137,7 +140,7 @@
 <button id="aUn" title="Ctrl+Z">Deshacer</button><button id="aClr">Quitar todo</button>
 </div>
 <div class="pg" id="pgbar" hidden><b>Páginas</b><button id="pgP" title="Página anterior">◀</button><input type="range" id="pgR" min="1" max="1" value="1"><button id="pgN" title="Página siguiente">▶</button><span id="pgL"></span><span id="pgNm" style="color:var(--mu);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:34%"></span></div>
-<div id="wrap"><canvas id="cv"></canvas><div id="load" hidden><i></i></div>
+<div id="wrap"><canvas id="cv" role="img" aria-label="Gráfica de las señales"></canvas><div id="load" hidden><i></i></div>
 <div id="empty"><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M2 20h8l4-14 6 28 6-22 5 14 4-6h6l4-10 5 20 4-10h8"/></svg>
 <h2>Arrastra aquí tu captura</h2><p>CSV de PicoScope y de otros osciloscopios. Se procesa en tu navegador.</p>
 <div><button class="p" id="emOp">Abrir archivos…</button><button id="emEx">Ver un ejemplo</button></div></div></div>
@@ -229,6 +232,12 @@
 <p class="hint" id="fcSt"></p>
 <div class="ficE ficF"><button id="fcNo">Ahora no</button><button id="fcSv" class="p">Guardar ficha</button><button id="fcTx" class="p" hidden>Guardar y enviar a verificación</button></div>
 </div></div>
+<div id="kb" hidden><div class="ficB" role="dialog" aria-labelledby="kbT"><h2 id="kbT">Atajos de teclado</h2>
+<dl class="kbL"><dt>← →</dt><dd>Desplazar la señal (con Mayús, más rápido)</dd><dt>+ −</dt><dd>Acercar y alejar</dd><dt>0</dt><dd>Ajustar a la pantalla</dd>
+<dt>1 … 8</dt><dd>Elegir canal y abrir sus ajustes</dd><dt>Re Pág · Av Pág</dt><dd>Página o buffer anterior y siguiente</dd>
+<dt>R · C · A · F</dt><dd>Reglas T1/T2 · Cilindros · Anotar · Ficha</dd><dt>Ctrl+Z · Ctrl+Mayús+Z</dt><dd>Deshacer y rehacer</dd><dt>Esc</dt><dd>Recoger paneles</dd><dt>?</dt><dd>Esta ayuda</dd></dl>
+<div class="ficE ficF"><button id="kbX" class="p">Cerrar</button></div></div></div>
+<div id="gd" hidden role="dialog" aria-live="polite"><b id="gdT"></b><p id="gdP"></p><div><span id="gdN"></span><button id="gdS">Saltar</button><button id="gdG" class="p">Siguiente</button></div></div>
 <footer>Ortu Automoción · ortuautomocion.com</footer>
 <script>const EJEMPLOS={{ejemplos:ejemplos}};const APP_CFG={{appcfg}};</script>
 <script>
