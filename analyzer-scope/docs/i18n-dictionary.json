@@ -1336,6 +1336,82 @@
   [
    "Cambiar el nombre del canal",
    "Rename the channel"
+  ],
+  [
+   "Cambiar entre la vista nueva (la señal a pantalla completa) y la vista clásica (todos los paneles a la vista)",
+   "Switch between the new view (the signal full screen) and the classic view (all panels visible)"
+  ],
+  [
+   "Cambiar entre tema oscuro y tema claro",
+   "Switch between dark theme and light theme"
+  ],
+  [
+   "Vista clásica",
+   "Classic view"
+  ],
+  [
+   "Vista nueva",
+   "New view"
+  ],
+  [
+   "Tema claro",
+   "Light theme"
+  ],
+  [
+   "Tema oscuro",
+   "Dark theme"
+  ],
+  [
+   "Cambiar de vista",
+   "Switch view"
+  ],
+  [
+   "Más opciones",
+   "More options"
+  ],
+  [
+   "Reglas de tiempo, fase y amplitud",
+   "Time, phase and amplitude rulers"
+  ],
+  [
+   "PMS, cilindros, distribución y avance",
+   "TDC, cylinders, valve timing and advance"
+  ],
+  [
+   "Informe PDF y CSV con los ajustes",
+   "PDF report and CSV with the settings"
+  ],
+  [
+   "Fondo de la ventana de gráficas",
+   "Background of the graph window"
+  ],
+  [
+   "Motor y canales matemáticos",
+   "Engine and math channels"
+  ],
+  [
+   "Configurar fase y cilindros…",
+   "Set up phase and cylinders…"
+  ],
+  [
+   "Canales matemáticos…",
+   "Math channels…"
+  ],
+  [
+   "Abre un CSV o elige un ejemplo",
+   "Open a CSV or choose an example"
+  ],
+  [
+   "Motor",
+   "Engine"
+  ],
+  [
+   "Exportar",
+   "Export"
+  ],
+  [
+   "Cerrar",
+   "Close"
   ]
  ]
 }

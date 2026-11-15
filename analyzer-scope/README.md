@@ -25,7 +25,7 @@ analyzer-scope/
 ├─ tests/                    ← pruebas de regresión en navegador real (Playwright) + datos de ejemplo
 │  ├─ smoke.js, package.json
 │  └─ data/ (7 CSV de varios osciloscopios, 1 .psdata nativo)
-└─ docs/i18n-dictionary.json ← diccionario español→inglés (344 pares) en formato legible
+└─ docs/i18n-dictionary.json ← diccionario español→inglés (363 pares) en formato legible
 ```
 
 ---------------------------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ Selector **Español | English** arriba a la derecha (cambia TODO el contenido).
 
 | Área | Funciones |
 |---|---|
+| **Interfaz** | **Vista nueva** (por defecto): la gráfica ocupa la pantalla; cada canal es una pastilla (clic = sus ajustes), las herramientas van en grupos que se despliegan y se recogen solos (Reglas, Motor, Anotar, Exportar, Fondo), las pestañas en el selector de vista de la cabecera y fase/cilindros/sincronización/matemáticos en un panel lateral. **Vista clásica** (☰ → «Vista clásica»): todos los paneles a la vista. **Tema** oscuro o claro (☰). La elección se recuerda en el navegador. |
 | **Carga** | CSV/TSV/TXT de varias marcas (separador `,` `;` tab, coma decimal, fila de unidades `(ms)`, `(mbar)`…), sesiones propias `.psdata` JSON (solo lectura). Varios archivos ⇒ **páginas** (barra «Páginas» con cursor ◀ ▶). CSV con cabeceras repetidas ⇒ varias páginas. Archivos de más de 25 MB ⇒ **lectura por trozos** con porcentaje (probado con 5 M de muestras). Archivos `nombre_1.csv`, `nombre_2.csv`… ⇒ se ordenan y la barra indica el **buffer**. La **escala automática** sale del conjunto de páginas (un buffer plano se ve plano). Al cargar, los **filtros** vuelven a «Sin filtro»; un canal filtrado lleva la marca **F**. El **nombre del canal** viene del CSV y se cambia con ✎ (vale para todos los buffers). |
 | **Visor** | 8 canales, zoom con rueda, desplazar arrastrando, escala V/div y posición por canal, **flecha de color** por canal en el borde izquierdo (arrastrar = mover la gráfica en vertical), parámetro medido por canal (etiqueta), filtros por canal (Usuario 500 Hz / paso bajo / paso alto / ancho de banda, doble pasada sin desfase), invertir, **deslizador de fondo negro→gris→blanco** (los colores se adaptan por contraste). |
 | **Reglas** | Fase 0–720° / 0–360° con 2/4/8 divisiones (INICIO=0°, FIN), PMS independiente de INICIO, T1/T2 y T3/T4 (Δt, frecuencia, grados), amplitud por canal (2 reglas horizontales), **candados 🔓/🔒** que mueven el grupo conservando la distancia. |

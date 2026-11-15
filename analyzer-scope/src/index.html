@@ -10,20 +10,25 @@
 <header>
 <div class="logo"><img id="logo" alt="Ortu Automoción Diagnosis" src="data:image/jpeg;base64,{{base64:img/logo.jpg}}"></div>
 <div class="ttl"><h1>Analyzer Scope</h1><span>by J.A.Ortúñez y Fran Rosales</span></div>
+<button id="bVw" class="nu" title="Cambiar de vista">Osciloscopio ▾</button>
 <span style="flex:1"></span>
 <button id="bPan" class="tog" title="Mostrar u ocultar el panel de canales">Canales</button>
 <button class="p" id="bOpen">Abrir archivos…</button>
 <input type="file" id="fi" multiple accept=".csv,.txt,.tsv,.psdata,.dat" hidden>
-<button id="bFit">Ajustar</button><button id="bClr">Limpiar</button>
+<button id="bMore" class="nu" title="Más opciones">☰</button>
+<div id="hMore"><button id="bFit">Ajustar</button><button id="bClr">Limpiar</button>
 <select id="ex" title="Capturas de ejemplo incluidas en la aplicación"><option value="">Ejemplos…</option></select>
 <div class="lang" role="group" aria-label="Idioma / Language"><button id="lES" class="on" title="Español">Español</button><button id="lEN" title="English">English</button></div>
+<button id="bThm" title="Cambiar entre tema oscuro y tema claro">Tema claro</button><button id="bUi" title="Cambiar entre la vista nueva (la señal a pantalla completa) y la vista clásica (todos los paneles a la vista)">Vista clásica</button></div>
 </header>
 <main>
-<section class="card" id="leftp"><div class="chtop"><b>Canales</b><button id="bSet" class="tog on" title="Mostrar u ocultar los ajustes de todos los canales">Ajustes</button></div>
+<section class="card" id="leftp"><div class="drh nu"><b>Motor y canales matemáticos</b><button id="bDrX" title="Cerrar">✕</button></div>
+<div id="chBox"><div class="chtop"><b>Canales</b><button id="bSet" class="tog on" title="Mostrar u ocultar los ajustes de todos los canales">Ajustes</button></div>
 <div class="ch hd"><span>Ver</span><span>Canal (clic = regla de amplitud)</span><span class="st">Escala</span><span class="st">Pos.</span><span class="st" title="Reglas de amplitud">Reglas</span></div>
 <div id="chs"></div>
 <p class="hint st">Fila inferior de cada canal: filtro (Hz, editables; doble pasada sin desfase) e Invertir. Usuario = paso bajo con corte de 500 Hz por defecto.</p>
-<hr>
+</div>
+<hr class="cl">
 <label class="sec"><input type="checkbox" id="oPh" checked> <b>Regla de fase</b></label>
 <div id="bPh">
 <p class="hint">INICIO marca los 0° de la regla de fase; arrastra FIN para ajustar el ciclo y elige el rango y las divisiones. La regla PMS es independiente: señala el PMS real y es la referencia (0°) del diagrama de distribución y del avance.</p>
@@ -90,20 +95,31 @@
 <div id="tabs"><button class="tab on" id="tabS">Osciloscopio</button><button class="tab" id="tabD">Diagrama de distribución</button><button class="tab" id="tabC">Compresión relativa</button><button class="tab" id="tabX">Diagnóstico</button><button class="tab" id="tabF">Unir y convertir CSV</button><button class="tab" id="tabG">GIF</button><button class="tab" id="tabI">Instrucciones</button><button class="tab" id="tabO">Objetivo</button></div>
 <div id="viewS">
 <div id="tb">
-<button class="tog on" id="tPh" title="Conectar o desconectar las reglas de fase">Reglas de fase</button><button class="tog lk" id="kPh" title="Bloquear el ciclo: al arrastrar FIN (o INICIO) se desplaza el ciclo entero">🔓</button>
-<button class="tog" id="tPms" title="Regla vertical de PMS">PMS</button>
-<button class="tog" id="tT" title="Dos reglas verticales para medir tiempo">Reglas T1/T2</button><button class="tog lk" id="kT" title="Bloquear el intervalo T1–T2: al arrastrar una regla se mueven las dos">🔓</button>
-<button class="tog" id="tT2" title="Otras dos reglas verticales para un segundo intervalo">Reglas T3/T4</button><button class="tog lk" id="kT2" title="Bloquear el intervalo T3–T4: al arrastrar una regla se mueven las dos">🔓</button>
-<button class="tog on" id="tAmp" title="Reglas horizontales de amplitud por canal">Amplitud</button>
-<button class="tog" id="tGr" title="Identificación de cilindros sobre la señal (overlay)">Cilindros</button>
-<button class="tog" id="tVv" title="AAA avance apertura admisión, RCE retraso cierre escape, AAE avance apertura escape, RCA retraso cierre admisión">AAA·RCE·AAE·RCA</button><button class="tog lk" id="kVv" title="Bloquear el conjunto AAA·RCE·AAE·RCA: al arrastrar una regla se mueven las cuatro">🔓</button>
-<button class="tog" id="tAdv" title="Regla de avance de encendido o de inyección">Avance</button>
-<button class="tog" id="tAn" title="Mostrar u ocultar las herramientas de anotación">Anotar</button>
-<label class="bgl" title="Color de fondo de la ventana de gráficas (de negro a blanco)">Fondo <input type="range" id="bgR" min="0" max="100" value="0"></label>
+<div id="chips" class="nu"></div>
 <span class="sp"></span>
-<button id="bExp">Exportar CSV</button>
-<select id="pdfBg" title="Fondo del informe PDF"><option value="w">PDF fondo blanco</option><option value="k">PDF fondo negro</option></select>
+<div class="grp" id="gRu"><button class="gb" title="Reglas de tiempo, fase y amplitud">Reglas</button><div class="gp">
+<span class="pr"><button class="tog on" id="tPh" title="Conectar o desconectar las reglas de fase">Reglas de fase</button><button class="tog lk" id="kPh" title="Bloquear el ciclo: al arrastrar FIN (o INICIO) se desplaza el ciclo entero">🔓</button></span>
+<span class="pr"><button class="tog" id="tT" title="Dos reglas verticales para medir tiempo">Reglas T1/T2</button><button class="tog lk" id="kT" title="Bloquear el intervalo T1–T2: al arrastrar una regla se mueven las dos">🔓</button></span>
+<span class="pr"><button class="tog" id="tT2" title="Otras dos reglas verticales para un segundo intervalo">Reglas T3/T4</button><button class="tog lk" id="kT2" title="Bloquear el intervalo T3–T4: al arrastrar una regla se mueven las dos">🔓</button></span>
+<button class="tog on" id="tAmp" title="Reglas horizontales de amplitud por canal">Amplitud</button>
+</div></div>
+<div class="grp" id="gMo"><button class="gb" title="PMS, cilindros, distribución y avance">Motor</button><div class="gp">
+<button class="tog" id="tPms" title="Regla vertical de PMS">PMS</button>
+<button class="tog" id="tGr" title="Identificación de cilindros sobre la señal (overlay)">Cilindros</button>
+<span class="pr"><button class="tog" id="tVv" title="AAA avance apertura admisión, RCE retraso cierre escape, AAE avance apertura escape, RCA retraso cierre admisión">AAA·RCE·AAE·RCA</button><button class="tog lk" id="kVv" title="Bloquear el conjunto AAA·RCE·AAE·RCA: al arrastrar una regla se mueven las cuatro">🔓</button></span>
+<button class="tog" id="tAdv" title="Regla de avance de encendido o de inyección">Avance</button>
+<button id="bDrw" class="nu">Configurar fase y cilindros…</button>
+<button id="bDrM" class="nu">Canales matemáticos…</button>
+</div></div>
+<button class="tog" id="tAn" title="Mostrar u ocultar las herramientas de anotación">Anotar</button>
+<div class="grp" id="gEx"><button class="gb" title="Informe PDF y CSV con los ajustes">Exportar</button><div class="gp">
 <button class="p" id="bPdf">Informe PDF</button>
+<select id="pdfBg" title="Fondo del informe PDF"><option value="w">PDF fondo blanco</option><option value="k">PDF fondo negro</option></select>
+<button id="bExp">Exportar CSV</button>
+</div></div>
+<div class="grp" id="gAj"><button class="gb" title="Fondo de la ventana de gráficas">Fondo</button><div class="gp">
+<label class="bgl" title="Color de fondo de la ventana de gráficas (de negro a blanco)">Fondo <input type="range" id="bgR" min="0" max="100" value="0"></label>
+</div></div>
 </div>
 <div id="at" hidden>
 <span style="color:var(--mu);font-size:12px">Anotar:</span><label style="font-size:12px"><input type="checkbox" id="aVis" checked> ver anotaciones</label>

@@ -66,3 +66,47 @@ footer{text-align:center;color:var(--mu);font-size:12px;padding:6px 0 14px}
 #mSl{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))}#mSl label{display:grid;gap:2px;font-size:12px}#mSl input{width:100%!important;min-width:0}
 #mL .cy b{color:#ffd24d}#mL button{padding:0 7px;margin-left:6px}
 .dxr{max-height:none}.dxh h4{margin:8px 0 2px;color:var(--mu);font-size:12px}.dxc{display:flex;gap:6px;align-items:flex-start;margin:3px 0;font-size:12.5px}.dxc input{margin-top:3px}#xRes a{color:#8fc1ff;display:inline-block;margin:4px 8px 0 0}
+
+/* ===== Vista nueva (por defecto): la señal ocupa la pantalla; canales, herramientas y ajustes se despliegan y se recogen ===== */
+:root{--pop:#0f1d38}
+body{font-family:"Open Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+.fix .nu,.fix .gb{display:none!important}.fix .grp,.fix .gp,.fix .pr,.fix #hMore{display:contents}.fix #gEx .gp>*{order:2}
+.fix #tb>.sp{order:1}
+body:not(.fix) .cl,body:not(.fix) #bPan,body:not(.fix) .chtop,body:not(.fix) footer,body:not(.fix) #chBox>.hint{display:none!important}
+html{height:100%}
+body:not(.fix){height:100%;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+body:not(.fix) header{flex:none;flex-wrap:nowrap;padding:6px 12px;position:relative;z-index:30;gap:8px}
+body:not(.fix) .logo{padding:2px 6px}body:not(.fix) .logo img{height:28px}
+body:not(.fix) .ttl{min-width:0}body:not(.fix) .ttl h1{font-size:15px;white-space:nowrap}body:not(.fix) .ttl span{display:none}
+#bVw{white-space:nowrap;font-weight:600}body:not(.fix) header button{white-space:nowrap}
+body:not(.fix) #hMore{display:none;position:absolute;top:calc(100% + 6px);right:12px;flex-direction:column;gap:6px;padding:8px;min-width:210px;background:var(--pop);border:1px solid var(--bd);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.45)}
+body.mo:not(.fix) #hMore{display:flex}body:not(.fix) #hMore .lang{margin:0}body:not(.fix) #hMore .lang button{flex:1}
+body:not(.fix) main{flex:1;min-height:0;display:block;padding:0;overflow:auto}
+body:not(.fix) main>.card:not(#leftp){border:0;border-radius:0;background:none;backdrop-filter:none;min-height:100%;display:flex;flex-direction:column;padding:8px 12px;position:relative}
+body:not(.fix) #viewS{flex:1;display:flex;flex-direction:column;min-height:0}
+body:not(.fix) #wrap{flex:1;height:auto;min-height:240px}body:not(.fix) #wrap canvas{position:absolute;inset:0}
+body:not(.fix) #st{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body:not(.fix) #tabs{display:none;position:absolute;z-index:25;top:0;left:12px;flex-direction:column;gap:4px;padding:8px;margin:0;min-width:230px;background:var(--pop);border:1px solid var(--bd);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.45)}
+body.vw:not(.fix) #tabs{display:flex}body:not(.fix) .tab{border-radius:8px;text-align:left}
+body:not(.fix) #tb{position:relative;z-index:20;align-items:center;margin-bottom:6px}body:not(.fix) #tb>.sp{display:none}
+#chips{display:flex;gap:6px;flex:1 1 220px;min-width:0;overflow-x:auto;scrollbar-width:none;align-items:center}#chips::-webkit-scrollbar{display:none}
+.chip{display:flex;align-items:center;gap:6px;flex:none;border-radius:16px;padding:4px 11px 4px 9px;white-space:nowrap;font-size:12.5px}.chip .dot{margin:0}.chip span{color:var(--mu);font-variant-numeric:tabular-nums}
+.chip.off{opacity:.5}.chip.cur{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}.chip .fb{font-size:10px;color:#1b1300;background:var(--gold);border-radius:4px;padding:0 4px}.chE{color:var(--mu);font-size:12.5px}
+body:not(.fix) .gb,body:not(.fix) #tAn{font-weight:600}.grp.open>.gb{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}
+body:not(.fix) .gp{display:none;position:absolute;top:calc(100% + 6px);right:0;flex-direction:column;gap:6px;padding:8px;min-width:230px;max-width:100%;background:var(--pop);border:1px solid var(--bd);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.45)}
+body:not(.fix) .grp.open>.gp{display:flex}body:not(.fix) .gp>button,body:not(.fix) .gp>select{width:100%;text-align:left}
+body:not(.fix) .gp .pr{display:flex;gap:9px}body:not(.fix) .gp .pr>:first-child{flex:1;text-align:left}body:not(.fix) .gp .bgl input{flex:1}
+body:not(.fix) #chBox{display:none;position:absolute;top:calc(100% + 6px);left:0;width:330px;max-width:100%;padding:8px 10px 2px;background:var(--pop);border:1px solid var(--bd);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.45)}
+body.cho:not(.fix) #chBox{display:block}body:not(.fix) #chBox .chb{display:none;border:0}body:not(.fix) #chBox .chb.cur{display:block}
+body:not(.fix) #leftp{display:none;position:fixed;z-index:40;inset:0 auto 0 0;width:min(350px,92vw);overflow:auto;border-radius:0;border-width:0 1px 0 0;background:var(--pop);backdrop-filter:none;box-shadow:12px 0 32px rgba(0,0,0,.45);padding-top:calc(10px + env(safe-area-inset-top,0px))}
+body.drw:not(.fix) #leftp{display:block}
+.drh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+@media(max-width:640px){body:not(.fix) .ttl{display:none}body:not(.fix) .logo img{height:22px}body:not(.fix) header{padding:6px 8px;gap:6px}body:not(.fix) header button{padding:5px 8px}body:not(.fix) #tb{gap:5px}body:not(.fix) .gb,body:not(.fix) #tAn{padding:5px 8px;font-size:12.5px}body:not(.fix) #chips{flex-basis:100%}body:not(.fix) #rd{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));max-height:20vh;overflow:auto}}
+/* ===== Tema claro (opcional) ===== */
+body.light{--bg1:#eaf3fb;--bg2:#eaf3fb;--card:#fff;--bd:rgba(20,85,143,.24);--tx:#12263a;--mu:#52697f;--ac:#1f6fb5;--gold:#b86e00;--pop:#fff;background:#eaf3fb}
+body.light header{background:#fff;box-shadow:none}body.light h1,body.light .doc h2{color:#14558f}
+body.light button,body.light select,body.light input{background:#fff}body.light button:hover{background:#dcebf8}
+body.light button.p{background:#1f6fb5;border-color:#1f6fb5;color:#fff}body.light button.tog.on{background:#fff1d6;color:#7a4700}
+body.light select option{background:#fff;color:#12263a}body.light .lang button.on,body.light .tab.on{background:#1f6fb5;border-color:#1f6fb5;color:#fff}
+body.light .sel,body.light .doc b{color:#14558f}body.light .doc h3,body.light #dd b,body.light .tcy .cy>b,body.light #mL .cy b{color:#14558f}
+body.light #xRes a{color:#1f6fb5}body.light .lab .ed:hover{background:none}body.light .bgl input{background:linear-gradient(90deg,#000,#808080 50%,#fff)}

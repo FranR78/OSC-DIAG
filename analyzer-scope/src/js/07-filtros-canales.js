@@ -25,10 +25,16 @@ const escH=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 /* Nombre del canal: viene del CSV y se puede cambiar; el cambio vale para todas las páginas (buffers) con ese mismo nombre */
 function setName(i,v){const c=CH[i],d=PG[pgI]&&PG[pgI].chs[i],old=d&&d.y===c.y0?d.n:null;
   if(old!=null)PG.forEach(p=>{const q=p.chs[i];if(q&&q.n===old)q.n=v});c.n=v}
+let chOpen=-1;
+function updChips(){const cp=$('chips');cp.innerHTML='';
+  CH.forEach((c,i)=>{if(!c.x)return;const b=document.createElement('button');b.className='chip'+(c.on?'':' off')+(i===chOpen?' cur':'');
+    b.innerHTML='<i class="dot" style="background:'+c.c+'"></i><b>'+escH(c.n)+'</b><span>'+fmt(c.vd,c.u)+'/div</span>'+(c.fl!=='off'?'<b class="fb" title="Filtro activo: la forma de la señal está modificada">F</b>':'');
+    b.onclick=()=>chipClick(i);cp.appendChild(b)});
+  if(!cp.children.length)cp.innerHTML='<span class="chE">Abre un CSV o elige un ejemplo</span>'}
 function ui(){
   $('chs').innerHTML='';
   CH.forEach((c,i)=>{
-    const w=document.createElement('div');w.className='chb';
+    const w=document.createElement('div');w.className='chb'+(i===chOpen?' cur':'');
     const d=document.createElement('div');d.className='ch';
     d.innerHTML='<input type="checkbox" title="Mostrar canal" '+(c.on?'checked':'')+(c.x?'':' disabled')+'>'+
       '<span class="lab'+(i===sel?' sel':'')+'"><i class="dot" style="background:'+c.c+'"></i>'+escH(c.n)+(c.fl!=='off'&&c.x?' <b class="fb" title="Filtro activo: la forma de la señal está modificada">F</b>':'')+(c.x&&!c.m?'<button class="ed" title="Cambiar el nombre del canal">✎</button>':'')+'</span>'+
@@ -36,8 +42,8 @@ function ui(){
       '<input class="st" type="number" step="0.5" value="'+(+c.off.toFixed(2))+'" title="Posición (div)">'+
       '<input class="st" type="checkbox" title="Reglas de amplitud de este canal" '+(c.hr?'checked':'')+'>';
     const k=d.children;
-    k[0].onchange=()=>{c.on=k[0].checked;draw()};k[1].onclick=()=>{sel=i;ui();draw()};
-    k[2].onchange=()=>{c.vd=+k[2].value;draw()};k[3].oninput=()=>{c.off=+k[3].value||0;draw()};
+    k[0].onchange=()=>{c.on=k[0].checked;updChips();draw()};k[1].onclick=()=>{sel=i;ui();draw()};
+    k[2].onchange=()=>{c.vd=+k[2].value;updChips();draw()};k[3].oninput=()=>{c.off=+k[3].value||0;draw()};
     k[4].onchange=()=>{c.hr=k[4].checked;draw()};
     const ed=k[1].querySelector('.ed');if(ed)ed.onclick=ev=>{ev.stopPropagation();
       const inp=document.createElement('input');inp.type='text';inp.className='nmI';inp.maxLength=24;inp.value=c.n;k[1].replaceWith(inp);inp.focus();inp.select();let done=false;
@@ -55,6 +61,6 @@ function ui(){
     q[3].onclick=()=>{if(!c.x)return;c.inv=!c.inv;c.off=-c.off;if(c.ref!=null)c.ref=-c.ref;if(c.h)c.h=c.h.map(v=>-v);proc(c);ui();draw()};
     const pr=document.createElement('input');pr.type='text';pr.className='par';pr.placeholder=i18('Parámetro medido (p. ej. Presión admisión)');pr.maxLength=40;pr.value=c.p||'';pr.oninput=()=>{c.p=pr.value;draw()};w.appendChild(d);w.appendChild(pr);w.appendChild(e);$('chs').appendChild(w);
   });
-  fillSC();
+  updChips();fillSC();
 }
 

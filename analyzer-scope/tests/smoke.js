@@ -19,6 +19,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   const b = await pw.chromium.launch({ headless: true });
   const ctx = await b.newContext({ viewport: { width: 1500, height: 950 }, acceptDownloads: true });
   await ctx.route(/^https?:/, r => r.abort()); // sin internet: todo debe funcionar en local
+  await ctx.addInitScript(() => { try { localStorage.setItem('as_ui', 'fix'); } catch (e) { } }); // esta batería recorre la vista clásica (todo a la vista); la vista nueva se prueba en F1
   const p = await ctx.newPage(); p.setDefaultTimeout(6000);
   const errs = []; p.on('pageerror', e => errs.push(String(e)));
   const E = (fn, ...a) => p.evaluate(fn, ...a);
@@ -281,6 +282,46 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('lectura por trozos = lectura normal (muestras, canales, tiempo y valores)', JSON.stringify(got) === JSON.stringify(ref), JSON.stringify([got, ref]));
     check('fase 0: sin errores JS', qe.length === 0, qe.join(' | '));
     await q.close();
+  }
+
+  console.log('\nF1 · Vista nueva: la señal manda, todo lo demás se despliega y se recoge');
+  {
+    const c2 = await b.newContext({ viewport: { width: 1400, height: 820 } }); await c2.route(/^https?:/, r => r.abort());
+    const q = await c2.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(400);
+    const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
+    check('vista nueva por defecto, panel lateral recogido', await q.evaluate(() => !document.body.classList.contains('fix')) && !(await vis('#leftp')));
+    await q.click('#bMore'); await q.selectOption('#ex', '0'); await q.waitForTimeout(700);
+    check('la gráfica ocupa más del 70 % del alto', await q.evaluate(() => cv.clientHeight / innerHeight) > 0.7);
+    check('una pastilla por canal cargado', await q.evaluate(() => document.querySelectorAll('.chip').length === CH.filter(c => c.x).length && document.querySelectorAll('.chip').length > 0));
+    await q.click('.chip');
+    check('pastilla → ajustes solo de ese canal', await q.evaluate(() => [...document.querySelectorAll('#chBox .chb')].filter(e => e.getBoundingClientRect().height > 0).length) === 1 && await vis('#chBox select.st'));
+    await q.selectOption('#chBox .chb.cur select.st', '5');
+    check('la pastilla refleja la escala elegida', (await q.evaluate(() => document.querySelector('.chip.cur span').textContent)).startsWith('5 '));
+    await q.mouse.click(700, 500); await q.waitForTimeout(100);
+    check('clic fuera: los ajustes del canal se recogen', !(await vis('#chBox')));
+    await q.click('#gRu .gb'); const t0 = await q.evaluate(() => tr.on); await q.click('#tT');
+    check('grupo «Reglas»: activa T1/T2 y sigue abierto', await q.evaluate(() => tr.on) !== t0 && await vis('#tT'));
+    await q.keyboard.press('Escape');
+    check('Escape recoge el grupo', !(await vis('#tT')));
+    await q.click('#gMo .gb'); await q.click('#bDrw');
+    check('«Configurar fase y cilindros…» abre el panel lateral', await vis('#leftp') && await vis('#gN') && !(await vis('#tPms')));
+    await q.click('#bDrX'); check('✕ lo cierra', !(await vis('#leftp')));
+    await q.click('#bVw'); await q.click('#tabD');
+    check('selector de vista: cambia de pestaña y se recoge', await q.evaluate(() => curTab === 'D' && $('bVw').textContent.startsWith('Diagrama')) && !(await vis('#tabS')));
+    await q.click('#bVw'); await q.click('#tabS');
+    await q.click('#bMore'); await q.click('#bThm');
+    check('tema claro: interfaz y fondo de la gráfica', await q.evaluate(() => document.body.classList.contains('light') && BGL > 0.99));
+    await q.click('#lEN'); await q.waitForTimeout(200);
+    check('textos nuevos traducidos', await q.evaluate(() => $('bVw').textContent.startsWith('Oscilloscope') && $('bThm').textContent === 'Dark theme' && document.querySelector('#gMo .gb').textContent === 'Engine'));
+    await q.click('#lES'); await q.click('#bThm'); await q.click('#bUi');
+    check('«Vista clásica»: paneles a la vista y canales de vuelta en su panel', await q.evaluate(() => document.body.classList.contains('fix') && $('chBox').parentElement.id === 'leftp') && await vis('#leftp') && await vis('#tPms'));
+    await q.reload(); await q.waitForTimeout(300);
+    check('la vista elegida se recuerda', await q.evaluate(() => document.body.classList.contains('fix')));
+    await q.click('#bUi');
+    await q.setViewportSize({ width: 400, height: 780 }); await q.click('#bMore'); await q.selectOption('#ex', '0'); await q.waitForTimeout(600);
+    check('móvil: sin desplazamiento horizontal y gráfica ≥ 45 % del alto', await q.evaluate(() => document.documentElement.scrollWidth <= innerWidth && cv.clientHeight / innerHeight >= 0.45), JSON.stringify(await q.evaluate(() => [document.documentElement.scrollWidth, cv.clientHeight])));
+    check('vista nueva: sin errores JS', qe.length === 0, qe.join(' | '));
+    await c2.close();
   }
 
   console.log(`\nRESULTADO: ${ok} correctas, ${bad} fallidas`);
