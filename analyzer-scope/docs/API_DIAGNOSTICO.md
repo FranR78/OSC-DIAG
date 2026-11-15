@@ -244,33 +244,8 @@ estanqueidad, máquina de humo…). Si todos fallan por igual (p. ej. 4 inyector
 
 ---------------------------------------------------------------------------------------------------
 
-## 10. `referencia` · señales para la biblioteca verificada (pendiente en el portal)
+## 10. `referencia` · fuera del portal
 
-La app pide una **ficha** al abrir cada captura (vehículo, prueba y, al final, *motor sin fallos / motor con fallo*).
-Dentro del portal, «Guardar y enviar a verificación» manda esta petición por la vía A (`google.script.run.apiDiagnostico`).
-La vía B (GET) no sirve: el CSV no cabe en la URL.
-
-Petición:
-```json
-{ "v": 1, "op": "referencia", "lang": "es", "cliente": { "app": "analyzer-scope", "ver": "2026.11.15" },
-  "ficha": { "marca": "Seat Altea 2.0 TDI", "codigo": "BKD", "combustible": "diesel | gasolina",
-             "condicion": "arranque | ralenti | aceleracion | carga | otra | \"\"", "temp": "frio | caliente | \"\"",
-             "obs": "", "estado": "ok | fallo", "averia": "",
-             "cilindros": 4, "orden": [1,3,4,2], "rpm": 820,
-             "senales": [ { "canal": "CH1", "nombre": "Canal A", "parametro": "Inyector 1", "entidad": "inyector", "unidad": "V" } ] },
-  "archivo": { "nombre": "captura_ref.csv", "muestras": 20000, "muestras_original": 5000000,
-               "csv": "#analyzer-scope-ajustes;{…}\r\nTiempo;…" } }
-```
-* `archivo.csv` es un CSV **con ajustes** de Analyzer Scope (se abre tal cual en la app y recupera escalas, reglas, anotaciones y la propia ficha),
-  reducido a ~20 000 filas como máximo conservando el mínimo y el máximo de cada tramo.
-* `estado` es lo que declara quien envía; **no** es la verificación.
-* La ficha no lleva matrícula, bastidor ni datos del cliente (la app lo avisa en el formulario).
-
-Respuesta: `{ "ok": true, "v": 1, "op": "referencia", "id": "<id del archivo>", "estado": "pendiente" }` o el error común (§1).
-
-Lo que hace el portal (por programar en su repo):
-* Carpeta de la biblioteca en **Propiedades del script** (`CARPETA_REFERENCIAS`); nada fijo en el código. Subcarpetas `pendientes/`, `verificadas/`, `descartadas/`.
-* Guarda en `pendientes/` el CSV y un `.json` con la ficha, quién lo envía (sesión Google) y la fecha. Límite de tamaño y de envíos por usuario.
-* **Verificación** (Ortu y Fran): abrir el CSV en la app, comprobar la señal y la ficha, y mover el par a `verificadas/` o `descartadas/`.
-  Solo lo que está en `verificadas/` puede usarse como referencia en el diagnóstico.
-
+Las señales para la biblioteca verificada **no** pasan por el portal (es del alumnado). Van a un servidor propio de
+Analyzer Scope: `apps-script-biblioteca/` en la raíz del repositorio, con su guía y su contrato en `docs/BIBLIOTECA.md`.
+El portal no tiene que programar nada para esto.

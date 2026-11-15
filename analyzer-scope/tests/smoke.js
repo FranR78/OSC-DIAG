@@ -354,10 +354,16 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await q.evaluate(() => $('bClr').click());
     await q.setInputFiles('#fi', { name: 'ref.csv', mimeType: 'text/csv', buffer: Buffer.from(csv) }); await q.waitForTimeout(700);
     check('al reabrirlo se recupera la ficha sin volver a preguntar', !(await vis('#fic')) && await q.evaluate(() => FIC && FIC.codigo === 'BKD' && $('bFic').textContent.startsWith('✓')));
-    check('fuera del portal no se ofrece el envío', await q.evaluate(() => { ficOpen(); const h = $('fcTx').hidden; $('fic').hidden = true; return h; }));
-    await q.evaluate(() => { window.google = { script: { run: { withSuccessHandler(f) { this.s = f; return this; }, withFailureHandler() { return this; }, apiDiagnostico(r) { window._req = r; this.s({ ok: true, v: 1, op: 'referencia', id: 'R1', estado: 'pendiente' }); } } } }; });
-    await q.click('#bFic'); await q.click('#fcKo'); await q.fill('#fcA', 'tirones'); await q.click('#fcTx'); await q.waitForTimeout(300);
-    check('portal: envío a verificación (op referencia, ficha, señales y CSV)', await q.evaluate(() => { const r = window._req; return r && r.op === 'referencia' && r.ficha.estado === 'fallo' && r.ficha.averia === 'tirones' && r.ficha.senales.length === 3 && r.ficha.senales[0].parametro === 'Inyector 1' && r.archivo.csv.startsWith('#analyzer-scope-ajustes;') && /pendiente/.test($('st').textContent) && FIC.enviada === 'R1'; }));
+    check('sin biblioteca configurada no se ofrece el envío', await q.evaluate(() => { ficOpen(); const h = $('fcTx').hidden && $('fcIl').hidden; $('fic').hidden = true; return h; }));
+    await q.evaluate(() => { APP_CFG.bibliotecaUrl = 'https://example.org/exec'; window._n = 0;
+      window.fetch = async (u, o) => { window._n++; window._url = u; window._opt = o; window._req = JSON.parse(o.body); return { json: async () => window._req.codigo === 'BUENO' ? { ok: true, v: 1, op: 'referencia', id: 'R1', estado: 'pendiente' } : { ok: false, v: 1, op: 'referencia', error: { codigo: 'no_autorizado', mensaje: 'El código de invitación no es válido.' } } }; }; });
+    await q.click('#bFic'); await q.click('#fcKo'); await q.fill('#fcA', 'tirones'); await q.click('#fcTx');
+    check('sin código de invitación no se envía', await vis('#fic') && await q.evaluate(() => window._n === 0 && /invitación/.test($('fcSt').textContent)));
+    await q.fill('#fcI', 'MALO'); await q.click('#fcTx'); await q.waitForTimeout(300);
+    check('código no válido: aviso en rojo y no queda como enviada', await q.evaluate(() => /no es válido/.test($('st').textContent) && $('st').classList.contains('err') && !FIC.enviada));
+    await q.click('#bFic'); await q.fill('#fcI', 'BUENO'); await q.click('#fcTx'); await q.waitForTimeout(300);
+    check('biblioteca: POST sin preflight con código, ficha, señales y CSV con ajustes', await q.evaluate(() => { const r = window._req, o = window._opt; return window._url === 'https://example.org/exec' && o.method === 'POST' && /^text\/plain/.test(o.headers['Content-Type']) && r.op === 'referencia' && r.codigo === 'BUENO' && r.ficha.estado === 'fallo' && r.ficha.averia === 'tirones' && r.ficha.senales.length === 3 && r.ficha.senales[0].parametro === 'Inyector 1' && r.archivo.csv.startsWith('#analyzer-scope-ajustes;') && /pendiente/.test($('st').textContent) && FIC.enviada === 'R1'; }));
+    check('el código se recuerda para el siguiente envío', await q.evaluate(() => { ficOpen(); const v = $('fcI').value; $('fic').hidden = true; return v === 'BUENO'; }));
     check('ficha: sin errores JS', qe.length === 0, qe.join(' | '));
     await c3.close();
   }

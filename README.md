@@ -11,3 +11,5 @@ basado solo en tus PDF de experto. Motor: Gemini API con key personal (gratis).
 
 Analizador de señales de osciloscopio (8 canales) para diagnosis de motores.
 Proyecto aparte: [`analyzer-scope/`](analyzer-scope/) — leer su `README.md`. Archivo para usar: `analyzer-scope/dist/analyzer-scope.html`.
+
+Biblioteca de señales de referencia (servidor propio, con código de invitación): [`apps-script-biblioteca/`](apps-script-biblioteca/) — guía en [`docs/BIBLIOTECA.md`](docs/BIBLIOTECA.md).

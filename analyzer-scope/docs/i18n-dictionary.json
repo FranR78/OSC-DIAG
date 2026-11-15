@@ -1808,6 +1808,18 @@
   [
    "Portada",
    "Home"
+  ],
+  [
+   "Código de invitación (solo para enviar a verificación)",
+   "Invitation code (only needed to send for verification)"
+  ],
+  [
+   "Escribe tu código de invitación para enviar.",
+   "Enter your invitation code to send."
+  ],
+  [
+   "no hay conexión con la biblioteca.",
+   "no connection to the library."
   ]
  ]
 }

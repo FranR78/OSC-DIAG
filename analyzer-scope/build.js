@@ -8,6 +8,7 @@
  *
  * Configuración (sin datos fijos en el código): src/config.json → {"portalUrl": "", "apiUrl": ""}
  *   portalUrl: enlace «Abrir en el portal» de la versión libre · apiUrl: puente GET para la versión libre (opcional)
+ *   bibliotecaUrl: web app de la biblioteca de señales (apps-script-biblioteca/, ver docs/BIBLIOTECA.md); vacío = sin envío
  *
  * Plantilla: src/index.html. Marcadores (no se buscan dentro de lo incluido):
  *   {{ruta}}          contenido de src/ruta tal cual
@@ -33,7 +34,7 @@ function build(modo) {
     }
     if (k === 'appcfg') {
       const cfg = fs.existsSync(path.join(SRC, 'config.json')) ? JSON.parse(rd('config.json')) : {};
-      return JSON.stringify({ modo, ver: rd('version.txt').toString('utf8').trim(), portalUrl: modo === 'libre' ? cfg.portalUrl || '' : '', apiUrl: modo === 'libre' ? cfg.apiUrl || '' : '' });
+      return JSON.stringify({ modo, ver: rd('version.txt').toString('utf8').trim(), portalUrl: modo === 'libre' ? cfg.portalUrl || '' : '', apiUrl: modo === 'libre' ? cfg.apiUrl || '' : '', bibliotecaUrl: cfg.bibliotecaUrl || '' });
     }
     if (k === 'js/*.js') return fs.readdirSync(path.join(SRC, 'js')).filter(f => f.endsWith('.js')).sort().map(f => rd('js/' + f).toString('utf8')).join('');
     return rd(k).toString('utf8');

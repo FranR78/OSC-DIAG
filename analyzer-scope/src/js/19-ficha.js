@@ -1,9 +1,9 @@
 /* ---------- Ficha de la captura: vehículo, prueba y estado del motor (sin fallos / con fallo) ----------
-   Se pide al abrir archivos, viaja en el CSV con ajustes y en el PDF, y en el portal se puede enviar a
-   verificación (op «referencia», docs/API_DIAGNOSTICO.md §10). Nunca lleva matrícula, bastidor ni datos del cliente. */
+   Se pide al abrir archivos, viaja en el CSV con ajustes y en el PDF, y con código de invitación se puede enviar a
+   verificación a la biblioteca propia (op «referencia», docs/BIBLIOTECA.md). Nunca lleva matrícula, bastidor ni datos del cliente. */
 let FIC=null,ficSt='',ficSkip=false,GRP=0;
 const FK={arranque:'arranque',ralenti:'ralentí',aceleracion:'aceleración en vacío',carga:'en carga o en marcha',otra:'otra condición'},FT={frio:'motor frío',caliente:'motor caliente'},FF={diesel:'diésel',gasolina:'gasolina'};
-const ficPortal=()=>!!(window.google&&google.script&&google.script.run);
+const ficBib=()=>APP_CFG.bibliotecaUrl||'';
 function ficE(e){ficSt=e;$('fcOk').classList.toggle('on',e==='ok');$('fcKo').classList.toggle('on',e==='fallo');$('fcAl').hidden=e!=='fallo'}
 function ficOpen(){
   if(!CH.some(c=>c.x))return st('No hay señales cargadas.');
@@ -12,7 +12,7 @@ function ficOpen(){
   const box=$('fcCh');box.innerHTML='';
   CH.forEach((c,i)=>{if(!c.x)return;const l=document.createElement('label');l.innerHTML='<span><i class="dot" style="background:'+c.c+'"></i>'+escH(c.n)+'</span>';
     const inp=document.createElement('input');inp.type='text';inp.maxLength=40;inp.value=c.p||'';inp.dataset.i=i;inp.placeholder=i18('Parámetro medido (p. ej. Presión admisión)');l.appendChild(inp);box.appendChild(l)});
-  ficE(f.estado||'');$('fcSt').textContent='';$('fcTx').hidden=!ficPortal();$('fic').hidden=false;$('fcM').focus();
+  ficE(f.estado||'');$('fcSt').textContent='';$('fcTx').hidden=$('fcIl').hidden=!ficBib();$('fcI').value=LS.get('as_bib')||'';$('fic').hidden=false;$('fcM').focus();
 }
 function ficSave(){
   if(!ficSt){$('fcSt').textContent='Elige el estado del motor: sin fallos o con fallo.';return null}
@@ -43,14 +43,15 @@ async function ficSend(f){
     ficha:Object.assign({},f,{cilindros:eng.n,orden:eng.order.slice(),rpm:ph.T>0&&!ph.auto?Math.round(120/ph.T):null,
       senales:r.A.map(c=>({canal:'CH'+(CH.indexOf(c)+1),nombre:c.n,parametro:c.p||'',entidad:dxEnt(c),unidad:c.u}))}),
     archivo:{nombre:nm+'_ref.csv',muestras:r.filas,muestras_original:r.original,csv:r.csv}};
-  st('Enviando a verificación…');
-  try{const a=await dxCall(req);if(!a||!a.ok)throw(a&&a.error)||{mensaje:'Respuesta no válida.'};f.enviada=a.id||true;st('Enviada a verificación: queda pendiente de revisión.')}
-  catch(e){st('No se pudo enviar: '+((e&&e.mensaje)||e))}
+  req.codigo=LS.get('as_bib')||'';st('Enviando a verificación…');
+  try{let a;try{a=await(await fetch(ficBib(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(req)})).json()}catch(e){throw{mensaje:i18('no hay conexión con la biblioteca.')}}
+    if(!a||!a.ok)throw(a&&a.error)||{mensaje:'Respuesta no válida.'};f.enviada=a.id||true;st('Enviada a verificación: queda pendiente de revisión.')}
+  catch(e){st('No se pudo enviar: '+((e&&e.mensaje)||e));$('st').classList.add('err')}
 }
 $('fcOk').onclick=()=>ficE('ok');$('fcKo').onclick=()=>ficE('fallo');
 $('fcNo').onclick=()=>{$('fic').hidden=true};
 $('fcSv').onclick=()=>{if(ficSave()){$('fic').hidden=true;st('Ficha guardada: irá en el CSV con ajustes y en el informe PDF.')}};
-$('fcTx').onclick=()=>{const f=ficSave();if(f){$('fic').hidden=true;ficSend(f)}};
+$('fcTx').onclick=()=>{const c=$('fcI').value.trim();if(!c){$('fcSt').textContent='Escribe tu código de invitación para enviar.';return}LS.set('as_bib',c);const f=ficSave();if(f){$('fic').hidden=true;ficSend(f)}};
 $('bFic').onclick=ficOpen;
 $('fic').addEventListener('pointerdown',e=>{if(e.target===$('fic'))$('fic').hidden=true});
 $('fic').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Escape')$('fic').hidden=true});
