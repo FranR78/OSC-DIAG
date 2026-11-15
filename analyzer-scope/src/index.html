@@ -137,7 +137,10 @@
 <button id="aUn" title="Ctrl+Z">Deshacer</button><button id="aClr">Quitar todo</button>
 </div>
 <div class="pg" id="pgbar" hidden><b>Páginas</b><button id="pgP" title="Página anterior">◀</button><input type="range" id="pgR" min="1" max="1" value="1"><button id="pgN" title="Página siguiente">▶</button><span id="pgL"></span><span id="pgNm" style="color:var(--mu);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:34%"></span></div>
-<div id="wrap"><canvas id="cv"></canvas></div>
+<div id="wrap"><canvas id="cv"></canvas><div id="load" hidden><i></i></div>
+<div id="empty"><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M2 20h8l4-14 6 28 6-22 5 14 4-6h6l4-10 5 20 4-10h8"/></svg>
+<h2>Arrastra aquí tu captura</h2><p>CSV de PicoScope y de otros osciloscopios. Se procesa en tu navegador.</p>
+<div><button class="p" id="emOp">Abrir archivos…</button><button id="emEx">Ver un ejemplo</button></div></div></div>
 <div id="rd"></div>
 <div id="st">Arrastra el fondo para desplazar, rueda para zoom. Clic = T1, Mayús+clic = T2. Arrastra cualquier regla para moverla. La flecha de color del borde izquierdo es el cursor de cada canal: arrástrala para subir o bajar su gráfica.</div>
 </div>

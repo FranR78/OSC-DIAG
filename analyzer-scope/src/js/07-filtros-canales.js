@@ -30,7 +30,8 @@ function updChips(){const cp=$('chips');cp.innerHTML='';
   CH.forEach((c,i)=>{if(!c.x)return;const b=document.createElement('button');b.className='chip'+(c.on?'':' off')+(i===chOpen?' cur':'');
     b.innerHTML='<i class="dot" style="background:'+c.c+'"></i><b>'+escH(c.n)+'</b><span>'+fmt(c.vd,c.u)+'/div</span>'+(c.fl!=='off'?'<b class="fb" title="Filtro activo: la forma de la señal está modificada">F</b>':'');
     b.onclick=()=>chipClick(i);cp.appendChild(b)});
-  if(!cp.children.length)cp.innerHTML='<span class="chE">Abre un CSV o elige un ejemplo</span>'}
+  if(!cp.children.length)cp.innerHTML='<span class="chE">Abre un CSV o elige un ejemplo</span>';
+  $('empty').hidden=CH.some(c=>c.x)}
 function ui(){
   $('chs').innerHTML='';
   CH.forEach((c,i)=>{

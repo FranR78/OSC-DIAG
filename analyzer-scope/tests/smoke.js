@@ -290,7 +290,11 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     const q = await c2.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(400);
     const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
     check('vista nueva por defecto, panel lateral recogido', await q.evaluate(() => !document.body.classList.contains('fix')) && !(await vis('#leftp')));
-    await q.click('#bMore'); await q.selectOption('#ex', '0'); await q.waitForTimeout(700);
+    check('sin señal: estado vacío con «Abrir archivos…» y «Ver un ejemplo»; iconos en los grupos', await vis('#empty') && await vis('#emOp') && await q.evaluate(() => !!document.querySelector('#gRu .gb svg') && !!document.querySelector('#bMore svg')));
+    await q.click('#emEx'); await q.waitForTimeout(700);
+    check('«Ver un ejemplo» carga la señal y quita el estado vacío', !(await vis('#empty')) && await q.evaluate(() => CH.some(c => c.x)));
+    await q.evaluate(async () => { await loadFiles([new File(['esto no es un csv'], 'malo.csv')]); });
+    check('un archivo no válido se avisa en rojo sin perder la señal', await q.evaluate(() => CH.some(c => c.x) && /malo\.csv/.test($('st').textContent)));
     check('la gráfica ocupa más del 70 % del alto', await q.evaluate(() => cv.clientHeight / innerHeight) > 0.7);
     check('una pastilla por canal cargado', await q.evaluate(() => document.querySelectorAll('.chip').length === CH.filter(c => c.x).length && document.querySelectorAll('.chip').length > 0));
     await q.click('.chip');

@@ -1568,6 +1568,18 @@
   [
    "Estado:",
    "Condition:"
+  ],
+  [
+   "CSV de PicoScope y de otros osciloscopios. Se procesa en tu navegador.",
+   "CSV from PicoScope and other oscilloscopes. It is processed in your browser."
+  ],
+  [
+   "Arrastra aquí tu captura",
+   "Drop your capture here"
+  ],
+  [
+   "Ver un ejemplo",
+   "See an example"
   ]
  ]
 }

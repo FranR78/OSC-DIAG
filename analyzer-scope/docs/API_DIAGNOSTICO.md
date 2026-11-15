@@ -244,7 +244,7 @@ estanqueidad, máquina de humo…). Si todos fallan por igual (p. ej. 4 inyector
 
 ---------------------------------------------------------------------------------------------------
 
-## 7. `referencia` · señales para la biblioteca verificada (pendiente en el portal)
+## 10. `referencia` · señales para la biblioteca verificada (pendiente en el portal)
 
 La app pide una **ficha** al abrir cada captura (vehículo, prueba y, al final, *motor sin fallos / motor con fallo*).
 Dentro del portal, «Guardar y enviar a verificación» manda esta petición por la vía A (`google.script.run.apiDiagnostico`).

@@ -1,6 +1,6 @@
 /* ---------- Ficha de la captura: vehículo, prueba y estado del motor (sin fallos / con fallo) ----------
    Se pide al abrir archivos, viaja en el CSV con ajustes y en el PDF, y en el portal se puede enviar a
-   verificación (op «referencia», docs/API_DIAGNOSTICO.md §7). Nunca lleva matrícula, bastidor ni datos del cliente. */
+   verificación (op «referencia», docs/API_DIAGNOSTICO.md §10). Nunca lleva matrícula, bastidor ni datos del cliente. */
 let FIC=null,ficSt='',ficSkip=false,GRP=0;
 const FK={arranque:'arranque',ralenti:'ralentí',aceleracion:'aceleración en vacío',carga:'en carga o en marcha',otra:'otra condición'},FT={frio:'motor frío',caliente:'motor caliente'},FF={diesel:'diésel',gasolina:'gasolina'};
 const ficPortal=()=>!!(window.google&&google.script&&google.script.run);

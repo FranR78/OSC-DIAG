@@ -2,6 +2,8 @@
 let PG=[],pgI=0,viewSet=false,curTab='S',QF=[],lastGif=null,gTouched=false;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const tick=()=>new Promise(r=>setTimeout(r,20));
+/* barra de progreso de lectura: u = 0…1, null = terminado */
+function busy(u){const b=$('load');b.hidden=u==null;if(u!=null){b.classList.toggle('ind',!u);b.firstChild.style.width=(u?Math.round(u*100):35)+'%'}}
 const fst=m=>{$('fSt').textContent=m};
 function splitBlocks(txt){
   const L=txt.split(/\r?\n/),num=s=>/^[+-]?(\d+[.,]?\d*|[.,]\d+)([eE][+-]?\d+)?$/.test(s.trim().replace(/^"|"$/g,''));
@@ -44,17 +46,18 @@ function updPager(){
   $('gInfo').textContent=N?N+' página(s) cargada(s). Elige el rango y crea el GIF.':'No hay páginas cargadas: añade archivos en «Unir y convertir CSV» o con «Abrir archivos…».';
 }
 async function loadFiles(files){
-  const msg=[],pages=[],asCh=$('fmode').value==='channels';
+  const msg=[],pages=[],asCh=$('fmode').value==='channels';let bad=false;busy(0);
   for(const f of sortBuf([...files])){
     try{
       const head=new Uint8Array(await f.slice(0,4).arrayBuffer());
       if(String.fromCharCode(...head)==='JWWD'){msg.push(f.name+': .psdata nativo (formato propietario cifrado/comprimido): no se puede leer aquí. Expórtalo a CSV desde el programa de tu osciloscopio y ábrelo aquí.');continue}
       const h2=await f.slice(0,80).text();if(h2.includes('ortu-psdata')){st('Leyendo sesión…');msg.push(await importSession(f));continue}
       st('Leyendo '+f.name+'…');await new Promise(q=>setTimeout(q,30));
-      const ds=await readAny(f,u=>st('Leyendo '+f.name+'… '+Math.round(u*100)+' %'));ds.forEach(d=>pages.push(d));
+      const ds=await readAny(f,u=>{busy(u);st('Leyendo '+f.name+'… '+Math.round(u*100)+' %')});ds.forEach(d=>pages.push(d));
       msg.push(f.name+': '+ds.map(d=>d.chs.length+' canal(es), '+d.n+' muestras').join(' | ')+(ds.length>1?' ('+ds.length+' páginas)':'')+(ds[0].cfg?' · ajustes recuperados':''));
-    }catch(e){msg.push(f.name+': '+e.message)}
+    }catch(e){bad=true;msg.push(f.name+': '+e.message)}
   }
+  busy(null);
   if(pages.length){
     if(asCh){let slot=CH.findIndex(c=>!c.x);
       pages.forEach(p=>p.chs.forEach(c=>{if(slot<0||slot>7){msg.push('Más de 8 canales: se omite '+c.n);return}
@@ -63,6 +66,7 @@ async function loadFiles(files){
     else addPages(pages)}
   const fo=flOn();
   st(msg.join(' | ')+(pages.length>1&&!asCh?' · usa el cursor de páginas para recorrerlas':'')+(fo.length?' · filtro activo en: '+fo.join(', '):''));
+  $('st').classList.toggle('err',bad&&!pages.length);
 }
 /* ---- archivos: lista, unión y conversión ---- */
 async function fAddFiles(files){
