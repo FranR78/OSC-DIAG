@@ -259,6 +259,30 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await pp.close();
   }
 
+  console.log('\nF0 · Escala común, buffers, lectura por trozos, filtros y nombre de canal');
+  {
+    const q = await ctx.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await q.goto(APP); await q.waitForTimeout(400);
+    const mk = (amp, n = 4000) => { let t = 'Tiempo;Canal A;Canal B\r\n(ms);(V);(V)\r\n\r\n'; for (let i = 0; i < n; i++) t += (i * 0.1).toFixed(4).replace('.', ',') + ';' + (amp * Math.sin(i / 20)).toFixed(6).replace('.', ',') + ';' + (0.5 * Math.cos(i / 30)).toFixed(6).replace('.', ',') + '\r\n'; return t; };
+    const F = (name, txt) => ({ name, mimeType: 'text/csv', buffer: Buffer.from(txt) });
+    await q.setInputFiles('#fi', [F('cap-0003_2.csv', mk(1.2)), F('cap-0003_1.csv', mk(0.004))]); await q.waitForTimeout(700);
+    check('los buffers se ordenan por su número (_1, _2)', await q.evaluate(() => PG.map(p => p.name).join()) === 'cap-0003_1.csv,cap-0003_2.csv');
+    check('la barra indica el buffer', (await q.evaluate(() => $('pgL').textContent)).startsWith('Buffer 1 · 1 / 2'));
+    check('buffer plano: la escala sale del conjunto (500 mV/div), no del ruido', await q.evaluate(() => CH[0].vd) === 0.5, String(await q.evaluate(() => CH[0].vd)));
+    await q.evaluate(() => { CH[0].fl = 'bajo'; proc(CH[0]); ui(); });
+    check('aviso «F» de filtro activo en el canal', await q.evaluate(() => !!document.querySelector('.chb .fb')));
+    await q.click('.chb .ed'); await q.fill('.nmI', 'CR <b>'); await q.press('.nmI', 'Enter');
+    check('nombre de canal editable, en todos los buffers y sin HTML', await q.evaluate(() => CH[0].n === 'CR <b>' && PG.every(p => p.chs[0].n === 'CR <b>') && !document.querySelector('.chb .lab b:not(.fb)')));
+    await q.setInputFiles('#fi', [F('otra.csv', mk(2))]); await q.waitForTimeout(600);
+    check('al cargar otro archivo los filtros vuelven a «Sin filtro»', await q.evaluate(() => CH.every(c => c.fl === 'off') && !document.querySelector('.chb .fb')));
+    const big = mk(1, 30000), ref = await q.evaluate(t => { const r = parseText(t); return [r.n, r.chs.length, r.chs[0].x[r.n - 1], r.chs[1].y[777]]; }, big);
+    await q.evaluate(() => { BIGF = 1000; $('bClr').click(); });
+    await q.setInputFiles('#fi', [F('grande.csv', big)]); await q.waitForTimeout(900);
+    const got = await q.evaluate(() => { const c = PG[0].chs; return [c[0].x.length, c.length, c[0].x[c[0].x.length - 1], c[1].y[777]]; });
+    check('lectura por trozos = lectura normal (muestras, canales, tiempo y valores)', JSON.stringify(got) === JSON.stringify(ref), JSON.stringify([got, ref]));
+    check('fase 0: sin errores JS', qe.length === 0, qe.join(' | '));
+    await q.close();
+  }
+
   console.log(`\nRESULTADO: ${ok} correctas, ${bad} fallidas`);
   await b.close(); process.exit(bad ? 1 : 0);
 })().catch(e => { console.log('FALLO DEL GUION:', e.message.split('\n')[0]); process.exit(2); });

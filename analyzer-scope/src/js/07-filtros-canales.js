@@ -21,13 +21,17 @@ function proc(c){
   if(c.inv){const z=new Float32Array(y.length);for(let i=0;i<z.length;i++)z[i]=-y[i];y=z}
   c.y=y;
 }
+const escH=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* Nombre del canal: viene del CSV y se puede cambiar; el cambio vale para todas las páginas (buffers) con ese mismo nombre */
+function setName(i,v){const c=CH[i],d=PG[pgI]&&PG[pgI].chs[i],old=d&&d.y===c.y0?d.n:null;
+  if(old!=null)PG.forEach(p=>{const q=p.chs[i];if(q&&q.n===old)q.n=v});c.n=v}
 function ui(){
   $('chs').innerHTML='';
   CH.forEach((c,i)=>{
     const w=document.createElement('div');w.className='chb';
     const d=document.createElement('div');d.className='ch';
     d.innerHTML='<input type="checkbox" title="Mostrar canal" '+(c.on?'checked':'')+(c.x?'':' disabled')+'>'+
-      '<span class="lab'+(i===sel?' sel':'')+'"><i class="dot" style="background:'+c.c+'"></i>'+c.n+'</span>'+
+      '<span class="lab'+(i===sel?' sel':'')+'"><i class="dot" style="background:'+c.c+'"></i>'+escH(c.n)+(c.fl!=='off'&&c.x?' <b class="fb" title="Filtro activo: la forma de la señal está modificada">F</b>':'')+(c.x&&!c.m?'<button class="ed" title="Cambiar el nombre del canal">✎</button>':'')+'</span>'+
       '<select class="st" title="Escala por división">'+VD.map(v=>'<option value="'+v+'"'+(v===c.vd?' selected':'')+'>'+fmt(v,c.u)+'/div</option>').join('')+'</select>'+
       '<input class="st" type="number" step="0.5" value="'+(+c.off.toFixed(2))+'" title="Posición (div)">'+
       '<input class="st" type="checkbox" title="Reglas de amplitud de este canal" '+(c.hr?'checked':'')+'>';
@@ -35,6 +39,10 @@ function ui(){
     k[0].onchange=()=>{c.on=k[0].checked;draw()};k[1].onclick=()=>{sel=i;ui();draw()};
     k[2].onchange=()=>{c.vd=+k[2].value;draw()};k[3].oninput=()=>{c.off=+k[3].value||0;draw()};
     k[4].onchange=()=>{c.hr=k[4].checked;draw()};
+    const ed=k[1].querySelector('.ed');if(ed)ed.onclick=ev=>{ev.stopPropagation();
+      const inp=document.createElement('input');inp.type='text';inp.className='nmI';inp.maxLength=24;inp.value=c.n;k[1].replaceWith(inp);inp.focus();inp.select();let done=false;
+      const fin=ok=>{if(done)return;done=true;const v=inp.value.trim();if(ok&&v&&v!==c.n)setName(i,v);ui();sync();draw()};
+      inp.onkeydown=e2=>{e2.stopPropagation();if(e2.key==='Enter')fin(true);else if(e2.key==='Escape')fin(false)};inp.onblur=()=>fin(true)};
     const e=document.createElement('div');e.className='ch2 st';
     e.innerHTML='<select title="Filtro del canal">'+[['off','Sin filtro'],['usuario','Usuario'],['bajo','Paso bajo'],['alto','Paso alto'],['banda','Ancho de banda']].map(([v,t])=>'<option value="'+v+'"'+(c.fl===v?' selected':'')+'>'+t+'</option>').join('')+'</select>'+
       '<input type="number" min="1" step="10" value="'+c.f1+'" title="Frecuencia de corte (Hz)"'+(c.fl==='off'||!c.x?' disabled':'')+'>'+

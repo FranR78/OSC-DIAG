@@ -20,7 +20,12 @@ function parseAny(text,name){
   if(!res.length)throw err||new Error('archivo vacío');return res;
 }
 /* ---- páginas ---- */
-function addPages(list){const first=PG.length;list.forEach(d=>PG.push(d));CH.forEach(c=>{c._set=false});viewSet=false;showPage(first)}
+/* «nombre_3.csv» → buffer 3 de la captura «nombre» (así exporta PicoScope todos los buffers) */
+const bufOf=name=>{const m=/^(.*?)[ _-](\d{1,4})\.[^.]+$/.exec(name||'');return m?{b:m[1],n:+m[2]}:null};
+function sortBuf(files){const g=new Map();files.forEach((f,i)=>{const q=bufOf(f.name);if(q){if(!g.has(q.b))g.set(q.b,[]);g.get(q.b).push({i,n:q.n,f})}});
+  const out=files.slice();g.forEach(a=>{if(a.length<2)return;const pos=a.map(q=>q.i);a.slice().sort((p,q)=>p.n-q.n).forEach((q,k)=>{out[pos[k]]=q.f})});return out}
+const flOn=()=>CH.filter(c=>c.x&&!c.m&&c.fl!=='off').map(c=>c.n);
+function addPages(list){const first=PG.length;list.forEach(d=>PG.push(d));CH.forEach(c=>{c._set=false;if(!c.m){c.fl='off';c.inv=false}});viewSet=false;showPage(first)}
 function showPage(i){
   if(!PG.length)return;i=Math.max(0,Math.min(PG.length-1,i));pgI=i;const p=PG[i];
   CH.forEach((c,k)=>{const d=p.chs[k];
@@ -33,19 +38,20 @@ function showPage(i){
 }
 function updPager(){
   const N=PG.length;$('pgbar').hidden=N<2;$('pgR').max=Math.max(1,N);$('pgR').value=pgI+1;
-  $('pgL').textContent=(pgI+1)+' / '+N;$('pgNm').textContent=PG[pgI]?PG[pgI].name:'';
+  const bq=PG[pgI]&&bufOf(PG[pgI].name),isB=bq&&PG.filter(p=>{const q=bufOf(p.name);return q&&q.b===bq.b}).length>1;
+  $('pgL').textContent=(isB?'Buffer '+bq.n+' · ':'')+(pgI+1)+' / '+N;$('pgNm').textContent=PG[pgI]?PG[pgI].name:'';
   $('gA').max=$('gB').max=Math.max(1,N);if(!gTouched||+$('gB').value>N)$('gB').value=N;if(+$('gA').value>N)$('gA').value=1;
   $('gInfo').textContent=N?N+' página(s) cargada(s). Elige el rango y crea el GIF.':'No hay páginas cargadas: añade archivos en «Unir y convertir CSV» o con «Abrir archivos…».';
 }
 async function loadFiles(files){
   const msg=[],pages=[],asCh=$('fmode').value==='channels';
-  for(const f of files){
+  for(const f of sortBuf([...files])){
     try{
       const head=new Uint8Array(await f.slice(0,4).arrayBuffer());
       if(String.fromCharCode(...head)==='JWWD'){msg.push(f.name+': .psdata nativo (formato propietario cifrado/comprimido): no se puede leer aquí. Expórtalo a CSV desde el programa de tu osciloscopio y ábrelo aquí.');continue}
       const h2=await f.slice(0,80).text();if(h2.includes('ortu-psdata')){st('Leyendo sesión…');msg.push(await importSession(f));continue}
       st('Leyendo '+f.name+'…');await new Promise(q=>setTimeout(q,30));
-      const ds=parseAny(await f.text(),f.name);ds.forEach(d=>pages.push(d));
+      const ds=await readAny(f,u=>st('Leyendo '+f.name+'… '+Math.round(u*100)+' %'));ds.forEach(d=>pages.push(d));
       msg.push(f.name+': '+ds.map(d=>d.chs.length+' canal(es), '+d.n+' muestras').join(' | ')+(ds.length>1?' ('+ds.length+' páginas)':'')+(ds[0].cfg?' · ajustes recuperados':''));
     }catch(e){msg.push(f.name+': '+e.message)}
   }
@@ -55,12 +61,13 @@ async function loadFiles(files){
         Object.assign(CH[slot],{m:null,mi:'',n:c.n,x:c.x,y:c.y,y0:c.y,on:true,u:c.u||'V',fl:'off',inv:false,f1:500,f2:1000});autoCh(slot);slot=CH.findIndex(q=>!q.x)}));
       fit();ui();sync();draw()}
     else addPages(pages)}
-  st(msg.join(' | ')+(pages.length>1&&!asCh?' · usa el cursor de páginas para recorrerlas':''));
+  const fo=flOn();
+  st(msg.join(' | ')+(pages.length>1&&!asCh?' · usa el cursor de páginas para recorrerlas':'')+(fo.length?' · filtro activo en: '+fo.join(', '):''));
 }
 /* ---- archivos: lista, unión y conversión ---- */
 async function fAddFiles(files){
   for(const f of files){const q={f,name:f.name};
-    try{fst('Leyendo '+f.name+'…');await tick();q.ds=parseAny(await f.text(),f.name)}catch(e){q.err=e.message}
+    try{fst('Leyendo '+f.name+'…');await tick();q.ds=await readAny(f,u=>fst('Leyendo '+f.name+'… '+Math.round(u*100)+' %'))}catch(e){q.err=e.message}
     QF.push(q)}
   fRender();fst(QF.length+' archivo(s) en la lista, en orden de carga.');
 }

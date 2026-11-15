@@ -1,6 +1,13 @@
 /* ---------- Escala / vista ---------- */
 function rng(c){let mn=Infinity,mx=-Infinity;for(let i=0;i<c.y.length;i++){const v=c.y[i];if(v<mn)mn=v;if(v>mx)mx=v}return[mn,mx]}
-function autoCh(i){const c=CH[i];if(!c.y)return;c.h=null;const[a,b]=rng(c);c.vd=nice(Math.max(b-a,1e-6)/6);c.ref=(a+b)/2;c.off=-c.ref/c.vd}
+/* Rango de un canal en todas las páginas cargadas (misma unidad): un buffer plano se ve plano, no ampliado */
+function rngPg(k,u){let mn=Infinity,mx=-Infinity;PG.forEach(p=>{const d=p.chs[k];if(!d||(d.u||'V')!==u)return;
+  if(!d.r){let a=Infinity,b=-Infinity;const y=d.y;for(let i=0;i<y.length;i++){const v=y[i];if(v<a)a=v;if(v>b)b=v}d.r=[a,b]}
+  if(d.r[0]<mn)mn=d.r[0];if(d.r[1]>mx)mx=d.r[1]});return[mn,mx]}
+function autoCh(i){const c=CH[i];if(!c.y)return;c.h=null;let[a,b]=rng(c);
+  const d=PG.length>1&&PG[pgI]&&PG[pgI].chs[i];
+  if(d&&d.y===c.y0){const[ga,gb]=rngPg(i,c.u);if(isFinite(ga)&&isFinite(gb))[a,b]=c.inv?[-gb,-ga]:[ga,gb]}
+  c.vd=nice(Math.max(b-a,1e-6)/6);c.ref=(a+b)/2;c.off=-c.ref/c.vd}
 function refOf(c){if(c.ref==null){const[a,b]=rng(c);c.ref=(a+b)/2}return c.ref}
 const rawY=c=>M.t+PH()/2-(refOf(c)/c.vd+c.off)*PH()/8;
 const arrowY=c=>Math.max(M.t+8,Math.min(M.t+PH()-8,rawY(c)));

@@ -1324,6 +1324,18 @@
   [
    "⚠ Una o más reglas están al otro lado de su referencia (se muestra el valor absoluto). ",
    "⚠ One or more rulers are on the other side of their reference (the absolute value is shown). "
+  ],
+  [
+   "Filtro activo: la forma de la señal está modificada",
+   "Filter active: the shape of the signal is modified"
+  ],
+  [
+   "filtro activo en",
+   "filter active on"
+  ],
+  [
+   "Cambiar el nombre del canal",
+   "Rename the channel"
   ]
  ]
 }
