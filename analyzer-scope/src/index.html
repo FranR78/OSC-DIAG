@@ -116,6 +116,7 @@
 <button class="tog" id="tGr" title="Identificación de cilindros sobre la señal (overlay)">Cilindros</button>
 <span class="pr"><button class="tog" id="tVv" title="AAA avance apertura admisión, RCE retraso cierre escape, AAE avance apertura escape, RCA retraso cierre admisión">AAA·RCE·AAE·RCA</button><button class="tog lk" id="kVv" title="Bloquear el conjunto AAA·RCE·AAE·RCA: al arrastrar una regla se mueven las cuatro">🔓</button></span>
 <button class="tog" id="tAdv" title="Reglas de avance de encendido y de inyección (Inyec.1, Inyec.2)">Avance</button>
+<button class="tog" id="tAnm" title="Pistones y válvulas según el ángulo de cigüeñal de la señal">Animación del motor</button>
 <button id="bMD" class="nu">Diagrama de distribución…</button>
 <button id="bMC" class="nu">Compresión relativa…</button>
 <button id="bDrw" class="nu">Configurar fase y cilindros…</button>
@@ -146,10 +147,12 @@
 <button id="aUn" title="Ctrl+Z">Deshacer</button><button id="aClr">Quitar todo</button>
 </div>
 <div class="pg" id="pgbar" hidden><b>Páginas</b><button id="pgP" title="Página anterior">◀</button><input type="range" id="pgR" min="1" max="1" value="1"><button id="pgN" title="Página siguiente">▶</button><span id="pgL"></span><span id="pgNm" style="color:var(--mu);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:34%"></span></div>
-<div id="wrap"><canvas id="cv" role="img" aria-label="Gráfica de las señales"></canvas><div id="load" hidden><i></i></div>
+<div id="wrap"><canvas id="cv" role="img" aria-label="Gráfica de las señales"></canvas><div id="load" hidden><i></i></div><i id="anL" hidden></i>
 <div id="empty"><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M2 20h8l4-14 6 28 6-22 5 14 4-6h6l4-10 5 20 4-10h8"/></svg>
 <h2>Arrastra aquí tu captura</h2><p>CSV de PicoScope y de otros osciloscopios. Se procesa en tu navegador.</p>
 <div><button class="p" id="emOp">Abrir archivos…</button><button id="emEx">Ver un ejemplo</button></div></div></div>
+<div id="anim" hidden><div class="anH"><button id="anP" title="Reproducir o parar">▶</button><input type="range" id="anR" min="0" max="1000" value="0" aria-label="Posición en la señal"><span id="anT"></span><button id="anX" title="Cerrar">✕</button></div>
+<canvas id="anC" role="img" aria-label="Pistones y válvulas según el ángulo de cigüeñal"></canvas><p class="hint" id="anN"></p></div>
 <div id="rd"></div>
 <div id="st">Arrastra el fondo para desplazar, rueda para zoom. Clic = T1, Mayús+clic = T2. Arrastra cualquier regla para moverla. La flecha de color del borde izquierdo es el cursor de cada canal: arrástrala para subir o bajar su gráfica.</div>
 </div>

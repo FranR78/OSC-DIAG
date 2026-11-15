@@ -18,6 +18,9 @@ function proc(c){
     if(bad)st(c.n+': el corte debe ser menor que '+fmt(ny*.98,'Hz')+' (frecuencia de Nyquist).');
     y=Float32Array.from(a);
   }
+  /* sensor: convierte la unidad del archivo (V, mV…) a la magnitud real (bar, A…): valor = k·lectura + o */
+  if(c.sen){if(!c._su){c.ur=c.u;c._su=true}c.u=c.sen.u;const k=+c.sen.k||1,o=+c.sen.o||0,z=new Float32Array(y.length);for(let i=0;i<z.length;i++)z[i]=y[i]*k+o;y=z}
+  else if(c._su){c.u=c.ur;c._su=false}
   if(c.inv){const z=new Float32Array(y.length);for(let i=0;i<z.length;i++)z[i]=-y[i];y=z}
   c.y=y;
 }
@@ -32,6 +35,11 @@ function updChips(){const cp=$('chips');cp.innerHTML='';
     b.onclick=()=>chipClick(i);cp.appendChild(b)});
   if(!cp.children.length)cp.innerHTML='<span class="chE">Abre un CSV o elige un ejemplo</span>';
   $('empty').hidden=CH.some(c=>c.x)}
+/* Sensores de uso general (factor por voltio). Los propios se guardan en el navegador. */
+const SEN0=[['Presión · 1 V = 1 bar',1,'bar'],['Presión · 1 V = 10 bar',10,'bar'],['Vacío · 1 V = 100 mbar',100,'mbar'],['Pinza 100 mV/A',10,'A'],['Pinza 10 mV/A',100,'A'],['Pinza 1 mV/A',1000,'A']];
+function senList(){let m=[];try{m=JSON.parse(localStorage.getItem('as_sensores')||'[]')||[]}catch(e){}return SEN0.concat(m.filter(q=>q&&q.length===3))}
+function senSave(s){let m=[];try{m=JSON.parse(localStorage.getItem('as_sensores')||'[]')||[]}catch(e){}const n='1 V = '+s.k+' '+s.u;if(!senList().some(q=>q[1]===s.k&&q[2]===s.u)){m.push([n,s.k,s.u]);try{localStorage.setItem('as_sensores',JSON.stringify(m.slice(-12)))}catch(e){}}}
+function senSet(i,s){const c=CH[i];c.sen=s;c.h=null;proc(c);autoCh(i);mathAll();ui();draw()}
 function ui(){
   $('chs').innerHTML='';
   CH.forEach((c,i)=>{
@@ -60,7 +68,15 @@ function ui(){
     q[1].onchange=()=>{c.f1=+q[1].value||1;proc(c);draw()};
     q[2].onchange=()=>{c.f2=+q[2].value||1;proc(c);draw()};
     q[3].onclick=()=>{if(!c.x)return;c.inv=!c.inv;c.off=-c.off;if(c.ref!=null)c.ref=-c.ref;if(c.h)c.h=c.h.map(v=>-v);proc(c);ui();draw()};
-    const pr=document.createElement('input');pr.type='text';pr.className='par';pr.placeholder=i18('Parámetro medido (p. ej. Presión admisión)');pr.maxLength=40;pr.value=c.p||'';pr.oninput=()=>{c.p=pr.value;draw()};w.appendChild(d);w.appendChild(pr);w.appendChild(e);$('chs').appendChild(w);
+    const e3=document.createElement('div');e3.className='ch3 st';
+    {const raw=c._su?c.ur:c.u,mv=/^mV$/i.test(raw||'')?1e-3:1,L=senList(),cur=c.sen?L.findIndex(q=>Math.abs(q[1]*mv-c.sen.k)<1e-12&&q[2]===c.sen.u&&!c.sen.o):-2;
+     e3.innerHTML='<select title="Sensor: convierte la lectura a la magnitud real (bar, A…)"'+(c.x&&!c.m?'':' disabled')+'><option value="">Sin sensor</option>'+L.map((q,j)=>'<option value="'+j+'"'+(j===cur?' selected':'')+'>'+escH(q[0])+'</option>').join('')+'<option value="c"'+(c.sen&&cur<0?' selected':'')+'>Personalizado…</option></select>'+
+       (c.sen?'<input type="number" step="any" value="'+c.sen.k+'" title="Factor: unidades del sensor por cada '+escH(raw||'V')+' del archivo"><input type="text" maxlength="6" value="'+escH(c.sen.u)+'" title="Unidad del sensor"><input type="number" step="any" value="'+(c.sen.o||0)+'" title="Desplazamiento (se suma tras multiplicar)"><button title="Guardar este sensor para otros canales">Guardar</button>':'');
+     const s3=e3.children;
+     s3[0].onchange=()=>{const v=s3[0].value;if(v==='')senSet(i,null);else if(v==='c')senSet(i,c.sen||{k:1,o:0,u:raw||'V'});else{const q=L[+v];senSet(i,{k:q[1]*mv,o:0,u:q[2]})}};
+     if(c.sen){const up=()=>senSet(i,{k:+s3[1].value||1,u:s3[2].value.trim()||'ud',o:+s3[3].value||0});s3[1].onchange=s3[2].onchange=s3[3].onchange=up;
+       s3[4].onclick=()=>{senSave({k:c.sen.k/mv,u:c.sen.u});ui();st('Sensor guardado en este navegador.')}}}
+    const pr=document.createElement('input');pr.type='text';pr.className='par';pr.placeholder=i18('Parámetro medido (p. ej. Presión admisión)');pr.maxLength=40;pr.value=c.p||'';pr.oninput=()=>{c.p=pr.value;draw()};w.appendChild(d);w.appendChild(pr);w.appendChild(e);w.appendChild(e3);$('chs').appendChild(w);
   });
   updChips();fillSC();
 }

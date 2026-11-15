@@ -430,6 +430,31 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await c5.close();
   }
 
+  console.log('\nF5 · Sensor por canal (barras en bar) y animación del motor');
+  {
+    const c6 = await b.newContext({ viewport: { width: 1400, height: 900 } }); await c6.route(/^https?:/, r => r.abort());
+    await c6.addInitScript(() => { try { localStorage.setItem('as_guia', '1'); localStorage.setItem('as_portada', '1'); } catch (e) { } });
+    const q = await c6.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await serve(c6); await q.goto(APP_H); await q.waitForTimeout(400);
+    const vis = s => q.evaluate(s => { const e = document.querySelector(s); if (!e) return false; const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, s);
+    await q.click('#emEx'); await q.waitForTimeout(800);
+    await q.click('.chip'); await q.selectOption('#chBox .chb.cur .ch3 select', '1');
+    check('sensor «1 V = 10 bar»: el canal pasa a bar y la señal se multiplica', await q.evaluate(() => { const c = CH[0]; return c.u === 'bar' && Math.abs(c.y[100] - c.y0[100] * 10) < Math.abs(c.y0[100] * 10) * 1e-5 + 1e-6 && /bar\/div/.test(document.querySelector('.chip').textContent); }));
+    await q.fill('#chBox .chb.cur .ch3 input[type=number]', '2'); await q.press('#chBox .chb.cur .ch3 input[type=number]', 'Tab'); await q.waitForTimeout(150);
+    check('factor personalizado y reglas de amplitud con su diferencia en bar', await q.evaluate(() => { const c = CH[0]; ensureH(c); draw(); return c.sen.k === 2 && Math.abs(c.y[100] - c.y0[100] * 2) < Math.abs(c.y0[100] * 2) * 1e-5 + 1e-6 && /amplitud.*Δ [-\d.,]+ [kmµ]?bar/.test($('rd').textContent); }), await q.evaluate(() => $('rd').textContent.slice(0, 300)));
+    check('el sensor va en los ajustes (CSV y deshacer) y se quita con «Sin sensor»', await q.evaluate(() => { const ok = cfgOf(CH).ch[0].sen.k === 2; senSet(0, null); return ok && CH[0].u === 'V' && CH[0].y[100] === CH[0].y0[100]; }));
+    await q.keyboard.press('Escape'); await q.click('#gMo .gb'); await q.click('#tAnm'); await q.waitForTimeout(300);
+    check('«Animación del motor» abre el panel con el dibujo', await vis('#anim') && await q.evaluate(() => { const c = $('anC'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 100) n++; return n > 800; }));
+    const k = await q.evaluate(() => { const A = engA(), c = eng.c0, T = ph.T, V = Object.assign({ med: false }, AM_TIP), f = u => { const r = amCyl(A + T * u, c, V); return [Math.round(r.a), +r.s.toFixed(3), +r.li.toFixed(3), +r.le.toFixed(3), r.st]; }; return [f(0), f(.25), f(.5), f(.625), f(.875)]; });
+    check('cinemática: PMS de compresión (pistón arriba, válvulas cerradas) y PMI tras la expansión (escape abriendo)', k[0].join() === '0,0,0,0,2' && k[1][0] === 180 && k[1][1] === 1 && k[1][2] === 0 && k[1][3] > 0, JSON.stringify(k));
+    check('cruce en el PMS de escape, admisión abierta a mitad de carrera y todo cerrado en compresión', k[2][0] === 360 && k[2][1] === 0 && k[2][2] > 0 && k[2][3] > 0 && k[3][2] > 0.5 && k[3][3] === 0 && k[3][4] === 0 && k[4][2] === 0 && k[4][3] === 0 && k[4][4] === 1, JSON.stringify(k));
+    await q.evaluate(() => { const r = $('anR'); r.value = 250; r.dispatchEvent(new Event('input')); });
+    check('el deslizador mueve el punto y la línea sobre la señal', await q.evaluate(() => Math.abs(AM.t - (view.t0 + view.span * .25)) < 1e-9 && !$('anL').hidden && /°/.test($('anT').textContent)));
+    const t1 = await q.evaluate(() => AM.t); await q.click('#anP'); await q.waitForTimeout(500);
+    check('▶ reproduce y ✕ cierra', (await q.evaluate(() => AM.t)) > t1 && await q.evaluate(() => { $('anX').click(); return $('anim').hidden && $('anL').hidden && !AM.play; }));
+    check('sensor y animación: sin errores JS', qe.length === 0, qe.join(' | '));
+    await c6.close();
+  }
+
   console.log(`\nRESULTADO: ${ok} correctas, ${bad} fallidas`);
   await b.close(); process.exit(bad ? 1 : 0);
 })().catch(e => { console.log('FALLO DEL GUION:', e.message.split('\n')[0]); process.exit(2); });

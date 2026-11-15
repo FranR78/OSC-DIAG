@@ -25,7 +25,7 @@ analyzer-scope/
 ├─ tests/                    ← pruebas de regresión en navegador real (Playwright) + datos de ejemplo
 │  ├─ smoke.js, package.json
 │  └─ data/ (7 CSV de varios osciloscopios, 1 .psdata nativo)
-└─ docs/i18n-dictionary.json ← diccionario español→inglés (465 pares) en formato legible
+└─ docs/i18n-dictionary.json ← diccionario español→inglés (490 pares) en formato legible
 ```
 
 ---------------------------------------------------------------------------------------------------

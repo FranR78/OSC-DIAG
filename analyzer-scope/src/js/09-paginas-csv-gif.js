@@ -27,7 +27,7 @@ const bufOf=name=>{const m=/^(.*?)[ _-](\d{1,4})\.[^.]+$/.exec(name||'');return 
 function sortBuf(files){const g=new Map();files.forEach((f,i)=>{const q=bufOf(f.name);if(q){if(!g.has(q.b))g.set(q.b,[]);g.get(q.b).push({i,n:q.n,f})}});
   const out=files.slice();g.forEach(a=>{if(a.length<2)return;const pos=a.map(q=>q.i);a.slice().sort((p,q)=>p.n-q.n).forEach((q,k)=>{out[pos[k]]=q.f})});return out}
 const flOn=()=>CH.filter(c=>c.x&&!c.m&&c.fl!=='off').map(c=>c.n);
-function addPages(list){const first=PG.length;list.forEach(d=>PG.push(d));CH.forEach(c=>{c._set=false;if(!c.m){c.fl='off';c.inv=false}});viewSet=false;showPage(first)}
+function addPages(list){const first=PG.length;list.forEach(d=>PG.push(d));CH.forEach(c=>{c._set=false;if(!c.m){c.fl='off';c.inv=false;c.sen=null;c._su=false}});viewSet=false;showPage(first)}
 function showPage(i){
   if(!PG.length)return;i=Math.max(0,Math.min(PG.length-1,i));pgI=i;const p=PG[i];
   CH.forEach((c,k)=>{const d=p.chs[k];

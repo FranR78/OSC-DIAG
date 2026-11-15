@@ -69,7 +69,7 @@ $('bClr').onclick=()=>{CH.forEach((c,i)=>{c.x=c.y=c.y0=null;c.h=null;c.on=false;
 document.body.addEventListener('dragover',e=>e.preventDefault());
 document.body.addEventListener('drop',e=>{e.preventDefault();loadFiles([...e.dataTransfer.files])});
 /* CSV con ajustes: 1.ª línea «#analyzer-scope-ajustes;{json}» + archivo completo con valores sin filtrar (y0) */
-const CHK=['n','p','on','vd','off','hr','h','fl','f1','f2','inv','m'];
+const CHK=['n','p','on','vd','off','hr','h','fl','f1','f2','inv','m','sen'];
 function cfgOf(A){
   const cp=o=>JSON.parse(JSON.stringify(o));
   return{v:1,ch:A.map(c=>{const o={};CHK.forEach(k=>o[k]=c[k]);if(c.m)o.m=Object.assign({},c.m,{a:A.indexOf(CH[c.m.a]),b:c.m.b!=null?A.indexOf(CH[c.m.b]):null});return o}),sel:Math.max(0,A.indexOf(CH[sel])),view:cp(view),cur:cp(cur),

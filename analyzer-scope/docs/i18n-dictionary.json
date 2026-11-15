@@ -1860,6 +1860,106 @@
   [
    "Inyec.2",
    "Inj.2"
+  ],
+  [
+   "Pistones y válvulas según el ángulo de cigüeñal de la señal",
+   "Pistons and valves according to the crank angle of the signal"
+  ],
+  [
+   "Pistones y válvulas según el ángulo de cigüeñal",
+   "Pistons and valves according to the crank angle"
+  ],
+  [
+   "Activa «Cilindros» y ajusta el ciclo de 720° para ver la animación",
+   "Turn on “Cylinders” and set the 720° cycle to see the animation"
+  ],
+  [
+   "Válvulas con valores típicos (coloca las reglas AAA·RCE·AAE·RCA para usar los tuyos).",
+   "Valves with typical values (place the IVO·EVC·EVO·IVC rulers to use your own)."
+  ],
+  [
+   "Válvulas según tus reglas AAA·RCE·AAE·RCA.",
+   "Valves from your IVO·EVC·EVO·IVC rulers."
+  ],
+  [
+   "Esquema genérico: no es la geometría real del motor.",
+   "Generic diagram: it is not the real geometry of the engine."
+  ],
+  [
+   "Animación del motor",
+   "Engine animation"
+  ],
+  [
+   "Reproducir o parar",
+   "Play or stop"
+  ],
+  [
+   "Posición en la señal",
+   "Position in the signal"
+  ],
+  [
+   "Sensor: convierte la lectura a la magnitud real (bar, A…)",
+   "Sensor: converts the reading to the real quantity (bar, A…)"
+  ],
+  [
+   "Desplazamiento (se suma tras multiplicar)",
+   "Offset (added after multiplying)"
+  ],
+  [
+   "Guardar este sensor para otros canales",
+   "Save this sensor for other channels"
+  ],
+  [
+   "Sensor guardado en este navegador.",
+   "Sensor saved in this browser."
+  ],
+  [
+   "Unidad del sensor",
+   "Sensor unit"
+  ],
+  [
+   "Factor: unidades del sensor por cada",
+   "Factor: sensor units per"
+  ],
+  [
+   "del archivo",
+   "of the file"
+  ],
+  [
+   "Sin sensor",
+   "No sensor"
+  ],
+  [
+   "Personalizado…",
+   "Custom…"
+  ],
+  [
+   "Presión · 1 V = 1 bar",
+   "Pressure · 1 V = 1 bar"
+  ],
+  [
+   "Presión · 1 V = 10 bar",
+   "Pressure · 1 V = 10 bar"
+  ],
+  [
+   "Vacío · 1 V = 100 mbar",
+   "Vacuum · 1 V = 100 mbar"
+  ],
+  [
+   "Pinza 100 mV/A",
+   "Clamp 100 mV/A"
+  ],
+  [
+   "Pinza 10 mV/A",
+   "Clamp 10 mV/A"
+  ],
+  [
+   "Pinza 1 mV/A",
+   "Clamp 1 mV/A"
+  ],
+  [
+   "Guardar",
+   "Save"
   ]
  ]
 }
