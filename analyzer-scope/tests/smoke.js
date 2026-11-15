@@ -319,7 +319,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('textos nuevos traducidos', await q.evaluate(() => $('bVw').textContent.startsWith('Oscilloscope') && $('bThm').textContent === 'Dark theme' && document.querySelector('#gMo .gb').textContent === 'Engine'));
     await q.click('#lES'); await q.click('#bThm'); await q.click('#bUi');
     check('«Vista clásica»: paneles a la vista y canales de vuelta en su panel', await q.evaluate(() => document.body.classList.contains('fix') && $('chBox').parentElement.id === 'leftp') && await vis('#leftp') && await vis('#tPms'));
-    await q.reload(); await q.waitForTimeout(300);
+    await q.reload(); await q.waitForFunction(() => typeof landShow === 'function'); await q.waitForTimeout(300);
     check('la vista elegida se recuerda', await q.evaluate(() => document.body.classList.contains('fix')));
     await q.click('#bUi');
     await q.setViewportSize({ width: 400, height: 780 }); await q.click('#bMore'); await q.selectOption('#ex', '0'); await q.waitForTimeout(600);
