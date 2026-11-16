@@ -5,6 +5,10 @@ const crCol=c=>CRC[(c-1)%CRC.length];
 let crRes=null,crMsg='';
 // Umbrales (% de la joroba del mejor cilindro). NT: «un 90 % no es para alarmarse; de 70-80 % para abajo, sí» (vídeo It3_s7hHN1k);
 // caso Subaru ~50 % = falta de compresión (pico-post-1198). Por debajo de CR_MAL → confirmar con compresímetro o WPS500X.
+// FT 13.1 (Formauto): diferencia de altura de picos > 20 % = cilindro con problemas de compresión (→ CR_MAL=80);
+// picos con corriente estabilizada: gasolina 100-200 A, diésel 200-350 A (más bajos en todos = motor desgastado; más altos = dureza);
+// la tensión de batería no debe caer por debajo de 7 V en el arranque.
+const CR_PK={g:[100,200],d:[200,350]},CR_VMIN=7;
 const CR_OK=90,CR_MAL=80,CR_COL={ok:'#e6edf6',vig:'#ffb020',mal:'#ff6b6b'};
 const crV=id=>{const v=$(id).value;return v===''||v==null?-1:+v};
 function crFill(){
@@ -37,7 +41,8 @@ function crCalc(si,ii,cyl){
   // % = altura de la joroba (pico − valle) frente a la del mejor cilindro: la corriente base del arranque no cuenta
   const mx=Math.max(...R.map(r=>r.amp));if(!(mx>0))return{err:'No se ven jorobas de compresión en '+I.n+'.'};
   R.forEach(r=>{r.pc=r.amp/mx*100;r.est=r.pc>=CR_OK?'ok':r.pc>=CR_MAL?'vig':'mal'});
-  return{R,T,rpm:120/T,u:I.u||'A',sN:S.n,iN:I.n,cyl,inv};
+  let ymin=Infinity;for(let i=0;i<n;i++)if(y[i]<ymin)ymin=y[i];
+  return{R,T,rpm:120/T,u:I.u||'A',sN:S.n,iN:I.n,cyl,inv,ymin,pkM:R.reduce((s,r)=>s+r.pk,0)/R.length};
 }
 function crGo(){
   const si=crV('crS'),ii=crV('crI'),cyl=+$('crY').value||1;
@@ -49,8 +54,17 @@ function crGo(){
     crMsg='Arranque a '+Math.round(r.rpm)+' rpm · '+Math.min(...r.R.map(q=>q.n))+' compresiones por cilindro promediadas. '+
       (mal?'Compresión baja (< 80 %): cilindro '+mal+'. Confirmar con compresímetro o transductor en cilindro. ':'')+
       (vig?'Vigilar (80-90 %): cilindro '+vig+'. Repetir la prueba. ':'')+
-      (mal||vig?'':'Todos los cilindros por encima del 90 %: compresión pareja.')}
+      (mal||vig?'':'Todos los cilindros por encima del 90 %: compresión pareja.')+crGlobal(r)}
   crOut();
+}
+// Comprobaciones globales de FT 13.1: picos de corriente estabilizada (A) y caída mínima de tensión (V)
+function crGlobal(r){
+  const f=$('crF').value||'g',[lo,hi]=CR_PK[f],m=Math.round(r.pkM),mot=f==='d'?'diésel':'gasolina';
+  if(r.inv)return r.ymin<CR_VMIN?' Tensión mínima '+r.ymin.toFixed(2)+' V: por debajo de 7 V, batería débil o motor duro.':' Tensión mínima '+r.ymin.toFixed(2)+' V (≥ 7 V, correcta).';
+  if(!/^A$/i.test(r.u))return'';
+  return m<lo?' Picos medios '+m+' A, bajos para '+mot+' ('+lo+'-'+hi+' A): posible falta de compresión en todos los cilindros (motor desgastado); confirmar con compresímetro.':
+    m>hi?' Picos medios '+m+' A, altos para '+mot+' ('+lo+'-'+hi+' A): posible dureza (motor de arranque, aceite o mecánica).':
+    ' Picos medios '+m+' A, dentro del rango de '+mot+' ('+lo+'-'+hi+' A).';
 }
 function crDraw(){
   const cn=$('cv3'),W=700,H=460,g3=cn.getContext('2d');cn.width=W;cn.height=H;
