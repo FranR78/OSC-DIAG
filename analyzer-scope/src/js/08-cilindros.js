@@ -1,6 +1,8 @@
 /* ---------- Cilindros: eventos, sincronización por disparo y tiempos ---------- */
 const isVis=c=>!eng.vis||eng.vis[c-1]!==false;
-function engA(){return eng.A!=null?eng.A:ph.t0+ph.T/2}
+/* PMS de compresión del primer cilindro. Con las reglas de fase visibles va encajado en la tabla de 720°: los tiempos (180° cada uno)
+   arrancan en INICIO y los cilindros solo se desplazan a saltos de 720°/n, así ningún tiempo puede durar menos que otro */
+function engA(){const b=ph.t0+ph.T/2;if(eng.A==null)return b;if(!(ph.on&&ph.T>0))return eng.A;const s=ph.T/eng.n;return b+Math.round((eng.A-b)/s)*s}
 function engEvents(a,b){
   if(!(ph.T>0))return[];const N=eng.n,step=ph.T/N,A=engA(),i0=Math.max(0,eng.order.indexOf(eng.c0));
   a=a==null?view.t0:a;b=b==null?view.t0+view.span:b;

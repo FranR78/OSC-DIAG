@@ -75,8 +75,14 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   check('numeración desde el cilindro del disparo (3,4,2,1)', seq === '3,4,2,1', seq);
   const gaps = await E(() => { const e = engEvents(); const g = new Set(); for (let i = 1; i < e.length; i++) g.add(((e[i].t - e[i - 1].t) * 1000).toFixed(3)); return [...g]; });
   check('separación equidistante 720°/n', gaps.length === 1, JSON.stringify(gaps));
-  const A0 = await E(() => engA()); await E(() => { eng.A += 0.003; draw(); });
-  check('deslizar mueve todos a la vez', Math.abs(await E(() => engA()) - A0 - 0.003) < 1e-9);
+  const A0 = await E(() => engA()); await E(a => { eng.A = a + 0.003; draw(); }, A0);
+  check('con las reglas de fase: un arrastre corto no descuadra los tiempos (encajados en la tabla de 720°)', Math.abs(await E(() => engA()) - A0) < 1e-9);
+  await E(a => { eng.A = a + ph.T / eng.n * 1.1; draw(); }, A0);
+  check('deslizar mueve todos a la vez, a saltos de 720°/n', Math.abs(await E(() => engA()) - A0 - (await E(() => ph.T / eng.n))) < 1e-9);
+  check('cada tiempo dura 180° y empieza en INICIO + múltiplo de 180°', await E(() => cylDataAll().every(d => d.st.every(q => { const a = (q.t0 - ph.t0) / ph.T * 720, l = (q.t1 - q.t0) / ph.T * 720; return Math.abs(l - 180) < 1e-6 && Math.abs(a / 180 - Math.round(a / 180)) < 1e-6; }))));
+  await E(a => { eng.A = a + 0.003; ph.on = false; draw(); }, A0);
+  check('sin reglas de fase el cilindro se desliza libre', Math.abs(await E(() => engA()) - A0 - 0.003) < 1e-9);
+  await E(() => { ph.on = true; draw(); });
   await E(() => { eng.A = engA(); });
   await E(() => { eng.vis = [true, false, true, false]; cylList(); });
   check('tabla solo con los cilindros marcados (Nº1 cil.3, Nº4 cil.1)', await E(() => cylData().map(d => 'N' + d.j + 'c' + d.cyl).join(',')) === 'N1c3,N4c1');

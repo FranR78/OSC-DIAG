@@ -96,6 +96,13 @@ function draw(theme){
     [[ph.t0,'INICIO 0°'],[ph.t0+RT,'FIN '+RG+'°']].forEach(([t,l])=>{const x=X(t);if(x<M.l-8||x>M.l+pw+8)return;
       g.fillStyle=g.strokeStyle=OR;g.lineWidth=2.5;g.beginPath();g.moveTo(x,M.t-30);g.lineTo(x,yb);g.stroke();
       g.beginPath();g.moveTo(x-7,M.t-42);g.lineTo(x+7,M.t-42);g.lineTo(x,M.t-30);g.closePath();g.fill();tag(l+(ph.lk?' 🔒':''),x>W-70?W-6:x,M.t-46,OR,x>W-70?'right':'center')})}
+  /* línea de grados (abajo, dentro de la gráfica): 0° en INICIO, negativos a la izquierda y positivos a la derecha, sin reiniciar en 720° */
+  if(T&&ph.on){const dpt=720/T,ppd=pw/(view.span*dpt),stp=[15,30,45,90,180,360,720,1440].find(s=>s*ppd>=56)||2880,
+      d0=(view.t0-ph.t0)*dpt,d1=(view.t0+view.span-ph.t0)*dpt,ya=yb-17;
+    g.fillStyle=BGA;g.fillRect(M.l,ya,pw,17);g.strokeStyle=OR;g.lineWidth=1;g.beginPath();g.moveTo(M.l,ya+.5);g.lineTo(M.l+pw,ya+.5);g.stroke();
+    g.textAlign='center';g.fillStyle=OR;
+    for(let d=Math.ceil(d0/stp)*stp;d<=d1;d+=stp){const x=Math.round(X(ph.t0+d/dpt))+.5;g.beginPath();g.moveTo(x,ya);g.lineTo(x,ya+5);g.stroke();
+      if(x>M.l+18&&x<M.l+pw-18)g.fillText((d>0?'+':d<0?'−':'')+Math.abs(+d.toFixed(1))+'°',x,yb-4)}}
   /* zona de dibujo */
   g.save();g.beginPath();g.rect(M.l,M.t,pw,hh);g.clip();
   /* identificación de cilindros (overlay): números siempre visibles (solo los marcados); con un cilindro elegido sus 4 tiempos; o los tiempos de los marcados en filas verticales por orden de encendido */
