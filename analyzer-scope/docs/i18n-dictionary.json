@@ -1960,6 +1960,54 @@
   [
    "Guardar",
    "Save"
+  ],
+  [
+   "Lupa: arrastra un recuadro sobre la señal para ampliar esa zona (Z)",
+   "Magnifier: drag a box over the signal to zoom into that area (Z)"
+  ],
+  [
+   "Lupa: arrastra un recuadro sobre la zona · clic = ×2 · Mayús+clic = alejar",
+   "Magnifier: drag a box over the area · click = ×2 · Shift+click = zoom out"
+  ],
+  [
+   "Lupa: arrastra un recuadro sobre la zona que quieres ver. Esc para salir.",
+   "Magnifier: drag a box over the area you want to see. Esc to exit."
+  ],
+  [
+   "Volver al zoom anterior (Retroceso)",
+   "Back to the previous zoom (Backspace)"
+  ],
+  [
+   "Ver la captura entera (0)",
+   "See the whole capture (0)"
+  ],
+  [
+   "No hay zoom anterior.",
+   "No previous zoom."
+  ],
+  [
+   "Lupa · zoom anterior",
+   "Magnifier · previous zoom"
+  ],
+  [
+   "Z · Retroceso",
+   "Z · Backspace"
+  ],
+  [
+   "Zoom anterior",
+   "Previous zoom"
+  ],
+  [
+   "Ver todo",
+   "See all"
+  ],
+  [
+   "Listo",
+   "Done"
+  ],
+  [
+   "Lupa",
+   "Magnifier"
   ]
  ]
 }

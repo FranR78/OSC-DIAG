@@ -31,7 +31,7 @@ function setName(i,v){const c=CH[i],d=PG[pgI]&&PG[pgI].chs[i],old=d&&d.y===c.y0?
 let chOpen=-1;
 function updChips(){const cp=$('chips');cp.innerHTML='';
   CH.forEach((c,i)=>{if(!c.x)return;const b=document.createElement('button');b.className='chip'+(c.on?'':' off')+(i===chOpen?' cur':'');
-    b.innerHTML='<i class="dot" style="background:'+c.c+'"></i><b>'+escH(c.n)+'</b><span>'+fmt(c.vd,c.u)+'/div</span>'+(c.fl!=='off'?'<b class="fb" title="Filtro activo: la forma de la señal está modificada">F</b>':'');
+    b.innerHTML='<i class="dot" style="background:'+c.c+'"></i><b>'+escH(c.n)+'</b><span>'+fmtV(c.vd,c.u)+'/div</span>'+(c.fl!=='off'?'<b class="fb" title="Filtro activo: la forma de la señal está modificada">F</b>':'');
     b.onclick=()=>chipClick(i);cp.appendChild(b)});
   if(!cp.children.length)cp.innerHTML='<span class="chE">Abre un CSV o elige un ejemplo</span>';
   $('empty').hidden=CH.some(c=>c.x)}
@@ -47,7 +47,7 @@ function ui(){
     const d=document.createElement('div');d.className='ch';
     d.innerHTML='<input type="checkbox" title="Mostrar canal" '+(c.on?'checked':'')+(c.x?'':' disabled')+'>'+
       '<span class="lab'+(i===sel?' sel':'')+'"><i class="dot" style="background:'+c.c+'"></i>'+escH(c.n)+(c.fl!=='off'&&c.x?' <b class="fb" title="Filtro activo: la forma de la señal está modificada">F</b>':'')+(c.x&&!c.m?'<button class="ed" title="Cambiar el nombre del canal">✎</button>':'')+'</span>'+
-      '<select class="st" title="Escala por división">'+VD.map(v=>'<option value="'+v+'"'+(v===c.vd?' selected':'')+'>'+fmt(v,c.u)+'/div</option>').join('')+'</select>'+
+      '<select class="st" title="Escala por división">'+(VD.includes(c.vd)?VD:VD.concat(c.vd).sort((a,b)=>a-b)).map(v=>'<option value="'+v+'"'+(v===c.vd?' selected':'')+'>'+fmtV(v,c.u)+'/div</option>').join('')+'</select>'+
       '<input class="st" type="number" step="0.5" value="'+(+c.off.toFixed(2))+'" title="Posición (div)">'+
       '<input class="st" type="checkbox" title="Reglas de amplitud de este canal" '+(c.hr?'checked':'')+'>';
     const k=d.children;

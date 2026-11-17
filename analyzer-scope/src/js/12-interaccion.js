@@ -10,7 +10,7 @@ function hit(e){
   for(const ci of [sel,...CH.map((_,i)=>i).filter(i=>i!==sel).reverse()]){const c=CH[ci];
     if(c&&c.on&&c.x&&x>=M.l-4&&x<=M.l+27&&Math.abs(y-arrowY(c))<=9)return{k:'arrow',ci}}
   if(eng.on&&ph.T>0){for(const e of engEvents()){const ex=M.l+(e.t-view.t0)/view.span*PW();if(isVis(e.cyl)&&Math.abs(x-ex)<=11&&Math.abs(y-(M.t+11))<=11)return{k:'cyl',cyl:e.cyl}}}
-  let best=null,bd=e.pointerType==='touch'?16:7;
+  let best=null,bd=e.pointerType==='touch'?16:10;
   const vx=(k,t)=>{if(t==null||!inV)return;const d=Math.abs(x-(M.l+(t-view.t0)/view.span*PW()));if(d<bd){bd=d;best={k}}};
   if(pms.on)vx('pms',pms.t);
   if(tr.on){vx('t1',cur.a);vx('t2',cur.b)}
@@ -28,13 +28,14 @@ function lockMove(o,dt){
   if((k==='t3'||k==='t4')&&tr2.lk){cur.c=S.c+dt;cur.d=S.d+dt;return true}
   if(['ia','fa','ie','fe'].includes(k)&&vv.lk){['ia','fa','ie','fe'].forEach(q=>vv[q]=S.vv[q]+dt);return true}
   if(k==='cyl'){eng.A=S.A+dt;return true}
-  if((k==='p0'||k==='p1')&&ph.lk){ph.t0=S.t0+dt;ph.auto=false;return true}
+  if((k==='p0'||k==='p1')&&ph.lk){ph.t0=S.t0+dt;ph.auto=false;if(S.A!=null)eng.A=S.A+dt;return true}
   return false;
 }
-cv.addEventListener('pointerdown',e=>{if(ann.tool!=='none'){annDown(e);return}try{cv.setPointerCapture(e.pointerId)}catch(_){}
+cv.addEventListener('pointerdown',e=>{if(zm.on){zmDown(e);return}if(ann.tool!=='none'){annDown(e);return}try{cv.setPointerCapture(e.pointerId)}catch(_){}
   if(e.pointerType==='touch'){TP.set(e.pointerId,e.offsetX);if(TP.size===2){drag=null;pinchSet();return}if(TP.size>2)return}
   drag={x:e.clientX,t0:view.t0,mv:false,o:hit(e),t00:tOf(e),snap:{a:cur.a,b:cur.b,c:cur.c,d:cur.d,t0:ph.t0,pms:pms.t,A:ph.T>0?engA():null,vv:{ia:vv.ia,fa:vv.fa,ie:vv.ie,fe:vv.fe}}};if(drag.o&&drag.o.k==='arrow'){const c=CH[drag.o.ci];drag.dy=e.offsetY-arrowY(c);if(sel!==drag.o.ci){sel=drag.o.ci;ui();draw()}}});
 cv.addEventListener('pointermove',e=>{
+  if(zm.on){zmMove(e);return}
   if(ann.tool!=='none'){annMove(e);return}
   if(TP.has(e.pointerId)){TP.set(e.pointerId,e.offsetX);if(pinch){pinchMove();return}}
   if(!drag){const h=hit(e);cv.style.cursor=h?(h.k==='h'||h.k==='arrow'?'ns-resize':'ew-resize'):'crosshair';return}
@@ -50,6 +51,7 @@ cv.addEventListener('pointermove',e=>{
   if(ph.T>0&&!ph.auto)$('rpm').value=Math.round(120/ph.T);
   draw()});
 cv.addEventListener('pointerup',e=>{
+  if(zm.on){zmUp(e);return}
   if(ann.tool!=='none'){annUp(e);return}
   if(TP.delete(e.pointerId)&&pinch){if(TP.size<2)pinch=null;drag=null;return}
   if(drag&&!drag.mv&&!drag.o&&e.offsetX>=M.l&&e.offsetX<=M.l+PW()&&e.offsetY>=M.t&&e.offsetY<=M.t+PH()){
@@ -57,7 +59,11 @@ cv.addEventListener('pointerup',e=>{
   if(drag&&drag.mv&&drag.o&&drag.o.k==='arrow')ui();
   if(drag&&drag.mv&&drag.o&&drag.o.k==='cyl')cylList();
   drag=null});
-cv.addEventListener('wheel',e=>{e.preventDefault();const f=e.deltaY>0?1.25:.8,u=Math.min(1,Math.max(0,(e.offsetX-M.l)/PW())),t=view.t0+u*view.span;
+/* rueda: zoom proporcional al giro (un trackpad manda muchos pasos pequeños; antes cada uno ampliaba un 25 %);
+   deslizar en horizontal (o Mayús+rueda) desplaza; pellizco del trackpad (Ctrl+rueda) amplía */
+cv.addEventListener('wheel',e=>{e.preventDefault();const k=e.deltaMode===1?16:e.deltaMode===2?400:1,dx=e.deltaX*k,dy=e.deltaY*k;
+  if(!e.ctrlKey&&(Math.abs(dx)>Math.abs(dy)||e.shiftKey)){view.t0+=(Math.abs(dx)>Math.abs(dy)?dx:dy)/PW()*view.span;draw();return}
+  const f=Math.exp(Math.max(-.5,Math.min(.5,dy*(e.ctrlKey?.01:.0022)))),u=Math.min(1,Math.max(0,(e.offsetX-M.l)/PW())),t=view.t0+u*view.span;
   view.span*=f;view.t0=t-u*view.span;draw()},{passive:false});
 cv.addEventListener('pointercancel',e=>{TP.delete(e.pointerId);if(TP.size<2)pinch=null;drag=null});
 addEventListener('resize',draw);

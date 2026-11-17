@@ -80,7 +80,7 @@ function draw(theme){
     for(let i=0;i<=8;i++){const y=Math.round(M.t+i*hh/8)+.5;g.moveTo(M.l,y);g.lineTo(M.l-7,y);
       if(i<8)for(let q=1;q<5;q++){const ys=Math.round(M.t+(i+q/5)*hh/8)+.5;g.moveTo(M.l,ys);g.lineTo(M.l-3,ys)}}
     g.stroke();
-    for(let i=0;i<=8;i++)g.fillText(fmt((4-i-cs.off)*cs.vd,cs.u),M.l-10,M.t+i*hh/8+4);
+    for(let i=0;i<=8;i++)g.fillText(fmtC((4-i-cs.off)*cs.vd,cs),M.l-10,M.t+i*hh/8+4);
     g.fillText(cs.n,M.l-10,M.t-6)}
   /* regla de fase (0-360° o 0-720°, con 2, 4 u 8 divisiones); 0° = INICIO (independiente de la regla PMS) */
   if(T){const dpt=720/T,step=RG/(ph.div||4),mn=step<=45?3:6,sub=step/mn,d0=(view.t0-ph.t0)*dpt,d1=(view.t0+view.span-ph.t0)*dpt,
@@ -101,6 +101,8 @@ function draw(theme){
   /* identificación de cilindros (overlay): números siempre visibles (solo los marcados); con un cilindro elegido sus 4 tiempos; o los tiempos de los marcados en filas verticales por orden de encendido */
   const EV=eng.on&&ph.T>0,N=eng.n,gold=pkc('#ffd24d','#9a6b00'),EVS=EV?engEvents():[],one=eng.show>0,multi=eng.show<0;
   PK=[];
+  /* ADM·COMP·EXP·ESC solo entre las reglas de fase (INICIO–FIN) cuando están visibles */
+  const W0=ph.on&&ph.T>0?X(ph.t0):-1e9,W1=ph.on&&ph.T>0?X(ph.t0+ph.T*ph.deg/720):1e9;
   if(EV){
     EVS.forEach((e,i)=>{const nx=EVS[i+1],xc=X(e.t);
       if(nx&&eng.show===0){const xl=X((e.t+nx.t)/2);g.strokeStyle=gold;g.globalAlpha=.55;g.lineWidth=1;g.setLineDash([2,4]);g.beginPath();g.moveTo(xl,M.t);g.lineTo(xl,yb);g.stroke();g.setLineDash([]);g.globalAlpha=1}
@@ -110,12 +112,13 @@ function draw(theme){
         g.fillStyle=lumHex(gold)>.4?'#1b1400':'#fff';g.textAlign='center';g.font='bold 11px system-ui';g.fillText(e.cyl,xc,M.t+15);g.font='11px system-ui'}});
     if(one)EVS.filter(e=>e.cyl===eng.show).forEach(e=>{
       for(let s2=0;s2<4;s2++){const t0s=e.t+(s2-2)*ph.T/4,xa=X(t0s),xm=X(t0s+ph.T/8);
+        if(xa<W0-1||xa>W1+1)continue;
         g.strokeStyle=gold;g.globalAlpha=.6;g.lineWidth=1;g.setLineDash([2,4]);g.beginPath();g.moveTo(xa,M.t+22);g.lineTo(xa,yb);g.stroke();g.setLineDash([]);g.globalAlpha=1;
-        if(xm>M.l&&xm<M.l+pw){g.fillStyle=gold;g.textAlign='center';g.fillText(ST4[s2][0],xm,M.t+38)}}});
+        if(xm>M.l&&xm<M.l+pw&&xm>W0&&xm<W1){g.fillStyle=gold;g.textAlign='center';g.fillText(ST4[s2][0],xm,M.t+38)}}});
     if(multi){const T=ph.T,i0=Math.max(0,eng.order.indexOf(eng.c0)),rot=[...eng.order.slice(i0),...eng.order.slice(0,i0)].filter(isVis),rh=14,y0=M.t+26;
       rot.forEach((cyl,r)=>{const y=y0+r*(rh+1);
         EVS.filter(e=>e.cyl===cyl).forEach(e=>{for(let s2=0;s2<4;s2++){const ta=e.t+(s2-2)*T/4,xa=X(ta),xb=X(ta+T/4);
-          const x0=Math.max(xa,M.l+24),x1=Math.min(xb,M.l+pw);if(x1-x0<3)continue;
+          const x0=Math.max(xa,M.l+24,W0),x1=Math.min(xb,M.l+pw,W1);if(x1-x0<3)continue;
           g.globalAlpha=D?.38:.45;g.fillStyle=ST4[s2][1];g.fillRect(x0,y,x1-x0-1,rh);g.globalAlpha=1;
           g.strokeStyle=ST4[s2][1];g.lineWidth=1;g.strokeRect(x0+.5,y+.5,x1-x0-2,rh-1);
           if(x1-x0>34){g.fillStyle=pkc('#f2f6fb','#1b2430');g.textAlign='center';g.fillText(ST4[s2][0],(x0+x1)/2,y+rh-3)}}});
@@ -145,13 +148,13 @@ function draw(theme){
       g.strokeStyle=gold;g.lineWidth=1;g.setLineDash([3,3]);g.beginPath();g.moveTo(M.l,Y(avg));g.lineTo(M.l+pw,Y(avg));g.stroke();g.setLineDash([]);
       pk.forEach(p=>{const dev=avg?(p.v-avg)/Math.abs(avg)*100:0,col=dev<=-10?(pkc('#ff5c5c','#c92a2a')):dev<=-5?(pkc('#ffb347','#c26a00')):(pkc('#5ddc8a','#15803d')),x=X(p.t),y=Y(p.v);p.dev=dev;
         g.fillStyle=col;g.beginPath();g.moveTo(x-5,y-12);g.lineTo(x+5,y-12);g.lineTo(x,y-4);g.closePath();g.fill();
-        tag('C'+p.cyl+' '+fmt(p.v,c.u)+' ('+(dev>=0?'+':'')+dev.toFixed(1)+'%)',x,y-16,col,'center')})}}
+        tag('C'+p.cyl+' '+fmtC(p.v,c)+' ('+(dev>=0?'+':'')+dev.toFixed(1)+'%)',x,y-16,col,'center')})}}
   if(amp.on)CH.forEach((c,ci)=>{if(!c.on||!c.x||!c.hr)return;ensureH(c);const col=cc(c);
     const ys=c.h.map(v=>M.t+hh/2-(v/c.vd+c.off)*hh/8),xa=M.l+pw-16-ci*11;
     g.strokeStyle=g.fillStyle=col;g.lineWidth=1;g.setLineDash([6,3]);g.beginPath();ys.forEach(y=>{g.moveTo(M.l,y);g.lineTo(M.l+pw,y)});g.stroke();g.setLineDash([]);
-    ys.forEach((y,i)=>{g.fillRect(M.l+pw-9,y-4,9,8);tag(fmt(c.h[i],c.u),M.l+4,y-3,col)});
+    ys.forEach((y,i)=>{g.fillRect(M.l+pw-9,y-4,9,8);tag(fmtC(c.h[i],c),M.l+4,y-3,col)});
     g.beginPath();g.moveTo(xa,ys[0]);g.lineTo(xa,ys[1]);g.stroke();
-    tag('Dif '+fmt(Math.abs(c.h[0]-c.h[1]),c.u),xa-4,(ys[0]+ys[1])/2+4,col,'right')});
+    tag('Dif '+fmtC(Math.abs(c.h[0]-c.h[1]),c),xa-4,(ys[0]+ys[1])/2+4,col,'right')});
   [[tr,'a','b','T1','T2',TC[0],TC[1],M.t+34],[tr2,'c','d','T3','T4',TC[2],TC[3],yb-34]].forEach(([q,ka,kb,la,lb2,c1,c2,ya])=>{
     if(!q.on||cur[ka]==null||cur[kb]==null)return;
     [[la,cur[ka],c1],[lb2,cur[kb],c2]].forEach(([l,t,col])=>{const x=X(t);

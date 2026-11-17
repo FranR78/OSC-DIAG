@@ -122,6 +122,7 @@
 <button id="bDrw" class="nu">Configurar fase y cilindros…</button>
 <button id="bDrM" class="nu">Canales matemáticos…</button>
 </div></div>
+<button class="tog" id="tZm" title="Lupa: arrastra un recuadro sobre la señal para ampliar esa zona (Z)">Lupa</button>
 <button class="tog" id="tAn" title="Mostrar u ocultar las herramientas de anotación">Anotar</button>
 <div class="grp" id="gEx"><button class="gb" title="Informe PDF y CSV con los ajustes">Exportar</button><div class="gp">
 <button class="p" id="bPdf">Informe PDF</button>
@@ -132,6 +133,7 @@
 <label class="bgl" title="Color de fondo de la ventana de gráficas (de negro a blanco)">Fondo <input type="range" id="bgR" min="0" max="100" value="0"></label>
 </div></div>
 </div>
+<div id="zb" hidden><span>Lupa: arrastra un recuadro sobre la zona · clic = ×2 · Mayús+clic = alejar</span><button id="zmB" title="Volver al zoom anterior (Retroceso)">Zoom anterior</button><button id="zmA" title="Ver la captura entera (0)">Ver todo</button><button id="zmX" class="p">Listo</button></div>
 <div id="at" hidden>
 <span style="color:var(--mu);font-size:12px">Anotar:</span><label style="font-size:12px"><input type="checkbox" id="aVis" checked> ver anotaciones</label>
 <button class="tog on" id="a_none" title="Volver a mover reglas y medir">Cursor</button>
@@ -147,7 +149,7 @@
 <button id="aUn" title="Ctrl+Z">Deshacer</button><button id="aClr">Quitar todo</button>
 </div>
 <div class="pg" id="pgbar" hidden><b>Páginas</b><button id="pgP" title="Página anterior">◀</button><input type="range" id="pgR" min="1" max="1" value="1"><button id="pgN" title="Página siguiente">▶</button><span id="pgL"></span><span id="pgNm" style="color:var(--mu);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:34%"></span></div>
-<div id="wrap"><canvas id="cv" role="img" aria-label="Gráfica de las señales"></canvas><div id="load" hidden><i></i></div><i id="anL" hidden></i>
+<div id="wrap"><canvas id="cv" role="img" aria-label="Gráfica de las señales"></canvas><div id="load" hidden><i></i></div><i id="anL" hidden></i><i id="zmR" hidden></i>
 <div id="empty"><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M2 20h8l4-14 6 28 6-22 5 14 4-6h6l4-10 5 20 4-10h8"/></svg>
 <h2>Arrastra aquí tu captura</h2><p>CSV de PicoScope y de otros osciloscopios. Se procesa en tu navegador.</p>
 <div><button class="p" id="emOp">Abrir archivos…</button><button id="emEx">Ver un ejemplo</button></div></div></div>
@@ -263,7 +265,7 @@
 <div id="kb" hidden><div class="ficB" role="dialog" aria-labelledby="kbT"><h2 id="kbT">Atajos de teclado</h2>
 <dl class="kbL"><dt>← →</dt><dd>Desplazar la señal (con Mayús, más rápido)</dd><dt>+ −</dt><dd>Acercar y alejar</dd><dt>0</dt><dd>Ajustar a la pantalla</dd>
 <dt>1 … 8</dt><dd>Elegir canal y abrir sus ajustes</dd><dt>Re Pág · Av Pág</dt><dd>Página o buffer anterior y siguiente</dd>
-<dt>R · C · A · F</dt><dd>Reglas T1/T2 · Cilindros · Anotar · Ficha</dd><dt>Ctrl+Z · Ctrl+Mayús+Z</dt><dd>Deshacer y rehacer</dd><dt>Esc</dt><dd>Recoger paneles</dd><dt>?</dt><dd>Esta ayuda</dd></dl>
+<dt>R · C · A · F</dt><dd>Reglas T1/T2 · Cilindros · Anotar · Ficha</dd><dt>Z · Retroceso</dt><dd>Lupa · zoom anterior</dd><dt>Ctrl+Z · Ctrl+Mayús+Z</dt><dd>Deshacer y rehacer</dd><dt>Esc</dt><dd>Recoger paneles</dd><dt>?</dt><dd>Esta ayuda</dd></dl>
 <div class="ficE ficF"><button id="kbX" class="p">Cerrar</button></div></div></div>
 <div id="gd" hidden role="dialog" aria-live="polite"><b id="gdT"></b><p id="gdP"></p><div><span id="gdN"></span><button id="gdS">Saltar</button><button id="gdG" class="p">Siguiente</button></div></div>
 <footer>Ortu Automoción · ortuautomocion.com</footer>

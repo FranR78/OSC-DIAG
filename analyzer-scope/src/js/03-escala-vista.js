@@ -7,7 +7,7 @@ function rngPg(k,u){let mn=Infinity,mx=-Infinity;PG.forEach(p=>{const d=p.chs[k]
 function autoCh(i){const c=CH[i];if(!c.y)return;c.h=null;let[a,b]=rng(c);
   const d=PG.length>1&&PG[pgI]&&PG[pgI].chs[i];
   if(d&&d.y===c.y0){const[ga,gb]=rngPg(i,c.u);if(isFinite(ga)&&isFinite(gb)){let lo=ga,hi=gb;if(c.sen){const k=+c.sen.k||1,o=+c.sen.o||0;lo=ga*k+o;hi=gb*k+o;if(lo>hi)[lo,hi]=[hi,lo]}[a,b]=c.inv?[-hi,-lo]:[lo,hi]}}
-  c.vd=nice(Math.max(b-a,1e-6)/6);c.ref=(a+b)/2;c.off=-c.ref/c.vd}
+  c.vd=nice(Math.max(b-a,1e-6)/6);c.ref=(a+b)/2;c.off=Math.round(-c.ref/c.vd)}
 function refOf(c){if(c.ref==null){const[a,b]=rng(c);c.ref=(a+b)/2}return c.ref}
 const rawY=c=>M.t+PH()/2-(refOf(c)/c.vd+c.off)*PH()/8;
 const arrowY=c=>Math.max(M.t+8,Math.min(M.t+PH()-8,rawY(c)));

@@ -455,6 +455,46 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await c6.close();
   }
 
+  console.log('\nF6 · Unidades por escala, rueda, lupa y tiempos entre INICIO y FIN');
+  {
+    const c7 = await b.newContext({ viewport: { width: 1400, height: 900 } }); await c7.route(/^https?:/, r => r.abort());
+    await c7.addInitScript(() => { try { localStorage.setItem('as_guia', '1'); localStorage.setItem('as_portada', '1'); localStorage.setItem('as_ficha', 'off'); } catch (e) { } });
+    const q = await c7.newPage(); const qe = []; q.on('pageerror', e => qe.push(String(e))); await serve(c7); await q.goto(APP_H); await q.waitForTimeout(400);
+    const mk = n => { let t = 'Tiempo;Pinza A\r\n(ms);(A)\r\n\r\n'; for (let i = 0; i < n; i++) t += (i * 0.01).toFixed(4).replace('.', ',') + ';' + (i % 500 < 20 ? 0.7287 : -0.0827).toFixed(4).replace('.', ',') + '\r\n'; return t; };
+    await q.setInputFiles('#fi', { name: 'pinza.csv', mimeType: 'text/csv', buffer: Buffer.from(mk(4000)) }); await q.waitForTimeout(600);
+    await q.evaluate(() => { CH[0].vd = 0.1; ui(); draw(); });
+    check('pinza a 100 mA/div: lecturas en A, como el rango del osciloscopio (0,7287 A, no 728,7 mA)', await q.evaluate(() => /Máx 0\.7287 A/.test($('rd').textContent) && document.querySelector('.chip span').textContent === '0.1 A/div'), await q.evaluate(() => $('rd').textContent.slice(0, 120)));
+    check('escalas pequeñas siguen en mA (20 mA/div) y el eje usa valores redondos', await q.evaluate(() => fmtV(0.02, 'A') === '20 mA' && fmtC(0.0648, { vd: 0.02, u: 'A' }) === '64.8 mA' && (autoCh(0), Number.isInteger(CH[0].off))));
+    const span0 = await q.evaluate(() => view.span), box = await q.evaluate(() => { const r = cv.getBoundingClientRect(); return { x: r.left + M.l + PW() / 2, y: r.top + M.t + PH() / 2 }; });
+    await q.mouse.move(box.x, box.y); await q.mouse.wheel(0, 4); await q.waitForTimeout(100);
+    const span1 = await q.evaluate(() => view.span);
+    check('rueda de trackpad (paso pequeño): zoom suave, < 2 %', span1 / span0 > 1 && span1 / span0 < 1.02, String(span1 / span0));
+    const t0a = await q.evaluate(() => view.t0); await q.mouse.wheel(60, 0); await q.waitForTimeout(100);
+    check('deslizar en horizontal desplaza la señal sin cambiar el zoom', await q.evaluate(t => view.t0 > t && Math.abs(view.span - (window._s = view.span)) < 1e-12, t0a) && Math.abs((await q.evaluate(() => view.span)) - span1) < 1e-12);
+    await q.keyboard.press('z');
+    check('Z activa la lupa con su barra', await q.evaluate(() => zm.on && !$('zb').hidden && $('tZm').classList.contains('on')));
+    const g = await q.evaluate(() => { const r = cv.getBoundingClientRect(); return { l: r.left + M.l, t: r.top + M.t, w: PW(), h: PH(), span: view.span, t0: view.t0, vd: CH[0].vd }; });
+    await q.mouse.move(g.l + g.w * .2, g.t + g.h * .5); await q.mouse.down(); await q.mouse.move(g.l + g.w * .4, g.t + g.h * .5 + 5, { steps: 4 }); await q.mouse.up();
+    check('recuadro bajo: amplía solo el tiempo de esa zona', await q.evaluate(g => Math.abs(view.span - g.span * .2) < g.span * .01 && Math.abs(view.t0 - (g.t0 + g.span * .2)) < g.span * .01 && CH[0].vd === g.vd, g));
+    { const h = await q.evaluate(() => { const r = cv.getBoundingClientRect(); return { l: r.left + M.l, t: r.top + M.t, w: PW(), h: PH() }; });
+      await q.mouse.move(h.l + h.w * .3, h.t + h.h * .25); await q.mouse.down(); await q.mouse.move(h.l + h.w * .6, h.t + h.h * .5, { steps: 4 }); await q.mouse.up(); }
+    check('recuadro alto: amplía también la amplitud (¼ de la escala) y el selector la muestra', await q.evaluate(g => { const o = document.querySelector('.chb select.st').selectedOptions[0]; return Math.abs(CH[0].vd - g.vd * .25) < 1e-9 && +o.value === CH[0].vd && o.textContent === fmtV(CH[0].vd, 'A') + '/div'; }, g));
+    await q.keyboard.press('Backspace'); await q.keyboard.press('Backspace');
+    check('Retroceso: vuelve paso a paso al zoom anterior', await q.evaluate(g => Math.abs(view.span - g.span) < 1e-12 && Math.abs(view.t0 - g.t0) < 1e-12 && CH[0].vd === g.vd, g));
+    await q.keyboard.press('Escape');
+    check('Esc sale de la lupa', await q.evaluate(() => !zm.on && $('zb').hidden));
+    const pix = await q.evaluate(() => {
+      CH.forEach(c => c.on = false); eng.on = true; eng.show = -1; ph.on = true; ph.deg = 720; ph.auto = false;
+      ph.t0 = view.t0 + view.span * .3; ph.T = view.span * .3; eng.A = null; draw();
+      const d = cv.getContext('2d'), dp = cv.width / cv.clientWidth, at = u => { const p = d.getImageData(Math.round((M.l + PW() * u) * dp), Math.round((M.t + 26 + 7) * dp), 1, 1).data; return p[0] + p[1] + p[2]; };
+      return { fuera: at(.15), dentro: at(.45), despues: at(.75) };
+    });
+    check('ADM·COMP·EXP·ESC solo entre INICIO y FIN', pix.dentro > pix.fuera + 40 && pix.dentro > pix.despues + 40, JSON.stringify(pix));
+    check('reglas de 720° bloqueadas: al llevarlas a otra zona, los cilindros van con ellas', await q.evaluate(() => { ph.lk = true; ph.t0 = view.t0 + view.span * .3; eng.A = ph.t0 + ph.T / 2 + 0.001; const A0 = engA(), t0 = ph.t0, dt = view.span * .1; drag = { snap: { t0: t0, A: A0 } }; const ok = lockMove({ k: 'p1' }, dt) && Math.abs(ph.t0 - (t0 + dt)) < 1e-12 && Math.abs(engA() - (A0 + dt)) < 1e-12; drag = null; ph.lk = false; return ok; }));
+    check('unidades, rueda y lupa: sin errores JS', qe.length === 0, qe.join(' | '));
+    await c7.close();
+  }
+
   console.log(`\nRESULTADO: ${ok} correctas, ${bad} fallidas`);
   await b.close(); process.exit(bad ? 1 : 0);
 })().catch(e => { console.log('FALLO DEL GUION:', e.message.split('\n')[0]); process.exit(2); });
