@@ -28,12 +28,15 @@ function lockMove(o,dt){
   if((k==='t3'||k==='t4')&&tr2.lk){cur.c=S.c+dt;cur.d=S.d+dt;return true}
   if(['ia','fa','ie','fe'].includes(k)&&vv.lk){['ia','fa','ie','fe'].forEach(q=>vv[q]=S.vv[q]+dt);return true}
   if(k==='cyl'){eng.A=S.A+dt;return true}
-  if((k==='p0'||k==='p1')&&ph.lk){ph.t0=S.t0+dt;ph.auto=false;if(S.A!=null)eng.A=S.A+dt;return true}
+  if((k==='p0'||k==='p1')&&ph.lk){ph.t0=S.t0+dt;ph.auto=false;if(S.A!=null)eng.A=S.A+dt;
+    /* el bloque de 720° bloqueado se lleva también la regla PMS, las de distribución y las de avance */
+    if(S.pms!=null)pms.t=S.pms+dt;['ia','fa','ie','fe'].forEach(q=>{if(S.vv[q]!=null)vv[q]=S.vv[q]+dt});
+    if(S.adv)['t','i1','i2'].forEach(q=>{if(S.adv[q]!=null)adv[q]=S.adv[q]+dt});return true}
   return false;
 }
 cv.addEventListener('pointerdown',e=>{if(zm.on){zmDown(e);return}if(ann.tool!=='none'){annDown(e);return}try{cv.setPointerCapture(e.pointerId)}catch(_){}
   if(e.pointerType==='touch'){TP.set(e.pointerId,e.offsetX);if(TP.size===2){drag=null;pinchSet();return}if(TP.size>2)return}
-  drag={x:e.clientX,t0:view.t0,mv:false,o:hit(e),t00:tOf(e),snap:{a:cur.a,b:cur.b,c:cur.c,d:cur.d,t0:ph.t0,pms:pms.t,A:ph.T>0?engA():null,vv:{ia:vv.ia,fa:vv.fa,ie:vv.ie,fe:vv.fe}}};if(drag.o&&drag.o.k==='arrow'){const c=CH[drag.o.ci];drag.dy=e.offsetY-arrowY(c);if(sel!==drag.o.ci){sel=drag.o.ci;ui();draw()}}});
+  drag={x:e.clientX,t0:view.t0,mv:false,o:hit(e),t00:tOf(e),snap:{a:cur.a,b:cur.b,c:cur.c,d:cur.d,t0:ph.t0,pms:pms.t,A:ph.T>0?engA():null,vv:{ia:vv.ia,fa:vv.fa,ie:vv.ie,fe:vv.fe},adv:{t:adv.t,i1:adv.i1,i2:adv.i2}}};if(drag.o&&drag.o.k==='arrow'){const c=CH[drag.o.ci];drag.dy=e.offsetY-arrowY(c);if(sel!==drag.o.ci){sel=drag.o.ci;ui();draw()}}});
 cv.addEventListener('pointermove',e=>{
   if(zm.on){zmMove(e);return}
   if(ann.tool!=='none'){annMove(e);return}
