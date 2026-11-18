@@ -272,3 +272,14 @@ una entrada por regla con `tema` cuyo contexto encaja (se cumpla o no); `cumplen
 Solo vía A (dentro del portal).
 
 Medida nueva en el catálogo §4.2: `comp_rel_pct` (%, por_cilindro): compresión relativa de cada cilindro en % del mejor.
+
+## 13. Permisos por correo y paquetes compartidos (2026.11.19)
+
+Servidor: `portal/Scope.gs` del repo del portal (guía de uso: `docs/SCOPE_CLIENTES.md` allí). Cada petición de la vía A pasa por los
+permisos del correo (pestaña `ScopePermisos`): sin acceso → `no_autorizado` con el motivo (desactivado, caducado…); sin notas
+maestras → `buscar`, `nt` y `diagnostico` responden `sin_notas` y la app hace el diagnóstico con sus paquetes.
+
+* `reglas_leer` añade `permisos: { notas, rol, caduca }`. «Mis reglas» se guardan ahora en la pestaña `ScopeReglas` (máx. 45 KB).
+* `paquetes_lista` → `{ paquetes: [{ id, nombre, autor, version, reglas }], permisos }` (los `todos` y los asignados).
+* `paquete_bajar` `{ id }` → `{ paquete }` (formato `analyzer-scope-reglas/1`). La app lo guarda como fuente de solo lectura.
+* `paquete_publicar` `{ paquete }` (rol autor o admin) → `{ id }`. Nace `asignado`.

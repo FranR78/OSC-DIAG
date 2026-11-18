@@ -7,8 +7,10 @@ function rgUsuario(){let a=null;try{a=JSON.parse(LS.get('as_paqs')||'null')}catc
 function rgGuardaUsuario(a){LS.set('as_paqs',JSON.stringify(a));if(typeof rgSube==='function')rgSube(a)}
 function rgOnMap(){try{return JSON.parse(LS.get('as_paqon')||'{}')||{}}catch(e){return{}}}
 const RG_NT={paquete:'nt',nombre:'Notas maestras (portal)',base:true,remoto:true,reglas:[]};
-const rgConPortal=()=>APP_CFG.modo==='portal'||!!APP_CFG.apiUrl;
-const rgTodos=()=>[...(rgConPortal()?[RG_NT]:[]),...REGLAS_BASE.map(p=>Object.assign({},p,{base:true})),...rgUsuario().map(p=>Object.assign({},p,{base:false}))];
+let RG_PERM=null;   // permisos del portal (reglas_leer): {notas, rol, caduca}
+const rgConPortal=()=>(APP_CFG.modo==='portal'||!!APP_CFG.apiUrl)&&!(RG_PERM&&RG_PERM.notas===false);
+function rgSubs(){try{const a=JSON.parse(LS.get('as_subs')||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
+const rgTodos=()=>[...(rgConPortal()?[RG_NT]:[]),...REGLAS_BASE.map(p=>Object.assign({},p,{base:true})),...rgSubs().map(p=>Object.assign({},p,{base:true,sub:true})),...rgUsuario().map(p=>Object.assign({},p,{base:false}))];
 const rgActivo=p=>rgOnMap()[p.paquete]!==false;
 const rgActivos=()=>rgTodos().filter(rgActivo);
 function rgSetActivo(id,on){const m=rgOnMap();m[id]=!!on;LS.set('as_paqon',JSON.stringify(m))}

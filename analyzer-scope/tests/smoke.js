@@ -297,7 +297,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await pp.addInitScript(() => {
       const mk = (s, f) => ({ withSuccessHandler: x => mk(x, f), withFailureHandler: y => mk(s, y), apiDiagnostico: req => { (window.__reqs = window.__reqs || []).push(req); setTimeout(() => s(window.__resp(req)), 5); } });
       window.google = { script: { run: mk(null, null) } };
-      window.__resp = req => req.op === 'reglas_leer' ? { ok: true, v: 1, op: 'reglas_leer', paquetes: [] } : req.op === 'reglas_guardar' ? { ok: true } : req.op === 'diagnostico' ? { ok: true, v: 1, op: 'diagnostico', hallazgos: [{ regla: 'ADM-TRANS-R01', nt_id: 'ADM-TRANS-001', nt_titulo: 'Transductor en admisión', sintoma: 'Un pulso de depresión menor que el resto', confianza: 'media',
+      window.__resp = req => req.op === 'reglas_leer' ? { ok: true, v: 1, op: 'reglas_leer', paquetes: [], permisos: { notas: true, rol: 'cliente' } } : req.op === 'paquetes_lista' ? { ok: true, paquetes: [{ id: 'ortu-pro', nombre: 'Ortu Pro', autor: 'x', version: '1', reglas: 1 }], permisos: { notas: true, rol: 'cliente' } } : req.op === 'paquete_bajar' ? { ok: true, paquete: { paquete: 'ortu-pro', nombre: 'Ortu Pro', version: '1', reglas: [{ id: 'P1', sintoma: 's', si: [{ medida: 'rpm', op: '>', valor: 1 }] }] } } : req.op === 'reglas_guardar' ? { ok: true } : req.op === 'diagnostico' ? { ok: true, v: 1, op: 'diagnostico', hallazgos: [{ regla: 'ADM-TRANS-R01', nt_id: 'ADM-TRANS-001', nt_titulo: 'Transductor en admisión', sintoma: 'Un pulso de depresión menor que el resto', confianza: 'media',
           evidencia: [{ medida: 'desv_pulso_cil', canal: 'CH1', cilindro: 4, valor: -14.2, condicion: '< -10 %', etiqueta: 'Medido' }],
           causas: [{ texto: 'Válvula de escape que no cierra', etiqueta: 'Inferido', como_separar: 'Prueba de fugas' }],
           comprobaciones: [{ orden: 1, texto: 'Compresión relativa', tipo: 'medida' }, { orden: 2, texto: 'Prueba de fugas en el cilindro 4', tipo: 'prueba' }], url_portal: 'https://example.org/nt/ADM-TRANS-001' }],
@@ -322,6 +322,10 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('portal: el PDF incluye la página de diagnóstico con la comprobación marcada', /posibles causas y comprobaciones/.test(pdf) && /\[x\] 1\. Compresi/.test(pdf));
     await pp.click('#tabX'); await pp.fill('#xQ', 'inyector'); await pp.click('#xBu'); await pp.waitForTimeout(100); await pp.click('#xRes button'); await pp.waitForTimeout(100);
     check('portal: buscar → ver NT (texto seguro, sin HTML ejecutable)', await pp.evaluate(() => /Inyector PD/.test($('xRes').innerText) && /PRV-0123/.test($('xRes').innerText) && !$('xRes').querySelector('img') && !window.__xss));
+    await pp.evaluate(() => pqCargar()); await pp.waitForTimeout(100);
+    await pp.click('#xPqP button'); await pp.waitForTimeout(100);
+    check('portal: paquete compartido se baja y queda como fuente de solo lectura', await pp.evaluate(() => rgTodos().some(p => p.paquete === 'ortu-pro' && p.base && p.sub)));
+    check('portal: sin notas maestras en el permiso, desaparece esa fuente', await pp.evaluate(() => { RG_PERM = { notas: false, rol: 'cliente' }; const r = !rgTodos().some(p => p.paquete === 'nt'); RG_PERM = { notas: true }; return r; }));
     check('portal: sin errores JS', perr.length === 0, perr.join(' | '));
     await pp.close();
   }

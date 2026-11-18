@@ -61,6 +61,6 @@ $('xPqE').onclick=()=>rgUsuario().forEach(P=>saveFile('reglas_'+P.paquete+'.csv'
 let rgSubeT=0;
 function rgSube(a){if(APP_CFG.modo!=='portal')return;clearTimeout(rgSubeT);rgSubeT=setTimeout(()=>{
   dxCall({v:1,op:'reglas_guardar',cliente:{app:'analyzer-scope',ver:APP_CFG.ver},paquetes:a}).then(r=>{if(r&&!r.ok)st(i18('No se pudieron guardar tus reglas en el portal')+': '+((r.error&&r.error.mensaje)||''))},()=>{})},800)}
-if(APP_CFG.modo==='portal')dxCall({v:1,op:'reglas_leer',cliente:{app:'analyzer-scope',ver:APP_CFG.ver}}).then(r=>{
+if(APP_CFG.modo==='portal')dxCall({v:1,op:'reglas_leer',cliente:{app:'analyzer-scope',ver:APP_CFG.ver}}).then(r=>{if(r&&r.ok&&r.permisos){RG_PERM=r.permisos;rgPanel();if(typeof pqCargar==='function')pqCargar()}
   if(r&&r.ok&&Array.isArray(r.paquetes)&&r.paquetes.length){LS.set('as_paqs',JSON.stringify(r.paquetes));rgPanel()}
   else if(r&&r.ok){const loc=rgUsuario();if(loc.some(P=>P.reglas.length))rgSube(loc)}},()=>{});
