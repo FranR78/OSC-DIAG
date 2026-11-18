@@ -30,7 +30,7 @@ const rgCmp=(c,v)=>{if(v==null||!isFinite(v))return false;v=+v;const a=c.valor;
   switch(c.op){case'<':return v<a;case'<=':return v<=a;case'>':return v>a;case'>=':return v>=a;
     case'entre':return v>=a[0]&&v<=a[1];case'fuera':return v<a[0]||v>a[1]}return false};
 function rgCondTxt(c){const u=c.unidad?' '+c.unidad:'';
-  if(c.op==='peor')return i18('el menor de todos los cilindros')+(c.valor!=null?' · < '+c.valor+' % '+i18('del mejor'):'');
+  if(c.op==='peor')return i18(c.sentido==='mayor'?'el mayor de todos los cilindros':'el menor de todos los cilindros')+(c.valor!=null?' · < '+c.valor+' % '+i18('del mejor'):'');
   if(c.op==='entre')return i18('entre')+' '+c.valor[0]+' '+i18('y')+' '+c.valor[1]+u;
   if(c.op==='fuera')return i18('fuera de')+' '+c.valor[0]+'–'+c.valor[1]+u;
   return c.op+' '+c.valor+u}
@@ -44,7 +44,7 @@ function rgEval(r,P,p){const H=[],motor=(p.contexto&&p.contexto.motor)||{},S=(p.
     const find=id=>p.medidas.find(m=>m.id===id&&(ch==null||m.canal==null||m.canal===ch));
     let cyls=null,ok=true;const U=[];
     for(const c of r.si){const m=find(c.medida);if(!m){ok=false;break}
-      if(c.op==='peor'){const rk=dxRank(m.por_cilindro);if(!rk){ok=false;break}const w=rk[0];
+      if(c.op==='peor'){const rk=dxRank(m.por_cilindro);if(!rk){ok=false;break}const w=c.sentido==='mayor'?rk[rk.length-1]:rk[0];
         if(c.valor!=null&&!(w.pct_mejor<c.valor)){ok=false;break}
         cyls=cyls?cyls.filter(k=>k===w.cilindro):[w.cilindro];U.push({c,m,rk})}
       else if(m.por_cilindro){const ks=Object.keys(m.por_cilindro).filter(k=>rgCmp(c,m.por_cilindro[k])).map(Number);
