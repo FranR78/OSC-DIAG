@@ -53,6 +53,7 @@ sec:[
 {h:'7 · Avance de encendido o de inyección',t:[
 'Pulsa «Avance» y, en la sección «Avance», marca las reglas que necesites: A.Enc (encendido) y avance de inyección con una o dos inyecciones (Inyec.1 e Inyec.2). Arrastra cada regla: los grados se miden respecto a la regla PMS (positivo = antes del PMS). Todas salen en el diagrama de distribución y en el informe PDF.']},
 {h:'8 · Diagrama de distribución',t:[
+'Por defecto el PMI está a 180° de la regla PMS. Si en tu señal no es así, activa «PMI» (menú Motor) y arrástrala al PMI real: AAE y RCA se miden desde ella.',
 'Pulsa «AAA·RCE·AAE·RCA» y arrastra las cuatro reglas a los puntos de apertura y cierre de válvulas de la señal, con la regla PMS entre AAA y RCE.',
 'Abre la pestaña «Diagrama de distribución»: verás el diagrama circular, los avances y retrasos, las duraciones y el cruce de válvulas.',
 'Los ángulos se muestran siempre en positivo: AAA y RCE se miden respecto al PMS; AAE y RCA, respecto al PMI. Si una regla queda al otro lado de su referencia, aparece ⚠ junto al valor.']},
@@ -135,6 +136,7 @@ sec:[
 {h:'7 · Ignition or injection advance',t:[
 'Press “Advance” and choose Ign.Adv or Inj.Adv in the “Advance” section. Drag the ruler: the degrees are measured relative to the TDC ruler (positive = before TDC).']},
 {h:'8 · Timing diagram',t:[
+'By default BDC is 180° from the TDC ruler. If that is not the case in your signal, turn on “BDC” (Engine menu) and drag it to the real BDC: EVO and IVC are measured from it.',
 'Press “IVO·EVC·EVO·IVC” and drag the four rulers to the valve opening and closing points of the signal, with the TDC ruler between IVO and EVC.',
 'Open the “Timing diagram” tab: you will see the circular diagram, the advances and delays, the durations and the valve overlap.',
 'Angles are always shown as positive values: IVO and EVC are measured relative to TDC; EVO and IVC, relative to BDC. If a ruler is on the other side of its reference, ⚠ appears next to the value.']},
@@ -166,6 +168,6 @@ sec:[
 }};
 function renderDocs(){
   const D=DOCS[LANG==='en'?'en':'es'],mk=o=>'<h2>'+o.title+'</h2><p class="lead">'+o.lead+'</p>'+o.sec.map(s=>'<h3>'+s.h+'</h3><ul>'+s.t.map(x=>'<li>'+x+'</li>').join('')+'</ul>').join('');
-  $('docI').innerHTML=mk(D.I);$('docO').innerHTML=mk(D.O);
+  $('docI').innerHTML=mk(D.I);$('docO').innerHTML=mk(D.O)+'<p class="ver">Analyzer Scope · '+(LANG==='en'?'version':'versión')+' '+APP_CFG.ver+(APP_CFG.modo==='portal'?' · portal':'')+'</p>';
 }
 

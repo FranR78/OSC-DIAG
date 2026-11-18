@@ -17,7 +17,7 @@ async function report(){
     doc.addImage(lg,'JPEG',10,7.5,28,12.6);doc.setTextColor(...hc);doc.setFontSize(16);doc.text('Informe de señales',46,14);
     doc.setFontSize(9);doc.setTextColor(...mc);doc.text('Analyzer Scope · by J.A.Ortúñez y Fran Rosales · '+new Date().toLocaleString(LANG==='en'?'en-GB':'es-ES'),46,20);
     doc.setDrawColor(217,169,58);doc.line(10,25,287,25)};
-  const foot=()=>{doc.setFontSize(8);doc.setTextColor(...mc);doc.text('Ortu Automoción · ortuautomocion.com',10,205);doc.text('Pág. '+page,287,205,{align:'right'})};
+  const foot=()=>{doc.setFontSize(8);doc.setTextColor(...mc);doc.text('Ortu Automoción · ortuautomocion.com · Analyzer Scope '+APP_CFG.ver,10,205);doc.text('Pág. '+page,287,205,{align:'right'})};
   head();
   const R=draw(K?'dark':'light'),img=cv.toDataURL('image/png');draw();
   let w=277,h=w*cv.height/cv.width;if(h>108){h=108;w=h*cv.width/cv.height}
@@ -53,6 +53,7 @@ async function report(){
   await saveFile('informe_osciloscopio.pdf',doc.output('blob'));
 }
 $('tPh').onclick=()=>{ph.on=!ph.on;sync();draw()};
+$('tPmi').onclick=()=>{pmi.on=!pmi.on;if(pmi.on&&pmi.t==null){const p0=pms.t!=null?pms.t:view.t0+view.span/2;pmi.t=ph.T>0?p0+ph.T/4:p0}sync();draw();if(typeof distTab==='function'&&curTab==='D')distTab()};
 $('tPms').onclick=()=>{pms.on=!pms.on;if(pms.on&&pms.t==null)pms.t=view.t0+view.span/2;sync();draw()};
 $('tT').onclick=()=>{tr.on=!tr.on;if(tr.on){if(cur.a==null)cur.a=view.t0+view.span/3;if(cur.b==null)cur.b=view.t0+view.span*2/3}sync();draw()};
 $('tT2').onclick=()=>{tr2.on=!tr2.on;if(tr2.on){if(cur.c==null)cur.c=view.t0+view.span*.55;if(cur.d==null)cur.d=view.t0+view.span*.8}sync();draw()};

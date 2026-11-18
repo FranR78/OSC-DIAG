@@ -268,6 +268,17 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   check('compresión relativa: ~183 rpm y los cilindros 1 y 3 por debajo del 90 %', cr && crLow === '1,3' && Math.abs(await E(() => crRes.rpm) - 183) < 10 && cr.some(r => r.pc === 100), JSON.stringify(cr));
   await click('#tabS');
 
+  { const v = require('fs').readFileSync(path.join(__dirname, '..', 'src', 'version.txt'), 'utf8').trim();
+    check('versión visible (menú ☰ y «Objetivo») = src/version.txt', await E(v => $('verM').textContent.includes(v) && $('docO').textContent.includes(v), v)); }
+  console.log('\nT4 · Etiquetas de amplitud y regla PMI');
+  { const ov = await E(() => { CH.forEach(c => { if (c.x) { c.on = true; c.hr = true; ensureH(c); c.h = [c.vd * 2, c.vd]; c.off = 0; } }); amp.on = true; draw();
+      const A = AMP_TAGS; let bad = 0; A.forEach((r, i) => A.forEach((q, j) => { if (i < j && r.x < q.x + q.w && r.x + r.w > q.x && r.y - 12 < q.y + 3 && r.y + 3 > q.y - 12) bad++; })); amp.on = false; draw(); return [A.length, bad]; });
+    check('reglas de amplitud de varios canales a la misma altura: etiquetas sin solaparse', ov[0] >= 6 && ov[1] === 0, JSON.stringify(ov));
+    const pm = await E(() => { ph.auto = false; ph.T = view.span / 2; ph.t0 = view.t0; pms.on = true; pms.t = view.t0 + view.span / 4; const d = ph.T / 720;
+      vv.on = true; vv.ia = pms.t - 15 * d; vv.fe = pms.t + 15 * d; vv.ie = pms.t + 135 * d; vv.fa = pms.t + 225 * d; const a = distCalc();
+      pmi.on = true; pmi.t = pms.t + 190 * d; const b = distCalc(); pmi.on = false; vv.on = false; draw(); return [a.aae, a.rca, b.aae, b.rca, b.pmi]; });
+    check('regla PMI propia: AAE y RCA se miden desde ella (PMI a 190° → AAE +10°, RCA −10°)', Math.abs(pm[0] - 45) < .01 && Math.abs(pm[1] - 45) < .01 && Math.abs(pm[2] - 55) < .01 && Math.abs(pm[3] - 35) < .01, JSON.stringify(pm)); }
+
   console.log('\nF7 · Barra de grados con animación al arrastrar');
   { await E(() => { ph.auto = false; ph.t0 = view.t0 + view.span * .1; ph.T = view.span * .8; eng.on = true; eng.A = null; draw(); gdOn(true); });
     const bx = await p.$eval('#cv', c => { const r = c.getBoundingClientRect(); return { x: r.x, y: r.y }; }), gx = await E(() => gdX()), gy = await E(() => M.t + PH() / 2);

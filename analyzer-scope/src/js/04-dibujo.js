@@ -2,11 +2,12 @@
 const M={l:76,t:60,r:14,b:26};
 const PW=()=>cv.clientWidth-M.l-M.r,PH=()=>cv.clientHeight-M.t-M.b;
 const LIGHT=['#1f5fd1','#d42a2a','#1a8f3e','#b58900','#6b46c1','#d46a00','#0e8fa3','#c2188a'];
+let AMP_TAGS=[];   // cajas de las etiquetas de amplitud del último dibujo (pruebas)
 const ST4=[['ADM','#3da5ff'],['COMP','#ffd24d'],['EXP','#ff6b4d'],['ESC','#9aa6b3']];
 const ORD={1:['1'],2:['1-2'],3:['1-2-3','1-3-2'],4:['1-3-4-2','1-2-4-3'],5:['1-2-4-5-3'],6:['1-5-3-6-2-4','1-4-2-5-3-6','1-2-3-4-5-6'],
   8:['1-8-4-3-6-5-7-2','1-5-4-2-6-3-7-8','1-5-4-8-6-3-7-2','1-6-2-5-8-3-7-4'],10:['1-6-5-10-2-7-3-8-4-9','1-6-2-7-3-8-4-9-5-10'],
   12:['1-7-5-11-3-9-6-12-2-8-4-10'],16:['1-8-9-2-3-10-11-4-5-12-13-6-7-14-15-16']};
-function sync(){[['tPh',ph.on],['tPms',pms.on],['tT',tr.on],['tT2',tr2.on],['tAmp',amp.on],['tGr',eng.on],['tVv',vv.on],['tAdv',adv.on]].forEach(([i,v])=>$(i).classList.toggle('on',v));[['kPh',ph],['kT',tr],['kT2',tr2],['kVv',vv]].forEach(([i,o])=>{$(i).textContent=o.lk?'🔒':'🔓';$(i).classList.toggle('on',!!o.lk)});$('tBox').hidden=!eng.on}
+function sync(){[['tPh',ph.on],['tPms',pms.on],['tPmi',pmi.on],['tT',tr.on],['tT2',tr2.on],['tAmp',amp.on],['tGr',eng.on],['tVv',vv.on],['tAdv',adv.on]].forEach(([i,v])=>$(i).classList.toggle('on',v));[['kPh',ph],['kT',tr],['kT2',tr2],['kVv',vv]].forEach(([i,o])=>{$(i).textContent=o.lk?'🔒':'🔓';$(i).classList.toggle('on',!!o.lk)});$('tBox').hidden=!eng.on}
 function ensureH(c){if(!c.h){const m=-c.off*c.vd;c.h=[m+c.vd,m-c.vd]}}
 const w720=x=>((x+360)%720+720)%720-360;
 const w360=x=>((x+180)%360+360)%360-180;
@@ -33,7 +34,9 @@ function distCalc(){
   if(!(ph.T>0))return null;const R={};
   if([vv.ia,vv.fa,vv.ie,vv.fe].every(v=>v!=null)){
     // w360: la regla PMS puede estar en el PMS de compresión o en el de cruce (separados 360°); cada regla se mide al PMS/PMI más cercano
-    R.aae=-w360(rel(vv.ie)+180);R.aaa=-w360(rel(vv.ia));R.rce=w360(rel(vv.fe));R.rca=w360(rel(vv.fa)-180);
+    // PMI: regla propia si está activa; si no, PMS ± 180°
+    const pmiD=pmi.on&&pmi.t!=null?rel(pmi.t):180;R.pmi=w360(pmiD);
+    R.aae=-w360(rel(vv.ie)-pmiD);R.aaa=-w360(rel(vv.ia));R.rce=w360(rel(vv.fe));R.rca=w360(rel(vv.fa)-pmiD);
     R.dadm=180+R.aaa+R.rca;R.desc=180+R.aae+R.rce;R.cruce=R.aaa+R.rce;R.ok=true}
   const al=advList();if(al.length){R.advs=al.map(a=>({k:a.k,i:a.i,lab:a.lab,long:a.long,deg:w360(-rel(a.t))}));R.adv=R.advs[0].deg;R.advk=R.advs[0].k}
   return R;
@@ -156,12 +159,15 @@ function draw(theme){
       pk.forEach(p=>{const dev=avg?(p.v-avg)/Math.abs(avg)*100:0,col=dev<=-10?(pkc('#ff5c5c','#c92a2a')):dev<=-5?(pkc('#ffb347','#c26a00')):(pkc('#5ddc8a','#15803d')),x=X(p.t),y=Y(p.v);p.dev=dev;
         g.fillStyle=col;g.beginPath();g.moveTo(x-5,y-12);g.lineTo(x+5,y-12);g.lineTo(x,y-4);g.closePath();g.fill();
         tag('C'+p.cyl+' '+fmtC(p.v,c)+' ('+(dev>=0?'+':'')+dev.toFixed(1)+'%)',x,y-16,col,'center')})}}
+  /* etiquetas de amplitud de varios canales: si una pisa a otra, baja hasta quedar libre (antes salía «Dif 4 V V V») */
+  const AT=AMP_TAGS=[],tagA=(t,x,y,col,al)=>{const w=g.measureText(t).width+8,x0=al==='right'?x-w:al==='center'?x-w/2:x;let k=0;
+    while(k<12&&AT.some(r=>x0<r.x+r.w&&x0+w>r.x&&y-12<r.y+3&&y+3>r.y-12)){y+=15;k++}AT.push({x:x0,y,w});tag(t,x,y,col,al)};
   if(amp.on)CH.forEach((c,ci)=>{if(!c.on||!c.x||!c.hr)return;ensureH(c);const col=cc(c);
     const ys=c.h.map(v=>M.t+hh/2-(v/c.vd+c.off)*hh/8),xa=M.l+pw-16-ci*11;
     g.strokeStyle=g.fillStyle=col;g.lineWidth=1;g.setLineDash([6,3]);g.beginPath();ys.forEach(y=>{g.moveTo(M.l,y);g.lineTo(M.l+pw,y)});g.stroke();g.setLineDash([]);
-    ys.forEach((y,i)=>{g.fillRect(M.l+pw-9,y-4,9,8);tag(fmtC(c.h[i],c),M.l+4,y-3,col)});
+    ys.forEach((y,i)=>{g.fillRect(M.l+pw-9,y-4,9,8);tagA(fmtC(c.h[i],c),M.l+4,y-3,col)});
     g.beginPath();g.moveTo(xa,ys[0]);g.lineTo(xa,ys[1]);g.stroke();
-    tag('Dif '+fmtC(Math.abs(c.h[0]-c.h[1]),c),xa-4,(ys[0]+ys[1])/2+4,col,'right')});
+    tagA('Dif '+fmtC(Math.abs(c.h[0]-c.h[1]),c),xa-4,(ys[0]+ys[1])/2+4,col,'right')});
   [[tr,'a','b','T1','T2',TC[0],TC[1],M.t+34],[tr2,'c','d','T3','T4',TC[2],TC[3],yb-34]].forEach(([q,ka,kb,la,lb2,c1,c2,ya])=>{
     if(!q.on||cur[ka]==null||cur[kb]==null)return;
     [[la,cur[ka],c1],[lb2,cur[kb],c2]].forEach(([l,t,col])=>{const x=X(t);
@@ -169,6 +175,8 @@ function draw(theme){
     const xa=X(cur[ka]),xb=X(cur[kb]),d=Math.abs(cur[kb]-cur[ka]);
     g.strokeStyle=pkc('#fff','#111');g.lineWidth=1;g.beginPath();g.moveTo(xa,ya);g.lineTo(xb,ya);g.moveTo(xa,ya-4);g.lineTo(xa,ya+4);g.moveTo(xb,ya-4);g.lineTo(xb,ya+4);g.stroke();
     tag((q.lk?'🔒 ':'')+'Δt '+fmt(d,'s')+(d?'  ·  '+fmt(1/d,'Hz'):'')+(ph.T>0?'  ·  '+(d/ph.T*720).toFixed(1)+'°':''),(xa+xb)/2,ya-6,pkc('#fff','#111'),'center')});
+  if(pmi.on&&pmi.t!=null){const x=X(pmi.t);g.strokeStyle=PMC;g.globalAlpha=.8;g.lineWidth=2;g.setLineDash([8,4]);g.beginPath();g.moveTo(x,M.t);g.lineTo(x,yb);g.stroke();g.setLineDash([]);g.globalAlpha=1;
+    tag('PMI · '+(ph.T>0?Math.abs(rel(pmi.t)).toFixed(0)+'°':'')+' · '+fmt(pmi.t,'s'),x+5,yb-24,PMC)}
   if(pms.on&&pms.t!=null){const x=X(pms.t);g.strokeStyle=PMC;g.lineWidth=2.2;g.beginPath();g.moveTo(x,M.t);g.lineTo(x,yb);g.stroke();
     tag('PMS · 0° · '+fmt(pms.t,'s'),x+5,yb-8,PMC)}
   const dc=distCalc();

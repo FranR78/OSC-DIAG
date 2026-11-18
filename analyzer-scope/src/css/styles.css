@@ -210,3 +210,4 @@ body:not(.fix) #tZm{font-weight:600;display:inline-flex;align-items:center}
 /* cabecera: con fuentes más anchas (Android, Linux) encoge «Abrir archivos…» y el selector de vista en vez de salirse de la pantalla */
 body:not(.fix) header>*{min-width:0}body:not(.fix) #bOpen,body:not(.fix) #bVw{flex:0 1 auto;min-width:0;overflow:hidden;white-space:nowrap}body:not(.fix) #bMore,body:not(.fix) .logo{flex:none}
 #chips{min-width:0}
+.ver{color:var(--mu);font-size:11.5px;font-variant-numeric:tabular-nums}#hMore .ver{padding:4px 2px 0;text-align:center}body.fix #verM{align-self:center}

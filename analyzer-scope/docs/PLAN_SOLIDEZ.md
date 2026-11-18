@@ -25,6 +25,8 @@ clientes ni matrículas, commit + push al terminar cada tarea.
 | Validación con capturas reales de taller | ⏳ Pendiente (depende de Ortu) |
 | Pruebas automáticas en GitHub (T1) | ✅ `.github/workflows/analyzer-scope.yml`: `build.js --check` + `smoke.js` en cada push/PR que toque `analyzer-scope/` (2026-11-18) |
 | Plantillas de issue (T2) | ✅ `.github/ISSUE_TEMPLATE/fallo.md` y `mejora.md` (2026-11-18) |
+| Versión visible y registro de cambios (T3) | ✅ menú ☰, «Objetivo» y pie del PDF; `CHANGELOG.md`; etiqueta `scope-2026.11.18c` (2026-11-18) |
+| Fallos pequeños (T4) | ✅ etiquetas de amplitud sin solaparse; regla PMI propia para AAE/RCA, con pruebas (2026-11-18) |
 
 ---------------------------------------------------------------------------------------------------
 
