@@ -1,0 +1,30 @@
+name: Analyzer Scope · pruebas
+
+on:
+  push:
+    paths: ['analyzer-scope/**', '.github/workflows/analyzer-scope.yml']
+  pull_request:
+    paths: ['analyzer-scope/**', '.github/workflows/analyzer-scope.yml']
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: analyzer-scope
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: analyzer-scope/tests/package-lock.json
+      - name: dist/ al día con src/
+        run: node build.js --check
+      - name: Instalar Playwright
+        working-directory: analyzer-scope/tests
+        run: npm ci && npx playwright install --with-deps chromium
+      - name: Pruebas (smoke.js)
+        working-directory: analyzer-scope/tests
+        run: npm test
