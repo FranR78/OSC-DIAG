@@ -207,3 +207,6 @@ body:not(.fix) #tZm{font-weight:600;display:inline-flex;align-items:center}
 #rgEB textarea{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:6px}
 .rgc{display:grid;gap:6px}.rgcr{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.rgcr select{max-width:100%}.rgcr input[type=text]{width:110px}
 #rgEB .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}#rgEB .sp{flex:1}
+/* cabecera: con fuentes más anchas (Android, Linux) encoge «Abrir archivos…» y el selector de vista en vez de salirse de la pantalla */
+body:not(.fix) header>*{min-width:0}body:not(.fix) #bOpen,body:not(.fix) #bVw{flex:0 1 auto;min-width:0;overflow:hidden;white-space:nowrap}body:not(.fix) #bMore,body:not(.fix) .logo{flex:none}
+#chips{min-width:0}
