@@ -39,8 +39,9 @@ function crGo(){
   if(si===ii){crRes=null;crMsg='El sincronismo y la corriente deben ser canales distintos.';return crOut()}
   const r=crCalc(si,ii,cyl);
   if(r.err){crRes=null;crMsg=r.err}
-  else{crRes=r;const lo=r.R.filter(q=>q.pc<90).map(q=>q.cyl);
-    crMsg='Arranque a '+Math.round(r.rpm)+' rpm · '+Math.min(...r.R.map(q=>q.n))+' compresiones por cilindro promediadas. '+(lo.length?'Por debajo del 90 %: cilindro '+lo.join(', ')+'.':'Todos los cilindros por encima del 90 %.')}
+  else{crRes=r;const U=crUmbrales();
+    crMsg='Arranque a '+Math.round(r.rpm)+' rpm · '+Math.min(...r.R.map(q=>q.n))+' compresiones por cilindro promediadas. '+U.map(u=>{const lo=r.R.filter(q=>q.pc<u.v).map(q=>q.cyl);
+      return (u.nombre&&U.length>1?u.nombre+': ':'')+(lo.length?'Por debajo del '+u.v+' %: cilindro '+lo.join(', ')+'.':'Todos los cilindros por encima del '+u.v+' %.')}).join(' ')}
   crOut();
 }
 function crDraw(){
@@ -58,10 +59,11 @@ function crDraw(){
   const n=r.R.length,bw=pw/n;
   r.R.forEach((q,i)=>{const x0=ml+i*bw+bw*.18,w=bw*.64,c=crCol(q.cyl);
     g3.fillStyle=c;g3.fillRect(x0,Y(q.pc),w,Y(0)-Y(q.pc));
-    txt(q.pc.toFixed(1)+' %',x0+w/2,Y(q.pc)-8,q.pc<90?'#ff6b6b':tx,'center',14,1);
+    txt(q.pc.toFixed(1)+' %',x0+w/2,Y(q.pc)-8,q.pc<Math.max(...crUmbrales().map(u=>u.v))?'#ff6b6b':tx,'center',14,1);
     txt('Cil. '+q.cyl,x0+w/2,Y(0)+20,c,'center',14,1);
     txt(fmt(q.pk,r.u),x0+w/2,Y(0)+38,mu,'center',11)});
-  g3.strokeStyle='#ff6b6b';g3.setLineDash([6,5]);g3.beginPath();g3.moveTo(ml,Y(90)+.5);g3.lineTo(W-mr,Y(90)+.5);g3.stroke();g3.setLineDash([]);
+  const UU=crUmbrales();UU.forEach((u,k)=>{const cl=k?'#ffb14d':'#ff6b6b';g3.strokeStyle=cl;g3.setLineDash([6,5]);g3.beginPath();g3.moveTo(ml,Y(u.v)+.5);g3.lineTo(W-mr,Y(u.v)+.5);g3.stroke();g3.setLineDash([]);
+    if(UU.length>1)txt(u.v+' % · '+u.nombre,W-mr-4,Y(u.v)-4,cl,'right',11)});
 }
 function crOut(){$('crSt').textContent=crMsg;crDraw()}
 function crTab(){crFill();crOut()}

@@ -201,3 +201,4 @@ body:not(.fix) #tZm{font-weight:600;display:inline-flex;align-items:center}
 .bgl input.nr{background:var(--bd)}
 #wrapH{flex:none;height:12px;margin:2px 0;cursor:ns-resize;touch-action:none;display:grid;place-items:center}#wrapH i{width:56px;height:4px;border-radius:3px;background:var(--bd)}#wrapH:hover i,#wrapH.on i{background:var(--ac)}
 #wrap.man{flex:none!important}
+.dxk{margin:5px 0;padding:5px 8px;border-left:3px solid var(--bd);font-size:12px}.dxk.dsc{border-left-color:#ffb14d;background:rgba(255,177,77,.08)}.dxk b{display:block;font-size:12px}

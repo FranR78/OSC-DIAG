@@ -203,6 +203,11 @@
 <div id="xSig"></div>
 </div>
 <div class="fbox"><b>2 · Medidas</b><div id="xMed" class="tcy"></div></div>
+<div class="fbox"><b>Fuente de conocimiento</b>
+<p class="hint">Paquetes de reglas que usa el diagnóstico. Si dos fuentes tratan el mismo tema con criterios distintos, se muestran las dos.</p>
+<div id="xPq"></div>
+<div class="row"><button id="xPqI">Importar paquete…</button><button id="xPqE">Exportar mis reglas</button><input type="file" id="xPqF" accept=".json,application/json" hidden></div>
+</div>
 <div class="fbox"><b>3 · Consulta al portal</b>
 <div class="row"><button class="p" id="xGo">Consultar diagnóstico</button></div>
 <div class="row"><input type="text" id="xQ" placeholder="Buscar notas técnicas…" style="flex:1;min-width:0"><button id="xBu">Buscar</button></div>
@@ -275,6 +280,6 @@
 <div class="ficE ficF"><button id="kbX" class="p">Cerrar</button></div></div></div>
 <div id="gd" hidden role="dialog" aria-live="polite"><b id="gdT"></b><p id="gdP"></p><div><span id="gdN"></span><button id="gdS">Saltar</button><button id="gdG" class="p">Siguiente</button></div></div>
 <footer>Ortu Automoción · ortuautomocion.com</footer>
-<script>const EJEMPLOS={{ejemplos:ejemplos}};const APP_CFG={{appcfg}};</script>
+<script>const EJEMPLOS={{ejemplos:ejemplos}};const REGLAS_BASE={{reglas:reglas}};const APP_CFG={{appcfg}};</script>
 <script>
 {{js/*.js}}</script></body></html>

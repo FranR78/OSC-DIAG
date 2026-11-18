@@ -1,0 +1,175 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "ortu",
+ "nombre": "Ortu Automoción (base)",
+ "base": true,
+ "version": "2026.11.18",
+ "aviso": "Comparación entre cilindros: dice cuál está peor, no si el motor está bien. Si todos fallan por igual, no se ve.",
+ "reglas": [
+  {
+   "id": "ORTU-ADM-PULSO",
+   "tema": "pulso-cilindro-adm",
+   "sintoma": "El cilindro {cil} es el más débil en admisión ({pct} % del mejor)",
+   "contexto": {
+    "entidad": [
+     "transductor admisión"
+    ]
+   },
+   "si": [
+    {
+     "medida": "desv_pulso_cil",
+     "op": "peor"
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Bloque: segmentos o camisas",
+     "etiqueta": "Inferido"
+    },
+    {
+     "texto": "Culata: junta, guías o asientos de válvula, obstrucción del colector",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Repetir: que salga el más débil en varios ciclos completos (720°)",
+     "tipo": "medida"
+    },
+    {
+     "texto": "Transductor en el cárter: si su pulso también destaca, bloque; si es normal, culata",
+     "tipo": "medida"
+    },
+    {
+     "texto": "Confirmar en el cilindro {cil}: presión absoluta, estanqueidad o máquina de humo",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "Ortu Automoción",
+   "estado": "validada"
+  },
+  {
+   "id": "ORTU-ESC-PULSO",
+   "tema": "pulso-cilindro-esc",
+   "sintoma": "El cilindro {cil} es el más débil en escape ({pct} % del mejor)",
+   "contexto": {
+    "entidad": [
+     "transductor escape"
+    ]
+   },
+   "si": [
+    {
+     "medida": "desv_pulso_cil",
+     "op": "peor"
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Bloque: segmentos o camisas",
+     "etiqueta": "Inferido"
+    },
+    {
+     "texto": "Culata: junta, guías o asientos de válvula, obstrucción del colector",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Repetir: que salga el más débil en varios ciclos completos (720°)",
+     "tipo": "medida"
+    },
+    {
+     "texto": "Transductor en el cárter: si su pulso también destaca, bloque; si es normal, culata",
+     "tipo": "medida"
+    },
+    {
+     "texto": "Confirmar en el cilindro {cil}: presión absoluta, estanqueidad o máquina de humo",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "Ortu Automoción",
+   "estado": "validada"
+  },
+  {
+   "id": "ORTU-CAR-PULSO",
+   "tema": "pulso-cilindro-car",
+   "sintoma": "El cilindro {cil} es el más débil en cárter ({pct} % del mejor)",
+   "contexto": {
+    "entidad": [
+     "transductor cárter"
+    ]
+   },
+   "si": [
+    {
+     "medida": "desv_pulso_cil",
+     "op": "peor"
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Bloque: segmentos o camisas",
+     "etiqueta": "Inferido"
+    },
+    {
+     "texto": "Culata: junta, guías o asientos de válvula, obstrucción del colector",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Repetir: que salga el más débil en varios ciclos completos (720°)",
+     "tipo": "medida"
+    },
+    {
+     "texto": "Transductor en el cárter: si su pulso también destaca, bloque; si es normal, culata",
+     "tipo": "medida"
+    },
+    {
+     "texto": "Confirmar en el cilindro {cil}: presión absoluta, estanqueidad o máquina de humo",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "Ortu Automoción",
+   "estado": "validada"
+  },
+  {
+   "id": "ORTU-COMP-REL",
+   "tema": "compresion-relativa",
+   "sintoma": "El cilindro {cil} está por debajo del 90 % en compresión relativa ({valor} %)",
+   "si": [
+    {
+     "medida": "comp_rel_pct",
+     "op": "<",
+     "valor": 90,
+     "por_cilindro": true
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Pérdida de estanqueidad: segmentos, válvulas o junta de culata",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Prueba de fugas en el cilindro {cil}",
+     "tipo": "prueba"
+    },
+    {
+     "texto": "Compresión absoluta con manómetro en el cilindro {cil}",
+     "tipo": "medida"
+    }
+   ],
+   "fuente": "Ortu Automoción",
+   "estado": "validada"
+  }
+ ]
+}

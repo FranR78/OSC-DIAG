@@ -14,6 +14,7 @@
  *   {{ruta}}          contenido de src/ruta tal cual
  *   {{base64:ruta}}   archivo en base64 (para data: URI)
  *   {{ejemplos:dir}}  los .csv de src/dir como JSON [{name, txt}] (el desarrollador añade ejemplos soltándolos ahí)
+ *   {{reglas:dir}}    los .json de src/dir (paquetes de reglas base) como JSON [paquete]
  *   {{appcfg}}        APP_CFG = {modo, ver, portalUrl, apiUrl}
  *   {{js/*.js}}       todos los .js de src/js en orden alfabético (un solo <script>, ámbito global compartido)
  * Sin dependencias. */
@@ -30,6 +31,12 @@ function build(modo) {
       const d = k.slice(9), dir = path.join(SRC, d);
       const list = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => /\.csv$/i.test(f)).sort((a, b) => a.localeCompare(b, 'es', { numeric: true }))
         .map(f => ({ name: f.replace(/\.csv$/i, '').replace(/^\d+[\s._-]+/, ''), txt: rd(d + '/' + f).toString('utf8').replace(/^\uFEFF/, '') })) : [];
+      return JSON.stringify(list).replace(/<\//g, '<\\/').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+    }
+    if (k.startsWith('reglas:')) {  // paquetes de reglas base (src/reglas/*.json) → [paquete, …]; las reglas propias del usuario van en su navegador
+      const d = k.slice(7), dir = path.join(SRC, d);
+      const list = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => /\.json$/i.test(f)).sort().map(f => JSON.parse(rd(d + '/' + f))) : [];
+      list.forEach(p => { if (!p.paquete || !Array.isArray(p.reglas)) throw new Error('paquete de reglas mal escrito: ' + d); });
       return JSON.stringify(list).replace(/<\//g, '<\\/').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
     }
     if (k === 'appcfg') {

@@ -229,11 +229,19 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   await click('#tabX'); await p.waitForTimeout(150);
   check('libre: calcula medidas y avisa de que la consulta está en el portal', await E(() => APP_CFG.modo === 'libre' && $('xMed').children.length > 0 && /portal/.test($('xSt').textContent)));
   await click('#xGo'); await p.waitForTimeout(100);
-  check('libre: «Consultar» da el diagnóstico local (o dice que no hay uno programado)', await E(() => $('xRes').querySelectorAll('.dxh').length > 0 || /programado/.test($('xSt').textContent)));
+  check('libre: «Consultar» da el diagnóstico local (o dice que no hay uno programado)', await E(() => $('xRes').querySelectorAll('.dxh').length > 0 || /programado|Ninguna regla/.test($('xSt').textContent)));
   const dxl = await E(() => dxLocal({ contexto: { senales: [{ canal: 'CH1', entidad: 'transductor admisión' }] },
     medidas: [{ id: 'desv_pulso_cil', canal: 'CH1', por_cilindro: { 1: 2.1, 2: -1, 3: 0.5, 4: -14.2 } }] }));
   check('libre: comparación local → el 4 es el más débil, con ranking (mejor = 100 %) y aviso',
     dxl.hallazgos.length === 1 && dxl.hallazgos[0].evidencia[0].cilindro === 4 && dxl.hallazgos[0].evidencia[0].comparacion[3].pct_mejor === 100 && /peor/.test(dxl.aviso), JSON.stringify(dxl.hallazgos[0] && dxl.hallazgos[0].evidencia));
+  check('paquete Ortu cargado como base y activo', await E(() => REGLAS_BASE.some(p => p.paquete === 'ortu' && p.reglas.length >= 4) && $('xPq').children.length >= 2));
+  const dsc = await E(() => { localStorage.setItem('as_paqs', JSON.stringify([{ paquete: 'propio', nombre: 'Mis reglas', reglas: [
+      { id: 'FR-COMP', tema: 'compresion-relativa', sintoma: 'Cil {cil} bajo', si: [{ medida: 'comp_rel_pct', op: '<', valor: 80, por_cilindro: true }], fuente: 'Curso X', estado: 'borrador' }] }]));
+    const r = dxLocal({ contexto: { motor: { cilindros: 4 }, senales: [] }, medidas: [{ id: 'comp_rel_pct', por_cilindro: { 1: 85, 2: 100, 3: 70, 4: 98 } }] });
+    localStorage.removeItem('as_paqs'); return r; });
+  const h1 = dsc.hallazgos.filter(h => h.evidencia[0].cilindro === 1), h3 = dsc.hallazgos.filter(h => h.evidencia[0].cilindro === 3);
+  check('dos fuentes: no se pisan y la discrepancia se ve (cil 1: Ortu sí, propia no)', h1.length === 1 && h1[0].paquete === 'ortu' && h1[0].discrepancia && h1[0].criterios.length === 2 && h3.length === 2 && !h3[0].discrepancia, JSON.stringify(dsc.hallazgos.map(h => [h.paquete, h.evidencia[0].cilindro, h.discrepancia])));
+  check('validación de paquetes', await E(() => rgValida({ paquete: 'xx', reglas: [{ id: 'a', sintoma: 's', si: [{ medida: 'rpm', op: '~' }] }] }).length === 1));
   await click('#tabS');
 
   console.log('\n15b · Compresión relativa (pinza de arranque + inyector 1, C4 1.6 HDi con 2 cilindros lavados)');

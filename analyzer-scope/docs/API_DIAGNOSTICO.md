@@ -254,3 +254,7 @@ La app puede enviar varias medidas `avance`: una con `k: "enc"` y hasta dos con 
 Las señales para la biblioteca verificada **no** pasan por el portal (es del alumnado). Van a un servidor propio de
 Analyzer Scope: `apps-script-biblioteca/` en la raíz del repositorio, con su guía y su contrato en `docs/BIBLIOTECA.md`.
 El portal no tiene que programar nada para esto.
+
+## 11. Diagnóstico local con paquetes de reglas (2026.11.18)
+
+El diagnóstico local ya no está en el código: lo dan los paquetes de `src/reglas/*.json` (base Ortu) y los del usuario. Formato, temas y discrepancias en `docs/REGLAS.md`. Medida nueva para las reglas: `comp_rel_pct` (%, por_cilindro) cuando hay resultado en «Compresión relativa». Los hallazgos locales llevan además `paquete`, `paquete_nombre`, `fuente`, `estado`, `criterios` y `discrepancia`; la respuesta, `perfil` (fuentes activas).

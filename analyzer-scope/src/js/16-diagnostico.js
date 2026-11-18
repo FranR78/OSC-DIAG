@@ -7,7 +7,7 @@ const DX_ENT=[[/admisi[oó]n|colector/i,'transductor admisión'],[/escape/i,'tra
   [/maf|caudal[ií]metro/i,'caudalímetro'],[/\bmap\b|presi[oó]n absoluta/i,'sensor MAP'],[/can[\s-]?(h|l|bus)?\b/i,'CAN'],[/bobina|encendido|secundario|primario/i,'encendido'],[/lambda|sonda/i,'sonda lambda']];
 const dxEnt=c=>{const s=(c.p||'')+' '+(c.n||'')+' '+(c.m?c.m.k:'');for(const[r,e]of DX_ENT)if(r.test(s))return e;return''};
 const MLB={rpm:'RPM',frecuencia:'Frecuencia',ciclo_util:'Ciclo útil',pico_pico:'Pico a pico',maximo:'Máx',minimo:'Mín',media:'Media',desv_pulso_cil:'Desviación del pulso por cilindro',desv_pico_cil:'Desviación del pico por cilindro',
-  duracion_t1t2:'T1→T2',avance:'Avance',aaa:'AAA',rce:'RCE',aae:'AAE',rca:'RCA',cruce:'Cruce',can_dominante:'CAN dominante',can_recesivo:'CAN recesivo',can_fuera_pct:'CAN fuera de rango'};
+  duracion_t1t2:'T1→T2',avance:'Avance',aaa:'AAA',rce:'RCE',aae:'AAE',rca:'RCA',cruce:'Cruce',can_dominante:'CAN dominante',can_recesivo:'CAN recesivo',can_fuera_pct:'CAN fuera de rango',comp_rel_pct:'Compresión relativa'};
 const mlb=id=>MLB[id]?i18(MLB[id]):id;
 const r4=v=>v==null||!isFinite(v)?null:+(+v).toPrecision(4);
 /* medidas por cilindro: ventana de cada cilindro centrada en su PMS de compresión (+ desfase) y media de los ciclos de la vista */
@@ -35,6 +35,7 @@ function dxPeticion(){
     if(c.m&&c.m.k==='rpm'){const s2=dxStats(c);if(s2)medidas.push({id:'rpm',canal:cn,valor:r4(s2.me),unidad:'rpm'})}
     const q=dxCyl(c,off);if(q){medidas.push({id:'desv_pico_cil',canal:cn,unidad:'%',por_cilindro:q.pico},{id:'desv_pulso_cil',canal:cn,unidad:'%',por_cilindro:q.pulso});cil.push(cn+': '+q.ciclos)}});
   if(ph.T>0&&!ph.auto&&!medidas.some(m=>m.id==='rpm'))medidas.push({id:'rpm',valor:r4(120/ph.T),unidad:'rpm'});
+  if(typeof crRes!=='undefined'&&crRes&&crRes.R)medidas.push({id:'comp_rel_pct',unidad:'%',por_cilindro:Object.fromEntries(crRes.R.map(q=>[q.cyl,r4(q.pc)]))});
   if(tr.on&&cur.a!=null&&cur.b!=null)medidas.push({id:'duracion_t1t2',valor:r4(Math.abs(cur.b-cur.a)*1000),unidad:'ms'});
   const d=distCalc();if(d){if(adv.on&&d.advs)d.advs.forEach(a=>medidas.push(Object.assign({id:'avance',valor:r4(a.deg),unidad:'°',k:a.k},a.k==='iny'?{inyeccion:a.i}:{})));
     if(vv.on&&d.ok)['aaa','rce','aae','rca','cruce'].forEach(k=>medidas.push({id:k,valor:r4(d[k]),unidad:'°'}))}
@@ -45,22 +46,10 @@ function dxPeticion(){
 /* ---------- Diagnóstico programado (local, también sin portal) ----------
    Transductor de pulso = COMPARACIÓN: no hay mV ni % de «motor bueno/malo». Se dice qué cilindro está peor
    (el mejor = 100 %) y se pasa a pruebas de confirmación. Si todos fallan igual, la comparación no lo ve. */
-const DX_PULSO={'transductor admisión':'admisión','transductor escape':'escape','transductor cárter':'cárter'};
 function dxRank(pc){const ks=Object.keys(pc||{}).filter(k=>isFinite(pc[k]));if(ks.length<2)return null;
   const o=ks.map(k=>({cilindro:+k,valor:+pc[k]})).sort((a,b)=>a.valor-b.valor),mejor=100+o[o.length-1].valor;
   o.forEach(x=>{if(mejor>0)x.pct_mejor=Math.round((100+x.valor)/mejor*1000)/10});return o}
-function dxLocal(p){const H=[];
-  p.contexto.senales.forEach(s=>{const lugar=DX_PULSO[s.entidad];if(!lugar)return;
-    const m=p.medidas.find(x=>x.id==='desv_pulso_cil'&&x.canal===s.canal);const r=m&&dxRank(m.por_cilindro);if(!r)return;const c=r[0].cilindro;
-    H.push({regla:'LOCAL-PULSO',local:true,comparativa:true,confianza:'media',
-      sintoma:i18('El cilindro')+' '+c+' '+i18('es el más débil en')+' '+i18(lugar)+(r[0].pct_mejor!=null?' ('+r[0].pct_mejor+' % '+i18('del mejor')+')':''),
-      evidencia:[{medida:'desv_pulso_cil',canal:s.canal,cilindro:c,valor:r[0].valor,condicion:i18('el menor de todos los cilindros'),etiqueta:'Medido',comparacion:r}],
-      causas:[{texto:i18('Bloque: segmentos o camisas'),etiqueta:'Inferido'},{texto:i18('Culata: junta, guías o asientos de válvula, obstrucción del colector'),etiqueta:'Inferido'}],
-      comprobaciones:[{orden:1,texto:i18('Repetir: que salga el más débil en varios ciclos completos (720°)')},
-        {orden:2,texto:i18('Transductor en el cárter: si su pulso también destaca, bloque; si es normal, culata')},
-        {orden:3,texto:i18('Confirmar en el cilindro')+' '+c+': '+i18('presión absoluta, estanqueidad o máquina de humo')}]})});
-  return{ok:true,v:1,op:'diagnostico',hallazgos:H,relacionadas:[],local:true,
-    aviso:i18('Comparación entre cilindros: dice cuál está peor, no si el motor está bien. Si todos fallan por igual, no se ve.')}}
+/* dxLocal (diagnóstico con los paquetes de reglas activos): js/25-reglas.js */
 /* transporte: dentro del portal google.script.run; fuera, GET al puente si está configurado */
 function dxCall(req){return new Promise((ok,ko)=>{
   const g=window.google&&google.script&&google.script.run;
@@ -93,8 +82,11 @@ function dxShow(res){
   if(res.op==='nt'){const n=res.nt;$('xSt').textContent='';box.appendChild(T('h3',n.titulo));box.appendChild(mdRender(n.cuerpo||n.resumen));
     (n.valores_referencia||[]).forEach(v=>box.appendChild(T('div',v.magnitud+': '+(v.valor!=null?v.valor:(v.min+'–'+v.max))+' '+(v.unidad||'')+(v.condicion?' ('+v.condicion+')':'')+' · '+v.etiqueta+(v.fuente?' · '+v.fuente+(v.pagina?', pág. '+v.pagina:''):''),'s')));
     (n.videos||[]).forEach(v=>box.appendChild(lnk(v.url,'▶ '+v.titulo)));if(n.url_portal)box.appendChild(lnk(n.url_portal,i18('Abrir en el portal')));return}
-  const H=res.hallazgos||[];$('xSt').textContent=H.length?H.length+' hallazgo(s)':(res.sin_reglas?'Esta señal aún no tiene reglas en el portal: mira las notas relacionadas.':'Ninguna regla se cumple con estas medidas.');
+  const H=res.hallazgos||[];$('xSt').textContent=H.length?H.length+' hallazgo(s)'+(res.perfil?' · '+i18('fuentes')+': '+res.perfil.join(' + '):''):(res.sin_reglas?'Esta señal aún no tiene reglas en el portal: mira las notas relacionadas.':'Ninguna regla se cumple con estas medidas.');
   H.forEach((h,hi)=>{const d=T('div',null,'cy dxh');d.appendChild(T('b',h.sintoma+' · '+i18('confianza')+' '+h.confianza));
+    if(h.paquete_nombre)d.appendChild(T('div',i18('Fuente')+': '+h.paquete_nombre+(h.fuente&&h.fuente!==h.paquete_nombre?' · '+h.fuente:'')+' · '+h.regla+(h.estado==='borrador'?' · '+i18('BORRADOR'):''),'hint'));
+    if(h.criterios){const k=T('div',null,'dxk'+(h.discrepancia?' dsc':''));k.appendChild(T('b',i18(h.discrepancia?'⚠ Discrepancia entre fuentes':'Criterios de las fuentes activas')));
+      h.criterios.forEach(c=>k.appendChild(T('div',(c.cumple?'✓ ':'✗ ')+c.paquete+': '+c.condicion+(c.fuente&&c.fuente!==c.paquete?' ('+c.fuente+')':''),'s')));d.appendChild(k)}
     (h.evidencia||[]).forEach(e=>d.appendChild(T('div',mlb(e.medida)+(e.canal?' · '+e.canal:'')+(e.cilindro!=null?' · '+i18('cilindro')+' '+e.cilindro:'')+': '+e.valor+' ('+e.condicion+') · '+(e.etiqueta||'Medido'),'s')));
     (h.evidencia||[]).forEach(e=>{if(e.comparacion)d.appendChild(T('div',i18('Comparación (mejor = 100 %)')+': '+e.comparacion.map(x=>x.cilindro+': '+(x.pct_mejor!=null?x.pct_mejor+' %':x.valor)).join(' · '),'s'))});
     if(h.causas&&h.causas.length){d.appendChild(T('h4',i18('Posibles causas')));h.causas.forEach(c=>d.appendChild(T('div','• '+c.texto+' ('+c.etiqueta+')'+(c.como_separar?' — '+c.como_separar:''),'hint')))}
@@ -107,7 +99,7 @@ function dxShow(res){
 }
 const dxBusy=m=>{$('xSt').textContent=m;$('xRes').innerHTML=''};
 function dxGo(){const p=dxMedidas();delete p._cil;if(!p.medidas.length)return;const loc=dxLocal(p);
-  if(APP_CFG.modo!=='portal'&&!APP_CFG.apiUrl){dxShow(loc);if(!loc.hallazgos.length)$('xSt').textContent=i18('Sin diagnóstico programado para estas señales (transductor de admisión, escape o cárter con «Cilindros» activado).');return}
+  if(APP_CFG.modo!=='portal'&&!APP_CFG.apiUrl){dxShow(loc);if(!loc.hallazgos.length)$('xSt').textContent=i18('Ninguna regla de las fuentes activas se cumple con estas señales (o falta activar «Cilindros» o la compresión relativa).');return}
   dxBusy('Consultando…');
   // El portal añade cómo comprobarlo; si no tiene regla para la señal, queda el diagnóstico local.
   dxCall(p).then(r=>{if(r&&r.ok&&!(r.hallazgos||[]).length&&loc.hallazgos.length){r.hallazgos=loc.hallazgos;r.aviso=loc.aviso+' '+(r.aviso||'')}dxShow(r)},e=>{dxShow(loc);dxErr(e)})}
