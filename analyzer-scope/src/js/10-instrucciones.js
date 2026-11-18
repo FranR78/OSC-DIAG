@@ -43,6 +43,7 @@ sec:[
 'INICIO marca los 0° y FIN el final del ciclo: arrástralos o escribe las «RPM del motor». Elige el rango (0–720° o 0–360°) y las divisiones (2, 4 u 8).',
 'La regla «PMS» es independiente: colócala sobre el PMS real de la señal.']},
 {h:'5 · Identificar los cilindros',t:[
+'<b>Barra de grados</b> (menú Reglas): una línea blanca dentro del ciclo de 720° con sus grados arriba. Mientras la arrastras, los cilindros aparecen sobre la señal en ese ángulo, con los grados de cada uno; al soltar, se quitan y la barra queda en su sitio.',
 'Pulsa «Cilindros» y abre «Identificación de cilindros»: elige el número de cilindros y el orden de encendido (hay órdenes habituales y uno de usuario).',
 'Los círculos numerados se arrastran todos a la vez, con una separación equidistante de 720°/n. Con «Mostrar» puedes ver los 4 tiempos de un cilindro o las filas de varios cilindros marcados.',
 'La tabla «Tiempos por cilindro» lista, en orden de encendido, el disparo y cada tiempo. «Picos de compresión» marca el máximo de cada cilindro en el canal seleccionado.']},
@@ -124,6 +125,7 @@ sec:[
 'START marks 0° and END the end of the cycle: drag them or type the “Engine RPM”. Choose the range (0–720° or 0–360°) and the divisions (2, 4 or 8).',
 'The “TDC” ruler is independent: place it on the real TDC of the signal.']},
 {h:'5 · Identify the cylinders',t:[
+'<b>Degree bar</b> (Rulers menu): a white line inside the 720° cycle with its degrees on top. While you drag it, the cylinders appear over the signal at that angle, with each one\'s degrees; when you release it, they disappear and the bar stays in place.',
 'Press “Cylinders” and open “Cylinder identification”: choose the number of cylinders and the firing order (common orders and a user-defined one are available).',
 'The numbered circles are dragged all at once, with an equal spacing of 720°/n. With “Show” you can see the 4 strokes of one cylinder or the rows of several selected cylinders.',
 'The “Strokes per cylinder” table lists, in firing order, the trigger and each stroke. “Compression peaks” marks the maximum of each cylinder in the selected channel.']},

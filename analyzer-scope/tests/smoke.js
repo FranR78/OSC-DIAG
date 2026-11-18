@@ -268,6 +268,15 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   check('compresión relativa: ~183 rpm y los cilindros 1 y 3 por debajo del 90 %', cr && crLow === '1,3' && Math.abs(await E(() => crRes.rpm) - 183) < 10 && cr.some(r => r.pc === 100), JSON.stringify(cr));
   await click('#tabS');
 
+  console.log('\nF7 · Barra de grados con animación al arrastrar');
+  { await E(() => { ph.auto = false; ph.t0 = view.t0 + view.span * .1; ph.T = view.span * .8; eng.on = true; eng.A = null; draw(); gdOn(true); });
+    const bx = await p.$eval('#cv', c => { const r = c.getBoundingClientRect(); return { x: r.x, y: r.y }; }), gx = await E(() => gdX()), gy = await E(() => M.t + PH() / 2);
+    await p.mouse.move(bx.x + gx, bx.y + gy); await p.mouse.down(); await p.mouse.move(bx.x + gx + 80, bx.y + gy, { steps: 3 });
+    const mid = await E(() => ({ d: gd.drag, deg: gdDeg(gd.t) }));
+    await p.mouse.up();
+    check('barra de grados: se arrastra, cambia los grados y la animación solo se ve mientras se arrastra', mid.d && mid.deg > 306 && !(await E(() => gd.drag)), JSON.stringify(mid));
+    await E(() => gdOn(false)); }
+
   console.log('\nErrores JS durante la sesión:', errs.length);
   errs.forEach(e => console.log('  !', e));
   check('sin errores JS', errs.length === 0);
