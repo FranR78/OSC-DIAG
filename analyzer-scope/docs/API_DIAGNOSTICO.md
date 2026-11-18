@@ -258,3 +258,17 @@ El portal no tiene que programar nada para esto.
 ## 11. Diagnóstico local con paquetes de reglas (2026.11.18)
 
 El diagnóstico local ya no está en el código: lo dan los paquetes de `src/reglas/*.json` (base Ortu) y los del usuario. Formato, temas y discrepancias en `docs/REGLAS.md`. Medida nueva para las reglas: `comp_rel_pct` (%, por_cilindro) cuando hay resultado en «Compresión relativa». Los hallazgos locales llevan además `paquete`, `paquete_nombre`, `fuente`, `estado`, `criterios` y `discrepancia`; la respuesta, `perfil` (fuentes activas).
+
+## 12. Fuentes combinadas y «Mis reglas» en la cuenta (2026.11.18)
+
+**`diagnostico`** · cada regla de las NT puede llevar `tema` y `fuente` (texto). La respuesta añade:
+```json
+"criterios_nt": [ { "tema": "compresion-relativa", "regla": "COMP-REL-R01", "condicion": "comp_rel_pct < 90", "fuente": "NT maestra", "cumplen": ["3|", "4|CH1"] } ]
+```
+una entrada por regla con `tema` cuyo contexto encaja (se cumpla o no); `cumplen` = claves `"<cilindro>|<canal>"` de sus hallazgos (vacío si no hay). Cada hallazgo lleva `tema` y `fuente`. La app junta estos hallazgos con los de sus paquetes y marca las discrepancias (`docs/REGLAS.md`).
+
+**`reglas_leer`** → `{ "ok": true, "v": 1, "op": "reglas_leer", "paquetes": [paquete, …] }` (lista vacía si no hay).
+**`reglas_guardar`** `{ "paquetes": [paquete, …] }` → `{ "ok": true, "v": 1, "op": "reglas_guardar", "bytes": n }`. Por usuario (correo de la sesión), máx. 90 KB. Error `demasiado_grande` si se pasa.
+Solo vía A (dentro del portal).
+
+Medida nueva en el catálogo §4.2: `comp_rel_pct` (%, por_cilindro): compresión relativa de cada cilindro en % del mejor.

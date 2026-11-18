@@ -71,7 +71,14 @@ sec:[
 'La pestaña «Diagnóstico» reúne las medidas de la señal (todas Medido): pico a pico, rpm, desviación de cada cilindro respecto a la media, T1→T2, avance, distribución y niveles de CAN. Escribe el «Parámetro medido» de cada canal para que se reconozca qué es.',
 'Para las medidas por cilindro activa «Cilindros» y sincroniza. Si la señal se adelanta o se retrasa respecto al PMS de compresión (por ejemplo, un transductor en admisión), indícalo en «Desfase de la señal respecto al PMS de compresión (°)».',
 'En la versión del portal, «Consultar diagnóstico» busca en las notas técnicas: hallazgos, posibles causas y comprobaciones ordenadas, que puedes marcar y que pasan al «Informe PDF». Son posibles causas: confírmalas antes de sustituir piezas.']},
-{h:'13 · Idioma',t:[
+{h:'13 · Fuente de conocimiento y reglas propias',t:[
+'El diagnóstico no lleva criterios fijos: los lee de <b>fuentes de conocimiento</b> que activas o desactivas en la pestaña «Diagnóstico». <b>Ortu Automoción (base)</b> viene con la app y no se puede cambiar. <b>Mis reglas</b> son tus criterios, como si fueran skills, y los vas añadiendo según te formas. En el portal hay además <b>Notas maestras</b>: las reglas de cada nota técnica.',
+'<b>Con una hoja de cálculo (lo más fácil):</b> pulsa «Descargar plantilla (Excel)». Ábrela en Excel o Google Sheets: la segunda fila explica cada columna y debajo hay ejemplos. Borra los ejemplos, escribe una regla por fila y guarda como CSV. Luego pulsa «Subir reglas (Excel/CSV o JSON)…».',
+'Cada fila dice <b>qué se mide</b> (columna medida, p. ej. comp_rel_pct = compresión relativa en % del mejor), <b>cuándo salta</b> (operador y valor, p. ej. &lt; 85), <b>qué significa</b> (síntoma, causas y comprobaciones) y <b>de dónde sale</b> (fuente: curso, manual, ficha técnica). Para una segunda condición de la misma regla, añade otra fila con el mismo id. {cil} se cambia por el número de cilindro.',
+'<b>Desde la app:</b> «Editar mis reglas…» abre un formulario. La opción de copiar una regla de la base la trae con el mismo tema para que cambies el umbral; el botón de probar con la señal actual dice si se cumple con lo cargado antes de guardarla.',
+'<b>Si dos fuentes no coinciden</b>, no se pisan: si tienen el mismo «tema», el hallazgo avisa de la discrepancia entre fuentes con el criterio de cada una y si se cumple. Lo mismo sale en el informe PDF, con la lista de fuentes activas. Las reglas en borrador se marcan como tal.',
+'Tus reglas se guardan en este navegador; en el portal, además, en tu cuenta. «Exportar mis reglas (Excel)» te da la copia para guardarla o compartirla.']},
+{h:'14 · Idioma',t:[
 'El selector Español | English de la esquina superior derecha cambia todos los textos de la aplicación.']}]}
 },
 en:{
@@ -145,7 +152,14 @@ sec:[
 'The “Diagnosis” tab gathers the signal measurements (all Measured): peak to peak, rpm, deviation of each cylinder from the mean, T1→T2, advance, valve timing and CAN levels. Type the “Measured parameter” of each channel so that it is recognised.',
 'For per-cylinder measurements turn on “Cylinders” and synchronize. If the signal leads or lags the compression TDC (for example, an intake transducer), set it in “Signal offset from compression TDC (°)”.',
 'In the portal version, “Run diagnosis query” searches the technical notes: findings, possible causes and ordered checks, which you can tick and which go into the “PDF report”. They are possible causes: confirm them before replacing parts.']},
-{h:'13 · Language',t:[
+{h:'13 · Knowledge source and your own rules',t:[
+'The diagnosis has no fixed criteria: it reads them from <b>knowledge sources</b> that you switch on or off in the “Diagnosis” tab. <b>Ortu Automoción (base)</b> comes with the app and cannot be changed. <b>My rules</b> are your own criteria, like skills, which you add as you train. In the portal there are also <b>Master notes</b>: the rules of each technical note.',
+'<b>With a spreadsheet (easiest):</b> press “Download template (Excel)”. Open it in Excel or Google Sheets: the second row explains each column and below there are examples. Delete the examples, write one rule per row and save as CSV. Then press “Upload rules (Excel/CSV or JSON)…”.',
+'Each row says <b>what is measured</b> (medida column, e.g. comp_rel_pct = relative compression in % of the best), <b>when it fires</b> (operator and value, e.g. &lt; 85), <b>what it means</b> (symptom, causes and checks) and <b>where it comes from</b> (source: course, manual, data sheet). For a second condition of the same rule, add another row with the same id. {cil} is replaced by the cylinder number.',
+'<b>From the app:</b> “Edit my rules…” opens a form. The option to copy a rule from the base brings it with the same topic so you change the threshold; the button to test with the current signal tells you whether it holds before saving.',
+'<b>If two sources disagree</b>, neither overwrites the other: if they share a topic, the finding warns that the sources disagree, with each criterion and whether it holds. The PDF report shows the same, with the list of active sources. Draft rules are marked as such.',
+'Your rules are stored in this browser and, in the portal, also in your account. “Export my rules (Excel)” gives you a copy to keep or share.']},
+{h:'14 · Language',t:[
 'The Español | English selector in the top-right corner changes all the texts of the application.']}]}
 }};
 function renderDocs(){

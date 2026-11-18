@@ -100,9 +100,11 @@ function dxShow(res){
 const dxBusy=m=>{$('xSt').textContent=m;$('xRes').innerHTML=''};
 function dxGo(){const p=dxMedidas();delete p._cil;if(!p.medidas.length)return;const loc=dxLocal(p);
   if(APP_CFG.modo!=='portal'&&!APP_CFG.apiUrl){dxShow(loc);if(!loc.hallazgos.length)$('xSt').textContent=i18('Ninguna regla de las fuentes activas se cumple con estas señales (o falta activar «Cilindros» o la compresión relativa).');return}
+  if(!rgActivo(RG_NT)){dxShow(loc);return}
   dxBusy('Consultando…');
-  // El portal añade cómo comprobarlo; si no tiene regla para la señal, queda el diagnóstico local.
-  dxCall(p).then(r=>{if(r&&r.ok&&!(r.hallazgos||[]).length&&loc.hallazgos.length){r.hallazgos=loc.hallazgos;r.aviso=loc.aviso+' '+(r.aviso||'')}dxShow(r)},e=>{dxShow(loc);dxErr(e)})}
+  // Notas maestras del portal + paquetes activos de la app: se juntan y se comparan por tema.
+  dxCall(p).then(r=>{if(!r||!r.ok)return dxShow(r);const m=dxLocal(p,{H:r.hallazgos,crit:r.criterios_nt});
+    m.relacionadas=r.relacionadas||[];m.sin_reglas=!m.hallazgos.length&&r.sin_reglas;m.aviso=[...new Set([r.aviso,loc.aviso].filter(Boolean))].join(' ');dxShow(m)},e=>{dxShow(loc);dxErr(e)})}
 function dxBuscar(){const t=$('xQ').value.trim();if(!t)return;dxBusy('Buscando…');dxCall({v:1,op:'buscar',lang:LANG,cliente:{app:'analyzer-scope',ver:APP_CFG.ver},texto:t,filtros:{solo_osciloscopio:true},limite:10}).then(dxShow,dxErr)}
 function dxNt(id){dxBusy('Cargando…');dxCall({v:1,op:'nt',lang:LANG,cliente:{app:'analyzer-scope',ver:APP_CFG.ver},id,formato:'md'}).then(dxShow,dxErr)}
 function dxTab(){dxMedidas();if(APP_CFG.modo!=='portal'&&!APP_CFG.apiUrl&&!DXR){$('xSt').textContent=i18('Versión libre: aquí se compara cilindro a cilindro; cómo comprobarlo, valores y notas técnicas, en el portal.');if(APP_CFG.portalUrl){$('xRes').innerHTML='';$('xRes').appendChild(lnk(APP_CFG.portalUrl,i18('Abrir en el portal')))}}}

@@ -11,6 +11,18 @@ En la pestaña **Diagnóstico → Fuente de conocimiento** cada paquete se activ
 
 **Discrepancias.** Las reglas de paquetes distintos no se pisan. Si tienen el mismo `tema`, cada hallazgo de ese tema enseña los criterios de todas las fuentes activas y si cada uno se cumple (✓/✗). Si alguno no se cumple, el hallazgo se marca «Discrepancia entre fuentes».
 
+## Plantilla de hoja de cálculo (lo normal para el usuario)
+«Diagnóstico → Descargar plantilla (Excel)» baja `plantilla_reglas_analyzer_scope.csv` (separador `;`, UTF-8 con BOM: Excel la abre bien). Fila 1: columnas; fila 2: ayuda de cada columna (se ignora al subir); debajo, ejemplos.
+
+Columnas: `id; tema; sintoma; senal; combustible; medida; operador; valor; por_cilindro; confianza; estado; causas; etiqueta_causas; comprobaciones; fuente`.
+* Una fila = una regla. Otra condición de la misma regla = otra fila con el mismo `id` y solo `medida`, `operador`, `valor`, `por_cilindro`.
+* `valor` con `entre`/`fuera`: `a|b`. `por_cilindro`: `si`.
+* `causas` y `comprobaciones`: separadas por `|`. Causa: «texto — cómo separarla». Comprobación: «texto → valor esperado».
+* «Subir reglas (Excel/CSV o JSON)…»: un CSV entra en «Mis reglas» (sustituye las reglas con el mismo `id`); un JSON entra como paquete aparte. «Exportar mis reglas (Excel)» da el CSV con el mismo formato.
+
+## Portal
+En la versión del portal hay una fuente más, **Notas maestras (portal)**: las reglas de `notas-tecnicas/reglas/<clave de la maestra>.yml` del repo del portal, que evalúa el servidor. La app junta sus hallazgos con los de los paquetes activos y compara por `tema` (el servidor manda `criterios_nt`). «Mis reglas» se guardan además en la cuenta del usuario (`reglas_leer` / `reglas_guardar`, `API_DIAGNOSTICO.md` §12).
+
 ## Formato (`analyzer-scope-reglas/1`)
 Es el mismo esquema que las reglas del portal (`API_DIAGNOSTICO.md` §5), en JSON, con `tema`, `fuente` y `estado`.
 ```json

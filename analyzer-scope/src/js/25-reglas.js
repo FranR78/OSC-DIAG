@@ -4,9 +4,11 @@
 const RG_FMT='analyzer-scope-reglas/1',RG_OPS=['<','<=','>','>=','entre','fuera','peor'],RG_CONF={alta:3,media:2,baja:1};
 function rgUsuario(){let a=null;try{a=JSON.parse(LS.get('as_paqs')||'null')}catch(e){}
   return Array.isArray(a)&&a.length?a:[{formato:RG_FMT,paquete:'propio',nombre:'Mis reglas',autor:'',version:'',reglas:[]}]}
-function rgGuardaUsuario(a){LS.set('as_paqs',JSON.stringify(a))}
+function rgGuardaUsuario(a){LS.set('as_paqs',JSON.stringify(a));if(typeof rgSube==='function')rgSube(a)}
 function rgOnMap(){try{return JSON.parse(LS.get('as_paqon')||'{}')||{}}catch(e){return{}}}
-const rgTodos=()=>[...REGLAS_BASE.map(p=>Object.assign({},p,{base:true})),...rgUsuario().map(p=>Object.assign({},p,{base:false}))];
+const RG_NT={paquete:'nt',nombre:'Notas maestras (portal)',base:true,remoto:true,reglas:[]};
+const rgConPortal=()=>APP_CFG.modo==='portal'||!!APP_CFG.apiUrl;
+const rgTodos=()=>[...(rgConPortal()?[RG_NT]:[]),...REGLAS_BASE.map(p=>Object.assign({},p,{base:true})),...rgUsuario().map(p=>Object.assign({},p,{base:false}))];
 const rgActivo=p=>rgOnMap()[p.paquete]!==false;
 const rgActivos=()=>rgTodos().filter(rgActivo);
 function rgSetActivo(id,on){const m=rgOnMap();m[id]=!!on;LS.set('as_paqon',JSON.stringify(m))}
@@ -62,16 +64,20 @@ function rgEval(r,P,p){const H=[],motor=(p.contexto&&p.contexto.motor)||{},S=(p.
         comprobaciones:(r.comprobaciones||[]).map((c,i)=>({orden:i+1,texto:i18(rgSub(c.texto,V)),tipo:c.tipo||'',esperado:c.esperado?rgSub(c.esperado,V):''}))})})}
   return H}
 /* diagnóstico con los paquetes activos; los temas con criterio de varios paquetes llevan «criterios» (cumple o no cada uno) */
-function dxLocal(p){const PA=rgActivos(),H=[],temas={};
+const rgKey=x=>{const e=(x.evidencia||[])[0]||{};return(e.cilindro==null?'':e.cilindro)+'|'+(e.canal||'')};
+const rgCondR=r=>(r.si||[]).map(c=>mlb(c.medida)+' '+rgCondTxt(c)).join(' · ');
+/* ext (portal): {H: hallazgos de las notas maestras, crit: [{tema, regla, condicion, fuente, cumplen:[clave]}]} */
+function dxLocal(p,ext){const PA=rgActivos().filter(P=>!P.remoto),H=[],temas={};
   PA.forEach(P=>(P.reglas||[]).forEach(r=>{if(rgValida({paquete:'xx',reglas:[r]}).length)return;
-    const h=rgEval(r,P,p);H.push(...h);if(r.tema)(temas[r.tema]=temas[r.tema]||[]).push({P,r,h})}));
-  H.forEach(h=>{const t=temas[h.tema];if(!t||new Set(t.map(x=>x.P.paquete)).size<2)return;
-    const key=x=>(x.evidencia[0]||{}).cilindro+'|'+(x.evidencia[0]||{}).canal;
-    h.criterios=t.map(({P,r,h:hs})=>({paquete:P.nombre||P.paquete,regla:r.id,condicion:r.si.map(c=>mlb(c.medida)+' '+rgCondTxt(c)).join(' · '),fuente:r.fuente||'',cumple:hs.some(x=>key(x)===key(h))}));
+    const h=rgEval(r,P,p);H.push(...h);if(r.tema)(temas[r.tema]=temas[r.tema]||[]).push({src:P.paquete,paquete:P.nombre||P.paquete,regla:r.id,condicion:rgCondR(r),fuente:r.fuente||'',keys:h.map(rgKey)})}));
+  if(ext){(ext.H||[]).slice().reverse().forEach(h=>{H.unshift(Object.assign(h,{paquete:'nt',paquete_nombre:RG_NT.nombre,base:true}))});
+    (ext.crit||[]).forEach(c=>{if(c.tema)(temas[c.tema]=temas[c.tema]||[]).push({src:'nt',paquete:RG_NT.nombre,regla:c.regla,condicion:c.condicion,fuente:c.fuente||'',keys:c.cumplen||[]})})}
+  H.forEach(h=>{const t=temas[h.tema];if(!t||new Set(t.map(x=>x.src)).size<2)return;const k=rgKey(h);
+    h.criterios=t.map(x=>({paquete:x.paquete,regla:x.regla,condicion:x.condicion,fuente:x.fuente,cumple:x.keys.includes(k)}));
     h.discrepancia=h.criterios.some(c=>!c.cumple)});
   H.sort((a,b)=>(RG_CONF[b.confianza]||0)-(RG_CONF[a.confianza]||0));
   const av=[...new Set(PA.filter(P=>P.aviso&&H.some(h=>h.paquete===P.paquete)).map(P=>i18(P.aviso)))];
-  return{ok:true,v:1,op:'diagnostico',hallazgos:H,relacionadas:[],local:true,perfil:PA.map(P=>P.nombre||P.paquete),
+  return{ok:true,v:1,op:'diagnostico',hallazgos:H,relacionadas:[],local:true,perfil:(ext?[RG_NT.nombre]:[]).concat(PA.map(P=>P.nombre||P.paquete)),
     aviso:(av.join(' ')+' '+i18('Posibles causas: confírmalas con las comprobaciones antes de sustituir piezas.')).trim()}}
 /* umbrales de compresión relativa de los paquetes activos (para la pestaña y su gráfica) */
 function crUmbrales(){const U=[];rgActivos().forEach(P=>(P.reglas||[]).forEach(r=>(r.si||[]).forEach(c=>{
@@ -81,18 +87,13 @@ function crUmbrales(){const U=[];rgActivos().forEach(P=>(P.reglas||[]).forEach(r
 function rgPanel(){const el=$('xPq');if(!el)return;el.innerHTML='';
   rgTodos().forEach(P=>{const l=T('label',null,'dxc'),cb=document.createElement('input');cb.type='checkbox';cb.checked=rgActivo(P);
     cb.onchange=()=>{rgSetActivo(P.paquete,cb.checked);DXR=null;$('xRes').innerHTML='';$('xSt').textContent=''};
+    if(P.remoto){l.appendChild(cb);l.appendChild(document.createTextNode(' '+i18(P.nombre)+' · '+i18('reglas de cada nota técnica')));el.appendChild(l);return}
     const n=(P.reglas||[]).length,b=(P.reglas||[]).filter(r=>r.estado==='borrador').length;
     l.appendChild(cb);l.appendChild(document.createTextNode(' '+i18(P.nombre||P.paquete)+' · '+n+' '+i18(n===1?'regla':'reglas')+(b?' ('+b+' '+i18('en borrador')+')':'')+(P.base?' · '+i18('base, solo lectura'):'')));el.appendChild(l)})}
 function rgExport(P){const o=Object.assign({},P);delete o.base;o.formato=RG_FMT;
   saveFile('reglas_'+o.paquete+'.json',new Blob([JSON.stringify(o,null,1)],{type:'application/json'}))}
-function rgImport(f){const rd=new FileReader();rd.onload=()=>{let p;try{p=JSON.parse(rd.result)}catch(e){return $('xSt').textContent=i18('El archivo no es JSON.')}
-  if(REGLAS_BASE.some(b=>b.paquete===p.paquete))p.paquete=p.paquete+'_copia';
-  const E=rgValida(p);if(E.length)return $('xSt').textContent=i18('Paquete no válido')+': '+E.slice(0,3).join(' ');
-  const a=rgUsuario().filter(x=>x.paquete!==p.paquete);a.push(p);rgGuardaUsuario(a);rgPanel();
-  $('xSt').textContent=i18('Paquete importado')+': '+(p.nombre||p.paquete)+' · '+p.reglas.length+' '+i18('reglas')};rd.readAsText(f)}
 $('xPqI').onclick=()=>$('xPqF').click();
 $('xPqF').onchange=e=>{const f=e.target.files[0];if(f)rgImport(f);e.target.value=''};
-$('xPqE').onclick=()=>{const a=rgUsuario();a.forEach(rgExport)};
 {const f=dxTab;dxTab=function(){rgPanel();f()}}
 {const h=setLang;setLang=function(l){h(l);rgPanel()}}
 rgPanel();

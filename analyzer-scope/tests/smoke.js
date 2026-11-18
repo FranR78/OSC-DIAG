@@ -248,6 +248,12 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   await p.click('#rgEB button.p'); await p.waitForTimeout(100);
   check('editor: crea y guarda una regla propia', await E(() => rgUsuario()[0].reglas.some(r => r.sintoma === 'El cilindro {cil} es el peor (prueba)' && r.estado === 'borrador')));
   await E(() => { localStorage.removeItem('as_paqs'); rgeClose(); });
+  const csvR = await E(() => { const P = rgDeCsv(RG_COLS.join(';') + '\n' + RG_AYUDA.join(';') + '\n' + RG_EJ.map(r => r.map(csvQ).join(';')).join('\n'), 'Mis reglas');
+    const back = rgDeCsv(rgACsv(P), 'Mis reglas'); return { n: P.reglas.length, c2: P.reglas[2].si.length, err: rgValida(P), same: JSON.stringify(back.reglas) === JSON.stringify(P.reglas) }; });
+  check('plantilla CSV: 3 reglas de ejemplo válidas, condición extra por fila e ida y vuelta', csvR.n === 3 && csvR.c2 === 2 && !csvR.err.length && csvR.same, JSON.stringify(csvR));
+  const mx = await E(() => dxLocal({ contexto: { motor: { cilindros: 4 }, senales: [] }, medidas: [{ id: 'comp_rel_pct', por_cilindro: { 1: 85, 2: 100, 3: 70, 4: 98 } }] },
+    { H: [], crit: [{ tema: 'compresion-relativa', regla: 'COMP-REL-R01', condicion: '< 80', fuente: 'NT', cumplen: ['3|'] }] }));
+  check('portal: criterio de la nota maestra entra en la comparación por tema', mx.hallazgos.some(h => h.evidencia[0].cilindro === 1 && h.discrepancia && h.criterios.some(c => c.regla === 'COMP-REL-R01' && !c.cumple)), JSON.stringify(mx.hallazgos.map(h => h.criterios)));
   check('validación de paquetes', await E(() => rgValida({ paquete: 'xx', reglas: [{ id: 'a', sintoma: 's', si: [{ medida: 'rpm', op: '~' }] }] }).length === 1));
   await click('#tabS');
 
@@ -271,7 +277,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await pp.addInitScript(() => {
       const mk = (s, f) => ({ withSuccessHandler: x => mk(x, f), withFailureHandler: y => mk(s, y), apiDiagnostico: req => { (window.__reqs = window.__reqs || []).push(req); setTimeout(() => s(window.__resp(req)), 5); } });
       window.google = { script: { run: mk(null, null) } };
-      window.__resp = req => req.op === 'diagnostico' ? { ok: true, v: 1, op: 'diagnostico', hallazgos: [{ regla: 'ADM-TRANS-R01', nt_id: 'ADM-TRANS-001', nt_titulo: 'Transductor en admisión', sintoma: 'Un pulso de depresión menor que el resto', confianza: 'media',
+      window.__resp = req => req.op === 'reglas_leer' ? { ok: true, v: 1, op: 'reglas_leer', paquetes: [] } : req.op === 'reglas_guardar' ? { ok: true } : req.op === 'diagnostico' ? { ok: true, v: 1, op: 'diagnostico', hallazgos: [{ regla: 'ADM-TRANS-R01', nt_id: 'ADM-TRANS-001', nt_titulo: 'Transductor en admisión', sintoma: 'Un pulso de depresión menor que el resto', confianza: 'media',
           evidencia: [{ medida: 'desv_pulso_cil', canal: 'CH1', cilindro: 4, valor: -14.2, condicion: '< -10 %', etiqueta: 'Medido' }],
           causas: [{ texto: 'Válvula de escape que no cierra', etiqueta: 'Inferido', como_separar: 'Prueba de fugas' }],
           comprobaciones: [{ orden: 1, texto: 'Compresión relativa', tipo: 'medida' }, { orden: 2, texto: 'Prueba de fugas en el cilindro 4', tipo: 'prueba' }], url_portal: 'https://example.org/nt/ADM-TRANS-001' }],
@@ -283,7 +289,8 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await pp.setInputFiles('#fi', CAPS[0]); await pp.waitForTimeout(600);
     await pp.evaluate(() => { CH[0].p = 'Presión admisión'; fit(); ph.auto = false; ph.t0 = view.t0; ph.T = view.span / 2.5; eng.A = null; eng.on = true; ui(); draw(); });
     await pp.click('#tabX'); await pp.click('#xGo'); await pp.waitForTimeout(150);
-    const rq = await pp.evaluate(() => window.__reqs && window.__reqs[0]);
+    const rq = await pp.evaluate(() => window.__reqs && window.__reqs.find(r => r.op === 'diagnostico'));
+    check('portal: al abrir pide «Mis reglas» guardadas en la cuenta', await pp.evaluate(() => window.__reqs.some(r => r.op === 'reglas_leer')));
     check('portal: petición «diagnostico» con contrato v1', rq && rq.v === 1 && rq.op === 'diagnostico' && rq.contexto.motor.cilindros === 4 && rq.contexto.senales[0].entidad === 'transductor admisión' && !('_cil' in rq), JSON.stringify(rq && rq.contexto));
     check('portal: medidas por cilindro (desv_pulso_cil con 4 cilindros)', rq && rq.medidas.some(m => m.id === 'desv_pulso_cil' && Object.keys(m.por_cilindro).length === 4));
     const tx = await pp.textContent('#xRes');
