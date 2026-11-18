@@ -87,7 +87,7 @@ function cfgOf(A){
 }
 function applyCfg(j){
   (j.ch||[]).forEach((q,k)=>{const c=CH[k];if(!c||!c.x)return;CHK.forEach(f=>{if(q[f]!==undefined)c[f]=q[f]});proc(c);c._set=true});
-  [[view,j.view],[cur,j.cur],[ph,j.ph],[pms,j.pms],[tr,j.tr],[tr2,j.tr2],[amp,j.amp],[vv,j.vv],[eng,j.eng]].forEach(([o,v])=>v&&Object.assign(o,v));advLoad(j.adv);
+  [[view,j.view],[cur,j.cur],[ph,j.ph],[pms,j.pms],[tr,j.tr],[tr2,j.tr2],[amp,j.amp],[vv,j.vv],[eng,j.eng]].forEach(([o,v])=>v&&Object.assign(o,v));advLoad(j.adv);if($("rhR"))$("rhR").value=eng.rh||14;
   if(j.sel!=null&&CH[j.sel]&&CH[j.sel].x)sel=j.sel;if(j.bg!=null){bgV=j.bg;$('bgR').value=Math.round(bgV*100)}if(j.ann)ann.list=j.ann;
   if(j.sec)['oPh','oCy','oAv','sOn','oMa'].forEach(id=>{$(id).checked=j.sec.includes(id);$(id).onchange()});
   $('phR').value=ph.deg;$('phD').value=ph.div;$('gN').value=eng.n;$('rpm').value=ph.T>0&&!ph.auto?Math.round(120/ph.T):'';
@@ -107,7 +107,7 @@ async function importSession(f){
   const sx=j.x?new Float64Array(u8(j.x)):null;
   j.channels.forEach(q=>{const c=CH[q.slot],y=new Float32Array(u8(q.y));
     Object.assign(c,{n:q.n,p:q.p||'',u:q.u,x:sx||new Float64Array(u8(q.t)),y0:y,y,on:true,vd:q.vd,off:q.off,fl:q.fl,f1:q.f1,f2:q.f2,inv:q.inv,hr:true,h:null});proc(c)});
-  Object.assign(ph,j.phase,{auto:false});[[pms,j.pms],[vv,j.vv],[tr,j.tr],[tr2,j.tr2],[cur,j.cur],[eng,j.eng]].forEach(([o,v])=>v&&Object.assign(o,v));advLoad(j.adv);
+  Object.assign(ph,j.phase,{auto:false});[[pms,j.pms],[vv,j.vv],[tr,j.tr],[tr2,j.tr2],[cur,j.cur],[eng,j.eng]].forEach(([o,v])=>v&&Object.assign(o,v));advLoad(j.adv);if($("rhR"))$("rhR").value=eng.rh||14;
   if(j.ann)ann.list=j.ann;$('phR').value=ph.deg;$('phD').value=ph.div;fillG();fillSC();if(eng.sync)$('sC').value=eng.sync.ch;cylList();$('cPk').checked=!!eng.pk;$('gN').value=eng.n;advUI();
   return f.name+': sesión .psdata con '+j.channels.length+' canal(es)';
 }

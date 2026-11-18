@@ -122,14 +122,14 @@ function draw(theme){
         if(xa<W0-1||xa>W1+1)continue;
         g.strokeStyle=gold;g.globalAlpha=.6;g.lineWidth=1;g.setLineDash([2,4]);g.beginPath();g.moveTo(xa,M.t+22);g.lineTo(xa,yb);g.stroke();g.setLineDash([]);g.globalAlpha=1;
         if(xm>M.l&&xm<M.l+pw&&xm>W0&&xm<W1){g.fillStyle=gold;g.textAlign='center';g.fillText(ST4[s2][0],xm,M.t+38)}}});
-    if(multi){const T=ph.T,i0=Math.max(0,eng.order.indexOf(eng.c0)),rot=[...eng.order.slice(i0),...eng.order.slice(0,i0)].filter(isVis),rh=14,y0=M.t+26;
+    if(multi){const T=ph.T,i0=Math.max(0,eng.order.indexOf(eng.c0)),rot=[...eng.order.slice(i0),...eng.order.slice(0,i0)].filter(isVis),rh=eng.rh||14,y0=M.t+26,fz=Math.round(Math.min(16,Math.max(9,rh*.62))),ty=rh/2+fz*.36;g.font=fz+'px system-ui';
       rot.forEach((cyl,r)=>{const y=y0+r*(rh+1);
         EVS.filter(e=>e.cyl===cyl).forEach(e=>{for(let s2=0;s2<4;s2++){const ta=e.t+(s2-2)*T/4,xa=X(ta),xb=X(ta+T/4);
           const x0=Math.max(xa,M.l+24,W0),x1=Math.min(xb,M.l+pw,W1);if(x1-x0<3)continue;
           g.globalAlpha=D?.38:.45;g.fillStyle=ST4[s2][1];g.fillRect(x0,y,x1-x0-1,rh);g.globalAlpha=1;
           g.strokeStyle=ST4[s2][1];g.lineWidth=1;g.strokeRect(x0+.5,y+.5,x1-x0-2,rh-1);
-          if(x1-x0>34){g.fillStyle=pkc('#f2f6fb','#1b2430');g.textAlign='center';g.fillText(ST4[s2][0],(x0+x1)/2,y+rh-3)}}});
-        g.fillStyle=gold;g.textAlign='left';g.font='bold 10px system-ui';g.fillText('C'+cyl,M.l+3,y+rh-3);g.font='11px system-ui'})}
+          if(x1-x0>fz*3){g.fillStyle=pkc('#f2f6fb','#1b2430');g.textAlign='center';g.fillText(ST4[s2][0],(x0+x1)/2,y+ty)}}});
+        g.fillStyle=gold;g.textAlign='left';g.font='bold '+fz+'px system-ui';g.fillText('C'+cyl,M.l+3,y+ty);g.font=fz+'px system-ui'});g.font='11px system-ui'}
   }
   /* trazas */
   const t1=view.t0+view.span;

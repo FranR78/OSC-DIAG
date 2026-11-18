@@ -116,6 +116,7 @@
 <button class="tog" id="tGr" title="Identificación de cilindros sobre la señal (overlay)">Cilindros</button>
 <span class="pr"><button class="tog" id="tVv" title="AAA avance apertura admisión, RCE retraso cierre escape, AAE avance apertura escape, RCA retraso cierre admisión">AAA·RCE·AAE·RCA</button><button class="tog lk" id="kVv" title="Bloquear el conjunto AAA·RCE·AAE·RCA: al arrastrar una regla se mueven las cuatro">🔓</button></span>
 <button class="tog" id="tAdv" title="Reglas de avance de encendido y de inyección (Inyec.1, Inyec.2)">Avance</button>
+<label class="bgl" title="Alto de las franjas ADM·COMP·EXP·ESC de cada cilindro">Franjas <input type="range" id="rhR" min="8" max="60" value="14" class="nr"></label>
 <button class="tog" id="tAnm" title="Pistones y válvulas según el ángulo de cigüeñal de la señal">Animación del motor</button>
 <button id="bMD" class="nu">Diagrama de distribución…</button>
 <button id="bMC" class="nu">Compresión relativa…</button>
@@ -153,6 +154,7 @@
 <div id="empty"><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M2 20h8l4-14 6 28 6-22 5 14 4-6h6l4-10 5 20 4-10h8"/></svg>
 <h2>Arrastra aquí tu captura</h2><p>CSV de PicoScope y de otros osciloscopios. Se procesa en tu navegador.</p>
 <div><button class="p" id="emOp">Abrir archivos…</button><button id="emEx">Ver un ejemplo</button></div></div></div>
+<div id="wrapH" title="Arrastra para cambiar el alto de la gráfica (doble clic: automático)" role="separator" aria-orientation="horizontal"><i></i></div>
 <div id="anim" hidden><div class="anH"><button id="anP" title="Reproducir o parar">▶</button><input type="range" id="anR" min="0" max="1000" value="0" aria-label="Posición en la señal"><span id="anT"></span><button id="anX" title="Cerrar">✕</button></div>
 <canvas id="anC" role="img" aria-label="Pistones y válvulas según el ángulo de cigüeñal"></canvas><p class="hint" id="anN"></p></div>
 <div id="rd"></div>
@@ -225,6 +227,10 @@
 </div>
 </section>
 </main>
+<div id="dxW" hidden><div class="ficB" role="dialog" aria-labelledby="dxWT">
+<h2 id="dxWT">Informe sin diagnóstico</h2>
+<p class="hint">Aún no has generado el diagnóstico de esta captura. Con él, el informe incluye hallazgos, cilindro más débil, posibles causas y comprobaciones.</p>
+<div class="row"><button class="p" id="dxWGo">Ir a Diagnóstico</button><button id="dxWPdf">Generar sin diagnóstico</button><button id="dxWNo">Cancelar</button></div></div></div>
 <div id="fic" hidden><div class="ficB" role="dialog" aria-labelledby="ficT">
 <h2 id="ficT">Ficha de la captura</h2>
 <p class="hint">Estos datos acompañan a la señal en el CSV y en el informe. No escribas matrícula, bastidor ni datos del cliente.</p>

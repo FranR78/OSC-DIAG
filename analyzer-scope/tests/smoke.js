@@ -153,8 +153,20 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   check('jsPDF incrustado (sin red)', await E(() => !!(window.jspdf && window.jspdf.jsPDF)));
   check('sin opción de equipo USB en «Fuente»', await E(() => ![...document.querySelectorAll('#src option')].some(o => o.value === 'hantek')));
   await p.setInputFiles('#fi', [CAPS[0]]); await p.waitForTimeout(600); await click('#tabS');
-  { const [dl] = await Promise.all([p.waitForEvent('download'), click('#bPdf')]);
+  await click('#bPdf'); await p.waitForTimeout(200);
+  check('aviso de informe sin diagnóstico', await E(() => !document.getElementById('dxW').hidden));
+  { const [dl] = await Promise.all([p.waitForEvent('download'), click('#dxWPdf')]);
     const buf = fs.readFileSync(await dl.path()); check('Informe PDF generado (%PDF)', buf.slice(0, 4).toString() === '%PDF', dl.suggestedFilename()); }
+
+  { const h0 = await E(() => document.getElementById('wrap').getBoundingClientRect().height);
+    const r = await p.locator('#wrapH').boundingBox();
+    await p.mouse.move(r.x + r.width / 2, r.y + 6); await p.mouse.down(); await p.mouse.move(r.x + r.width / 2, r.y + 126, { steps: 5 }); await p.mouse.up();
+    const h1 = await E(() => document.getElementById('wrap').getBoundingClientRect().height);
+    check('tirador: la gráfica crece al arrastrar', h1 > h0 + 80, h0 + ' → ' + h1);
+    await p.dblclick('#wrapH'); await p.waitForTimeout(100); }
+  await E(() => { const r = document.getElementById('rhR'); r.value = 40; r.oninput(); });
+  check('alto de franjas ADM·COMP·EXP·ESC ajustable', await E(() => eng.rh === 40));
+  await E(() => { const r = document.getElementById('rhR'); r.value = 14; r.oninput(); });
 
   console.log('\n12 · Tablet / móvil');
   await p.setViewportSize({ width: 390, height: 844 }); await p.waitForTimeout(300);
