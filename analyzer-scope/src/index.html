@@ -206,7 +206,7 @@
 <div class="fbox"><b>Fuente de conocimiento</b>
 <p class="hint">Paquetes de reglas que usa el diagnóstico. Si dos fuentes tratan el mismo tema con criterios distintos, se muestran las dos.</p>
 <div id="xPq"></div>
-<div class="row"><button id="xPqI">Importar paquete…</button><button id="xPqE">Exportar mis reglas</button><input type="file" id="xPqF" accept=".json,application/json" hidden></div>
+<div class="row"><button id="xPqI">Importar paquete…</button><button class="p" id="xPqEd">Editar mis reglas…</button><button id="xPqE">Exportar mis reglas</button><input type="file" id="xPqF" accept=".json,application/json" hidden></div>
 </div>
 <div class="fbox"><b>3 · Consulta al portal</b>
 <div class="row"><button class="p" id="xGo">Consultar diagnóstico</button></div>
@@ -236,6 +236,7 @@
 <h2 id="dxWT">Informe sin diagnóstico</h2>
 <p class="hint">Aún no has generado el diagnóstico de esta captura. Con él, el informe incluye hallazgos, cilindro más débil, posibles causas y comprobaciones.</p>
 <div class="row"><button class="p" id="dxWGo">Ir a Diagnóstico</button><button id="dxWPdf">Generar sin diagnóstico</button><button id="dxWNo">Cancelar</button></div></div></div>
+<div id="rgE" hidden><div class="ficB" role="dialog" aria-labelledby="rgET"><h2 id="rgET">Mis reglas</h2><p class="hint">Tus criterios, como si fueran skills. No pisan la base: si tratan el mismo tema, el diagnóstico enseña los dos.</p><div id="rgEB"></div></div></div>
 <div id="fic" hidden><div class="ficB" role="dialog" aria-labelledby="ficT">
 <h2 id="ficT">Ficha de la captura</h2>
 <p class="hint">Estos datos acompañan a la señal en el CSV y en el informe. No escribas matrícula, bastidor ni datos del cliente.</p>

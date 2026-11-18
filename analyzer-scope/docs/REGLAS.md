@@ -34,4 +34,7 @@ Es el mismo esquema que las reglas del portal (`API_DIAGNOSTICO.md` §5), en JSO
 * `tema`: los criterios que tratan lo mismo llevan el mismo tema, así se comparan entre fuentes.
 * `estado`: `validada` o `borrador` (sale marcada «BORRADOR» en pantalla y en el PDF).
 
+## Editor («Diagnóstico → Editar mis reglas…»)
+Crea, edita, duplica y borra reglas de los paquetes propios, y crea o exporta paquetes. «Copiar una regla de la base» la trae en borrador con el mismo `tema`: cambias el umbral y la fuente, y el diagnóstico enseña los dos criterios. «Probar con la señal actual» evalúa la regla con lo que hay cargado.
+
 Una regla mal escrita no se evalúa. Un paquete importado mal escrito se rechaza y la app dice por qué.

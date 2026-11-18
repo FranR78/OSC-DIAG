@@ -241,6 +241,13 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     localStorage.removeItem('as_paqs'); return r; });
   const h1 = dsc.hallazgos.filter(h => h.evidencia[0].cilindro === 1), h3 = dsc.hallazgos.filter(h => h.evidencia[0].cilindro === 3);
   check('dos fuentes: no se pisan y la discrepancia se ve (cil 1: Ortu sí, propia no)', h1.length === 1 && h1[0].paquete === 'ortu' && h1[0].discrepancia && h1[0].criterios.length === 2 && h3.length === 2 && !h3[0].discrepancia, JSON.stringify(dsc.hallazgos.map(h => [h.paquete, h.evidencia[0].cilindro, h.discrepancia])));
+  await click('#xPqEd'); await p.waitForTimeout(100);
+  await p.click('#rgEB button.p'); await p.waitForTimeout(100);
+  await p.fill('#rgEB label:nth-of-type(1) input', 'FR-TEST');
+  await E(() => { const i = [...document.querySelectorAll('#rgEB .rgl input[type=text]')]; i[2].value = 'El cilindro {cil} es el peor (prueba)'; });
+  await p.click('#rgEB button.p'); await p.waitForTimeout(100);
+  check('editor: crea y guarda una regla propia', await E(() => rgUsuario()[0].reglas.some(r => r.sintoma === 'El cilindro {cil} es el peor (prueba)' && r.estado === 'borrador')));
+  await E(() => { localStorage.removeItem('as_paqs'); rgeClose(); });
   check('validación de paquetes', await E(() => rgValida({ paquete: 'xx', reglas: [{ id: 'a', sintoma: 's', si: [{ medida: 'rpm', op: '~' }] }] }).length === 1));
   await click('#tabS');
 
