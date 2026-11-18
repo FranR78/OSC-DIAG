@@ -2,9 +2,9 @@ name: Analyzer Scope · pruebas
 
 on:
   push:
-    paths: ['analyzer-scope/**', '.github/workflows/analyzer-scope.yml']
+    paths: ['analyzer-scope/**', 'apps-script-scope/**', '.github/workflows/analyzer-scope.yml']
   pull_request:
-    paths: ['analyzer-scope/**', '.github/workflows/analyzer-scope.yml']
+    paths: ['analyzer-scope/**', 'apps-script-scope/**', '.github/workflows/analyzer-scope.yml']
 
 jobs:
   pruebas:

@@ -53,13 +53,17 @@ function build(modo) {
 }
 
 const check = process.argv.includes('--check');let bad = false;
+/* el servidor propio de Analyzer Scope (../apps-script-scope) sirve la versión portal como App.html */
+const EXTRA = { portal: path.join(__dirname, '..', 'apps-script-scope', 'App.html') };
 for (const [modo, f] of Object.entries(OUTS)) {
   const html = build(modo), out = path.join(DIST, f);
   if (check) {
     const cur = fs.existsSync(out) ? fs.readFileSync(out, 'utf8') : '';
     if (cur !== html) { console.error('dist/' + f + ' no está al día: ejecuta  node build.js'); bad = true; }
+    const ex = EXTRA[modo]; if (ex && fs.existsSync(path.dirname(ex)) && (fs.existsSync(ex) ? fs.readFileSync(ex, 'utf8') : '') !== html) { console.error(path.relative(__dirname, ex) + ' no está al día: ejecuta  node build.js'); bad = true; }
   } else {
     fs.mkdirSync(DIST, { recursive: true }); fs.writeFileSync(out, html);
+    const ex = EXTRA[modo]; if (ex && fs.existsSync(path.dirname(ex))) fs.writeFileSync(ex, html);
     console.log('dist/' + f, (html.length / 1024).toFixed(0) + ' KB');
   }
 }
