@@ -254,6 +254,11 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   const mx = await E(() => dxLocal({ contexto: { motor: { cilindros: 4 }, senales: [] }, medidas: [{ id: 'comp_rel_pct', por_cilindro: { 1: 85, 2: 100, 3: 70, 4: 98 } }] },
     { H: [], crit: [{ tema: 'compresion-relativa', regla: 'COMP-REL-R01', condicion: '< 80', fuente: 'NT', cumplen: ['3|'] }] }));
   check('portal: criterio de la nota maestra entra en la comparación por tema', mx.hallazgos.some(h => h.evidencia[0].cilindro === 1 && h.discrepancia && h.criterios.some(c => c.regla === 'COMP-REL-R01' && !c.cumple)), JSON.stringify(mx.hallazgos.map(h => h.criterios)));
+  const sk = await E(() => { const P = { paquete: 'sk', nombre: 'Skill', reglas: [{ id: 'S1', tema: 't-x', sintoma: 'Cil {cil}', si: [{ medida: 'comp_rel_pct', op: '<', valor: 90, por_cilindro: true }] }],
+      notas: [{ id: 'N-01', titulo: 'Cómo confirmarlo', tema: 't-x', texto: '# Paso\n- uno', valores: [{ magnitud: 'p', min: 25, max: 32, unidad: 'bar' }] }] };
+    const h = rgEval(P.reglas[0], P, { contexto: { motor: {}, senales: [] }, medidas: [{ id: 'comp_rel_pct', por_cilindro: { 1: 80, 2: 100 } }] });
+    const NN = rgNotasDeCsv(rgNotasACsv(P)); return { err: rgValida(P), n: h[0] && h[0].notas_paquete.length, csv: NN && NN[0].titulo === 'Cómo confirmarlo' && NN[0].valores[0].max === 32 && NN[0].texto.includes('- uno') }; });
+  check('skill = reglas + notas: la regla trae su nota por el tema y las notas van y vuelven en CSV', !sk.err.length && sk.n === 1 && sk.csv, JSON.stringify(sk));
   check('validación de paquetes', await E(() => rgValida({ paquete: 'xx', reglas: [{ id: 'a', sintoma: 's', si: [{ medida: 'rpm', op: '~' }] }] }).length === 1));
   await click('#tabS');
 

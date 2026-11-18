@@ -43,6 +43,7 @@ async function report(){
     const line=(t,sz,colr,ind)=>{doc.setFontSize(sz);const L=doc.splitTextToSize(cl(t),270-(ind||0));if(yy+L.length*sz*.42>199){foot();doc.addPage();page++;head();yy=36}doc.setTextColor(...colr);doc.text(L,10+(ind||0),yy);yy+=L.length*sz*.42+1.5};
     if(DXR.perfil)line('Fuentes de conocimiento activas: '+DXR.perfil.join(' + '),8.5,mc);
     DXR.hallazgos.forEach(h=>{line(h.sintoma+' · confianza '+h.confianza+(h.nt_titulo?' · NT: '+h.nt_titulo:''),10,hc);
+      (h.notas_paquete||[]).forEach(n=>line('Nota del paquete: '+n.titulo+(n.fuente?' ('+n.fuente+')':''),8,mc,4));
       if(h.paquete_nombre)line('Fuente: '+h.paquete_nombre+(h.fuente&&h.fuente!==h.paquete_nombre?' · '+h.fuente:'')+' · '+h.regla+(h.estado==='borrador'?' · BORRADOR':''),8,mc,4);
       if(h.criterios){line((h.discrepancia?'Discrepancia entre fuentes:':'Criterios de las fuentes activas:'),8.5,hc,4);h.criterios.forEach(c=>line((c.cumple?'[cumple] ':'[no cumple] ')+c.paquete+': '+c.condicion+(c.fuente&&c.fuente!==c.paquete?' ('+c.fuente+')':''),8,tc,8))}
       (h.evidencia||[]).forEach(e=>line(e.medida+(e.canal?' · '+e.canal:'')+(e.cilindro!=null?' · cilindro '+e.cilindro:'')+': '+e.valor+' ('+e.condicion+') · '+(e.etiqueta||'Medido'),8.5,tc,4));

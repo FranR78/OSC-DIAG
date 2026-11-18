@@ -3,6 +3,10 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.19b
+- **Skills = reglas + notas:** cada paquete puede llevar notas (explicación, valores de referencia, procedimiento), enlazadas a sus reglas por el tema; plantilla de notas en hoja de cálculo; botón 📖 en el hallazgo y en el PDF.
+- **Servidor propio** (`apps-script-scope/`): los clientes ejecutan sobre la copia del dueño, sin entrar en el portal.
+
 ## 2026.11.19
 - **Portal para clientes:** permisos por correo (activo, caducidad, notas maestras sí/no, paquetes asignados).
 - **Paquetes compartidos:** se bajan desde Diagnóstico y funcionan sin conexión; los autores los publican desde la app.

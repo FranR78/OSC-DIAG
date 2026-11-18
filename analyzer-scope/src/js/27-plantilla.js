@@ -42,12 +42,24 @@ function rgACsv(P){const L=[RG_COLS.join(';')];
     L.push((k?[r.id,'','','','',c.medida,c.op,v,c.por_cilindro?'si':'','','','','','','']:[r.id,r.tema||'',r.sintoma,rgL(cx.entidad)[0]||'',rgL(cx.combustible)[0]||'',c.medida,c.op,v,c.por_cilindro?'si':'',r.confianza||'media',r.estado||'',
       (r.causas||[]).map(q=>q.texto+(q.separar?' — '+q.separar:'')).join(' | '),((r.causas||[])[0]||{}).etiqueta||'',(r.comprobaciones||[]).map(q=>q.texto+(q.esperado?' → '+q.esperado:'')).join(' | '),r.fuente||'']).map(csvQ).join(';'))}));
   return'﻿'+L.join('\r\n')+'\r\n'}
-function rgPlantilla(){const L=[RG_COLS.join(';'),RG_AYUDA.map(csvQ).join(';'),...RG_EJ.map(r=>r.map(csvQ).join(';'))];
+const RG_NCOLS=['id','titulo','tema','texto','valores','fuente'];
+const RG_NAYUDA=['Identificador de la nota (N-01…)','Título','Mismo tema que sus reglas: se enlazan solas','Explicación o procedimiento (en Excel, Alt+Intro para saltos de línea)','Separados por |: «magnitud: valor unidad (condición)»','De dónde sale'];
+const RG_NEJ=[['N-01','Compresión relativa: cómo confirmarla','compresion-relativa','Si un cilindro sale bajo:\n- Prueba de fugas en ese cilindro\n- Si el aire sale por el escape, válvula de escape','presión de compresión: 25–32 bar (diésel, motor caliente)','Curso de diagnosis (ejemplo)']];
+function rgPlantillaNotas(){const L=[RG_NCOLS.join(';'),RG_NAYUDA.map(csvQ).join(';'),...RG_NEJ.map(r=>r.map(x=>csvQ(String(x).replace(/\\n/g,'\n'))).join(';'))];
+  saveFile('plantilla_notas_analyzer_scope.csv',new Blob(['\uFEFF'+L.join('\r\n')+'\r\n'],{type:'text/csv'}))}
+function rgNotasDeCsv(txt){const R=csvParse(txt);const H=(R[0]||[]).map(h=>h.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''));if(!H.includes('titulo')||!H.includes('texto'))return null;
+  const g=(r,k)=>H.indexOf(k)<0?'':String(r[H.indexOf(k)]||'').trim();
+  return R.slice(1).filter(r=>g(r,'id')&&!/^Identificador/i.test(g(r,'id'))).map(r=>{const o={id:g(r,'id'),titulo:g(r,'titulo'),texto:g(r,'texto'),fuente:g(r,'fuente'),
+    valores:g(r,'valores').split('|').map(x=>x.trim()).filter(Boolean).map(x=>{const m=/^(.*?):\s*([\d.,]+)(?:\s*[–-]\s*([\d.,]+))?\s*([^()]*?)\s*(?:\((.*)\))?$/.exec(x);if(!m)return{magnitud:x};
+      const v={magnitud:m[1].trim()},a=+m[2].replace(',','.');if(m[3]!=null){v.min=a;v.max=+m[3].replace(',','.')}else v.valor=a;if(m[4])v.unidad=m[4].trim();if(m[5])v.condicion=m[5].trim();return v})};if(g(r,'tema'))o.tema=g(r,'tema');return o})}
+function rgPlantilla(){setTimeout(rgPlantillaNotas,600);const L=[RG_COLS.join(';'),RG_AYUDA.map(csvQ).join(';'),...RG_EJ.map(r=>r.map(csvQ).join(';'))];
   saveFile('plantilla_reglas_analyzer_scope.csv',new Blob(['﻿'+L.join('\r\n')+'\r\n'],{type:'text/csv'}))}
 /* importar: .json (paquete) o .csv (hoja); los .csv entran en el paquete «Mis reglas» (sustituyen las reglas con el mismo id) */
 function rgImport(f){const rd=new FileReader();rd.onload=()=>{const txt=String(rd.result);let p=null;
   if(/\.json$/i.test(f.name)||/^\s*\{/.test(txt)){try{p=JSON.parse(txt)}catch(e){return $('xSt').textContent=i18('El archivo no es JSON.')}}
-  else{p=rgDeCsv(txt,'Mis reglas');if(!p)return $('xSt').textContent=i18('La hoja no tiene las columnas de la plantilla (id, medida…). Descarga la plantilla y rellénala.');
+  else{const NN=rgNotasDeCsv(txt);if(NN){const U=rgUsuario(),P=U[0],ids=new Set(NN.map(n=>n.id)),nuevo={...P,notas:(P.notas||[]).filter(n=>!ids.has(n.id)).concat(NN)},E=rgValida(nuevo);
+      if(E.length)return $('xSt').textContent=i18('Hoja no válida')+': '+E.slice(0,3).join(' ');U[0]=nuevo;rgGuardaUsuario(U);rgPanel();return $('xSt').textContent=i18('Notas cargadas desde la hoja')+': '+NN.length}
+    p=rgDeCsv(txt,'Mis reglas');if(!p)return $('xSt').textContent=i18('La hoja no tiene las columnas de la plantilla (id, medida…). Descarga la plantilla y rellénala.');
     const U=rgUsuario(),P=U[0],ids=new Set(p.reglas.map(r=>r.id));const nuevo={...P,reglas:P.reglas.filter(r=>!ids.has(r.id)).concat(p.reglas)};
     const E=rgValida(nuevo);if(E.length)return $('xSt').textContent=i18('Hoja no válida')+': '+E.slice(0,3).join(' ');
     U[0]=nuevo;rgGuardaUsuario(U);rgPanel();return $('xSt').textContent=i18('Reglas cargadas desde la hoja')+': '+p.reglas.length+' → '+(P.nombre||P.paquete)}
@@ -56,7 +68,8 @@ function rgImport(f){const rd=new FileReader();rd.onload=()=>{const txt=String(r
   const a=rgUsuario().filter(x=>x.paquete!==p.paquete);a.push(p);rgGuardaUsuario(a);rgPanel();
   $('xSt').textContent=i18('Paquete importado')+': '+(p.nombre||p.paquete)+' · '+p.reglas.length+' '+i18('reglas')};rd.readAsText(f)}
 $('xPqT').onclick=rgPlantilla;
-$('xPqE').onclick=()=>rgUsuario().forEach(P=>saveFile('reglas_'+P.paquete+'.csv',new Blob([rgACsv(P)],{type:'text/csv'})));
+function rgNotasACsv(P){return'\uFEFF'+[RG_NCOLS.join(';'),...(P.notas||[]).map(n=>[n.id,n.titulo,n.tema||'',n.texto||'',(n.valores||[]).map(v=>v.magnitud+': '+(v.valor!=null?v.valor:v.min+'–'+v.max)+(v.unidad?' '+v.unidad:'')+(v.condicion?' ('+v.condicion+')':'')).join(' | '),n.fuente||''].map(csvQ).join(';'))].join('\r\n')+'\r\n'}
+$('xPqE').onclick=()=>rgUsuario().forEach(P=>{saveFile('reglas_'+P.paquete+'.csv',new Blob([rgACsv(P)],{type:'text/csv'}));if((P.notas||[]).length)setTimeout(()=>saveFile('notas_'+P.paquete+'.csv',new Blob([rgNotasACsv(P)],{type:'text/csv'})),600)});
 /* portal: «Mis reglas» se guardan en tu cuenta (op reglas_leer / reglas_guardar), así las tienes en cualquier equipo */
 let rgSubeT=0;
 function rgSube(a){if(APP_CFG.modo!=='portal')return;clearTimeout(rgSubeT);rgSubeT=setTimeout(()=>{

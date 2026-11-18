@@ -26,6 +26,8 @@ function rgValida(p){const E=[];if(!p||typeof p!=='object')return['No es un paqu
         if(['entre','fuera'].includes(c.op)&&!(Array.isArray(c.valor)&&c.valor.length===2))E.push(w+'«'+c.op+'» necesita valor [a, b].');
         if(['<','<=','>','>='].includes(c.op)&&!isFinite(c.valor))E.push(w+'«'+c.op+'» necesita un número.')});
       if(r&&r.confianza&&!RG_CONF[r.confianza])E.push(w+'confianza alta, media o baja.')})}
+  if(p.notas!=null){if(!Array.isArray(p.notas))E.push('«notas» debe ser una lista.');else{const ni=new Set();p.notas.forEach((n,i)=>{const w='Nota '+(i+1)+': ';
+    if(!n||!n.id)E.push(w+'falta «id».');else if(ni.has(n.id))E.push(w+'«id» repetido.');else ni.add(n.id);if(!n||!n.titulo)E.push(w+'falta «titulo».')})}}
   return E}
 const rgL=v=>v==null||v===''?[]:Array.isArray(v)?v:[v];
 const rgCmp=(c,v)=>{if(v==null||!isFinite(v))return false;v=+v;const a=c.valor;
@@ -59,7 +61,8 @@ function rgEval(r,P,p){const H=[],motor=(p.contexto&&p.contexto.motor)||{},S=(p.
         const e={medida:m.id,canal:m.canal,cilindro:cyl,valor:v,condicion:rgCondTxt(c),etiqueta:'Medido'};
         if(rk){e.comparacion=rk;const q=rk.find(x=>x.cilindro===cyl);if(q&&pct==null)pct=q.pct_mejor}return e});
       const V={cil:cyl,valor:val,pct,canal:ch};
-      H.push({regla:r.id,tema:r.tema||'',paquete:P.paquete,paquete_nombre:P.nombre||P.paquete,base:!!P.base,fuente:r.fuente||'',estado:r.estado||'',
+      const NS=(P.notas||[]).filter(n=>rgL(r.notas).includes(n.id)||(r.tema&&n.tema===r.tema));
+      H.push({notas_paquete:NS,regla:r.id,tema:r.tema||'',paquete:P.paquete,paquete_nombre:P.nombre||P.paquete,base:!!P.base,fuente:r.fuente||'',estado:r.estado||'',
         local:true,comparativa:r.si.some(c=>c.op==='peor'),confianza:r.confianza||'media',etiqueta:r.etiqueta||'',
         sintoma:i18(rgSub(r.sintoma,V)),evidencia:ev,
         causas:(r.causas||[]).map(c=>({texto:i18(rgSub(c.texto,V)),etiqueta:c.etiqueta||'Inferido',como_separar:c.separar?i18(rgSub(c.separar,V)):''})),
@@ -90,8 +93,8 @@ function rgPanel(){const el=$('xPq');if(!el)return;el.innerHTML='';
   rgTodos().forEach(P=>{const l=T('label',null,'dxc'),cb=document.createElement('input');cb.type='checkbox';cb.checked=rgActivo(P);
     cb.onchange=()=>{rgSetActivo(P.paquete,cb.checked);DXR=null;$('xRes').innerHTML='';$('xSt').textContent=''};
     if(P.remoto){l.appendChild(cb);l.appendChild(document.createTextNode(' '+i18(P.nombre)+' · '+i18('reglas de cada nota técnica')));el.appendChild(l);return}
-    const n=(P.reglas||[]).length,b=(P.reglas||[]).filter(r=>r.estado==='borrador').length;
-    l.appendChild(cb);l.appendChild(document.createTextNode(' '+i18(P.nombre||P.paquete)+' · '+n+' '+i18(n===1?'regla':'reglas')+(b?' ('+b+' '+i18('en borrador')+')':'')+(P.base?' · '+i18('base, solo lectura'):'')));el.appendChild(l)})}
+    const n=(P.reglas||[]).length,b=(P.reglas||[]).filter(r=>r.estado==='borrador').length;const nn=(P.notas||[]).length;
+    l.appendChild(cb);l.appendChild(document.createTextNode(' '+i18(P.nombre||P.paquete)+' · '+n+' '+i18(n===1?'regla':'reglas')+(nn?' · '+nn+' '+i18(nn===1?'nota':'notas'):'')+(b?' ('+b+' '+i18('en borrador')+')':'')+(P.base?' · '+i18('base, solo lectura'):'')));el.appendChild(l)})}
 function rgExport(P){const o=Object.assign({},P);delete o.base;o.formato=RG_FMT;
   saveFile('reglas_'+o.paquete+'.json',new Blob([JSON.stringify(o,null,1)],{type:'application/json'}))}
 $('xPqI').onclick=()=>$('xPqF').click();

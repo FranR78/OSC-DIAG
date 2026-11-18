@@ -24,6 +24,12 @@ function rgeList(){const B=$('rgEB');B.innerHTML='';const U=rgUsuario();if(RGE.p
       rgeH('button',{text:'Borrar',onclick:()=>{if(row.dataset.ok){P.reglas.splice(i,1);rgGuardaUsuario(U);rgeList()}else{row.dataset.ok=1;row.querySelector('button:last-child').textContent=i18('¿Seguro? Pulsa otra vez')}}})]));
     ul.appendChild(row)});
   B.appendChild(ul);
+  B.appendChild(rgeH('p',{class:'hint',text:'Un paquete es un skill: reglas (lo que detecta) y notas (lo que sabe: explicación, valores, procedimiento). Las reglas se enlazan con sus notas por el tema.'}));
+  const nl=rgeH('div',{class:'tcy'});(P.notas||[]).forEach((n,i)=>{const row=rgeH('div',{class:'cy'});row.appendChild(rgeH('b',{text:'📖 '+n.titulo}));row.appendChild(rgeH('div',{class:'hint',text:(n.tema?n.tema+' · ':'')+n.id}));
+    row.appendChild(rgeH('div',{class:'row'},[rgeH('button',{text:'Editar',onclick:()=>rgeNota(JSON.parse(JSON.stringify(n)),i)}),
+      rgeH('button',{text:'Borrar',onclick:e=>{if(e.target.dataset.ok){P.notas.splice(i,1);rgGuardaUsuario(U);rgeList()}else{e.target.dataset.ok=1;e.target.textContent=i18('¿Seguro? Pulsa otra vez')}}})]));nl.appendChild(row)});
+  B.appendChild(rgeH('b',{text:'Notas del paquete'}));B.appendChild(nl);
+  B.appendChild(rgeH('div',{class:'row'},[rgeH('button',{text:'Nueva nota',onclick:()=>rgeNota({id:rgeNewIdN(P,'N-01'),titulo:'',tema:'',texto:'',valores:[],fuente:''},-1)})]));
   const base=rgeSel([['','— copiar una regla de la base —'],...REGLAS_BASE.flatMap(b=>b.reglas.map(r=>[b.paquete+'|'+r.id,(b.nombre||b.paquete)+' · '+r.id]))],'');
   base.onchange=()=>{const[pq,id]=base.value.split('|');const b=REGLAS_BASE.find(x=>x.paquete===pq);const r=b&&b.reglas.find(x=>x.id===id);if(!r)return;
     const c=JSON.parse(JSON.stringify(r));c.id=rgeNewId(P,'FR-'+r.id.replace(/^[A-Z]+-/,''));c.estado='borrador';c.fuente='';rgeForm(c,-1)};
@@ -33,6 +39,24 @@ function rgeList(){const B=$('rgEB');B.innerHTML='';const U=rgUsuario();if(RGE.p
     U.length>1?rgeH('button',{text:'Borrar paquete',onclick:e=>{if(e.target.dataset.ok){U.splice(RGE.pq,1);rgGuardaUsuario(U);RGE.pq=0;rgeList()}else{e.target.dataset.ok=1;e.target.textContent=i18('¿Seguro? Pulsa otra vez')}}}):null,
     rgeH('span',{class:'sp'}),rgeH('button',{text:'Cerrar',onclick:rgeClose})]))}
 function rgeNewId(P,id){const ids=new Set(P.reglas.map(r=>r.id));if(!ids.has(id))return id;const m=/^(.*?)(\d+)$/.exec(id)||[0,id+'-',1];let n=+m[2];while(ids.has(m[1]+String(n).padStart(2,'0')))n++;return m[1]+String(n).padStart(2,'0')}
+function rgeNewIdN(P,id){const ids=new Set((P.notas||[]).map(n=>n.id));if(!ids.has(id))return id;let k=1;while(ids.has('N-'+String(k).padStart(2,'0')))k++;return'N-'+String(k).padStart(2,'0')}
+/* formulario de una nota del paquete */
+function rgeNota(n,idx){const B=$('rgEB');B.innerHTML='';const U=rgUsuario(),P=U[RGE.pq];
+  const inp=(v,ml,ph)=>rgeH('input',{type:'text',value:v||'',maxlength:ml||120,placeholder:ph?i18(ph):null}),ta=(v,r,ph)=>{const t=rgeH('textarea',{rows:r,placeholder:ph?i18(ph):null});t.value=v;return t};
+  const fI=inp(n.id,30),fT=inp(n.titulo,120),fE=inp(n.tema,40,'p. ej. compresion-relativa'),fF=inp(n.fuente,120,'Curso, manual, ficha técnica…'),
+    fX=ta(n.texto||'',8,'# Cómo se hace\n- Paso 1…'),fV=ta((n.valores||[]).map(v=>v.magnitud+': '+(v.valor!=null?v.valor:v.min+'–'+v.max)+(v.unidad?' '+v.unidad:'')+(v.condicion?' ('+v.condicion+')':'')).join('\n'),3,'presión de compresión: 25–32 bar (motor caliente)');
+  fE.setAttribute('list','rgeTl2');const dl=rgeH('datalist',{id:'rgeTl2'});rgeTemas().forEach(t=>dl.appendChild(rgeH('option',{value:t})));
+  B.appendChild(rgeH('h3',{text:idx<0?'Nueva nota':'Notas del paquete'}));
+  B.appendChild(rgeH('div',{class:'rgg'},[rgeLbl('Identificador',fI),rgeLbl('Tema (igual que la regla de la otra fuente para compararlas)',fE),dl]));
+  B.appendChild(rgeLbl('Título',fT));B.appendChild(rgeLbl('Texto (se puede usar # títulos y - listas)',fX));
+  B.appendChild(rgeLbl('Valores de referencia: uno por línea, «magnitud: valor unidad (condición)»',fV));B.appendChild(rgeLbl('Fuente (de dónde sale el criterio)',fF));
+  const msg=rgeH('p',{class:'hint'});
+  const save=()=>{const o={id:fI.value.trim(),titulo:fT.value.trim(),texto:fX.value,fuente:fF.value.trim(),
+      valores:fV.value.split('\n').map(x=>x.trim()).filter(Boolean).map(x=>{const m=/^(.*?):\s*([\d.,]+)(?:\s*[–-]\s*([\d.,]+))?\s*([^()]*?)\s*(?:\((.*)\))?$/.exec(x);if(!m)return{magnitud:x};
+        const v={magnitud:m[1].trim()},a=+m[2].replace(',','.');if(m[3]!=null){v.min=a;v.max=+m[3].replace(',','.')}else v.valor=a;if(m[4])v.unidad=m[4].trim();if(m[5])v.condicion=m[5].trim();return v})};
+    if(fE.value.trim())o.tema=fE.value.trim();const notas=(P.notas||[]).filter((x,i)=>i!==idx).concat([o]),E=rgValida({paquete:'xx',reglas:[],notas});if(E.length)return msg.textContent=E.join(' ');
+    P.notas=P.notas||[];if(idx<0)P.notas.push(o);else P.notas[idx]=o;rgGuardaUsuario(U);rgeList()};
+  B.appendChild(msg);B.appendChild(rgeH('div',{class:'row'},[rgeH('button',{class:'p',text:'Guardar',onclick:save}),rgeH('button',{text:'Volver',onclick:rgeList})]));fT.focus()}
 /* formulario de una regla */
 function rgeForm(r,idx){const B=$('rgEB');B.innerHTML='';const U=rgUsuario(),P=U[RGE.pq];
   const inp=(v,ml,ph)=>rgeH('input',{type:'text',value:v||'',maxlength:ml||120,placeholder:ph?i18(ph):null});
@@ -62,12 +86,13 @@ function rgeForm(r,idx){const B=$('rgEB');B.innerHTML='';const U=rgUsuario(),P=U
     fCh=ta((r.comprobaciones||[]).map(c=>c.texto+(c.esperado?' → '+c.esperado:'')),'Una comprobación por línea, en orden. Opcional: « → valor esperado»');
   B.appendChild(rgeH('div',{class:'rgg'},[rgeLbl('Posibles causas',fCa),rgeLbl('Etiqueta de las causas',fEt)]));
   B.appendChild(rgeLbl('Comprobaciones',fCh));B.appendChild(rgeLbl('Fuente (de dónde sale el criterio)',fFu));
+  const fNo=inp(rgL(r.notas).join(', '),120);B.appendChild(rgeLbl('Notas enlazadas (ids separados por comas; o se enlazan solas por el tema)',fNo));
   B.appendChild(rgeH('p',{class:'hint',text:'En los textos: {cil} = cilindro, {valor} = valor medido, {pct} = % del mejor, {canal} = canal.'}));
   const msg=rgeH('p',{class:'hint',id:'rgeM'});
   const get=()=>{const o={id:fId.value.trim(),tema:fTe.value.trim(),sintoma:fSi.value.trim(),si:[...CS.children].map(x=>x._get()),confianza:fCo.value,estado:fEs.value,fuente:fFu.value.trim(),
       causas:fCa.value.split('\n').map(x=>x.trim()).filter(Boolean).map(x=>{const[a,b]=x.split(/\s+—\s+/);const c={texto:a,etiqueta:fEt.value};if(b)c.separar=b;return c}),
       comprobaciones:fCh.value.split('\n').map(x=>x.trim()).filter(Boolean).map(x=>{const[a,b]=x.split(/\s*→\s*/);const c={texto:a,tipo:'prueba'};if(b)c.esperado=b;return c})};
-    const c={};if(fEn.value)c.entidad=[fEn.value];if(fCb.value)c.combustible=[fCb.value];if(Object.keys(c).length)o.contexto=c;if(!o.tema)delete o.tema;return o};
+    const c={};if(fEn.value)c.entidad=[fEn.value];if(fCb.value)c.combustible=[fCb.value];if(Object.keys(c).length)o.contexto=c;if(!o.tema)delete o.tema;const nn=fNo.value.split(/[,;\s]+/).filter(Boolean);if(nn.length)o.notas=nn;return o};
   const test=()=>{const o=get(),E=rgValida({paquete:'xx',reglas:[o]});if(E.length)return msg.textContent=E.join(' ');
     if(!CH.some(c=>c.x))return msg.textContent=i18('Carga una señal para probar la regla.');
     const p=dxPeticion(),h=rgEval(o,{paquete:P.paquete,nombre:P.nombre},p);

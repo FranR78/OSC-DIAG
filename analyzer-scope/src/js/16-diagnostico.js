@@ -93,10 +93,15 @@ function dxShow(res){
     if(h.comprobaciones&&h.comprobaciones.length){d.appendChild(T('h4',i18('Comprobaciones')));
       h.comprobaciones.forEach((c,ci)=>{const l=T('label',null,'dxc'),cb=document.createElement('input');cb.type='checkbox';cb.checked=!!c._ok;cb.onchange=()=>{c._ok=cb.checked};
         l.appendChild(cb);l.appendChild(document.createTextNode(' '+c.orden+'. '+c.texto+(c.esperado?' → '+c.esperado:'')));d.appendChild(l)})}
+    (h.notas_paquete||[]).forEach(n=>{const b=T('button','📖 '+n.titulo,'nu');b.onclick=()=>rgNotaVer(n,h.paquete_nombre);d.appendChild(b)});
     if(h.url_portal)d.appendChild(lnk(h.url_portal,i18('Nota técnica')+': '+(h.nt_titulo||h.nt_id)));box.appendChild(d)});
   if(res.relacionadas&&res.relacionadas.length){box.appendChild(T('h4',i18('Notas relacionadas')));res.relacionadas.forEach(r=>{const d=T('div');d.appendChild(lnk(r.url_portal,r.titulo));box.appendChild(d)})}
   if(res.aviso)box.appendChild(T('p','⚠ '+res.aviso,'hint'));
 }
+/* nota de un paquete (skill): texto, valores de referencia y fuente, como una NT */
+function rgNotaVer(n,pq){const box=$('xRes'),prev=[...box.childNodes];box.innerHTML='';const back=T('button',i18('← Volver al diagnóstico'));back.onclick=()=>{box.innerHTML='';prev.forEach(x=>box.appendChild(x))};
+  box.appendChild(back);box.appendChild(T('h3',n.titulo));box.appendChild(T('div',i18('Fuente')+': '+(pq||'')+(n.fuente?' · '+n.fuente:''),'hint'));box.appendChild(mdRender(n.texto||''));
+  (n.valores||[]).forEach(v=>box.appendChild(T('div',v.magnitud+': '+(v.valor!=null?v.valor:(v.min+'–'+v.max))+' '+(v.unidad||'')+(v.condicion?' ('+v.condicion+')':'')+(v.etiqueta?' · '+v.etiqueta:''),'s')))}
 const dxBusy=m=>{$('xSt').textContent=m;$('xRes').innerHTML=''};
 function dxGo(){const p=dxMedidas();delete p._cil;if(!p.medidas.length)return;const loc=dxLocal(p);
   if(APP_CFG.modo!=='portal'&&!APP_CFG.apiUrl){dxShow(loc);if(!loc.hallazgos.length)$('xSt').textContent=i18('Ninguna regla de las fuentes activas se cumple con estas señales (o falta activar «Cilindros» o la compresión relativa).');return}

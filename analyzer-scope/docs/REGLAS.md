@@ -1,4 +1,7 @@
-# Fuente de conocimiento · paquetes de reglas
+# Fuente de conocimiento · paquetes de reglas (skills)
+
+Un **paquete es un skill**: **reglas** (lo que detecta) + **notas** (lo que sabe: explicación, valores de referencia,
+procedimiento para confirmar o reparar). Cada hallazgo enseña las notas de su paquete enlazadas (botón 📖), que salen también en el PDF.
 
 El diagnóstico local de Analyzer Scope (las dos versiones) no lleva criterios escritos en el código: los lee de **paquetes de reglas**.
 
@@ -44,6 +47,11 @@ Es el mismo esquema que las reglas del portal (`API_DIAGNOSTICO.md` §5), en JSO
 * `contexto` (opcional): solo se evalúa si coincide la entidad de la señal, el combustible o el número de cilindros.
 * Textos: `{cil}`, `{valor}`, `{pct}` (% del mejor) y `{canal}` se sustituyen.
 * `tema`: los criterios que tratan lo mismo llevan el mismo tema, así se comparan entre fuentes.
+* `notas` (en la regla, opcional): ids de notas del paquete. Sin ellas, la regla se enlaza sola con las notas de su mismo `tema`.
+* **Notas del paquete** (`"notas": [...]` junto a `"reglas"`): `{ "id": "N-01", "titulo": "...", "tema": "...", "texto": "# títulos y - listas",
+  "valores": [{ "magnitud": "...", "valor": 0 | "min": 0, "max": 0, "unidad": "...", "condicion": "..." }], "fuente": "..." }`.
+  Plantilla aparte en hoja de cálculo (`plantilla_notas_analyzer_scope.csv`, columnas `id; titulo; tema; texto; valores; fuente`;
+  valores separados por `|` como «magnitud: 25–32 bar (condición)»). Se sube con el mismo botón.
 * `estado`: `validada` o `borrador` (sale marcada «BORRADOR» en pantalla y en el PDF).
 
 ## Editor («Diagnóstico → Editar mis reglas…»)
