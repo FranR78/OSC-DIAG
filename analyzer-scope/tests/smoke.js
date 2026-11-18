@@ -279,6 +279,9 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
       pmi.on = true; pmi.t = pms.t + 190 * d; const b = distCalc(); pmi.on = false; vv.on = false; draw(); return [a.aae, a.rca, b.aae, b.rca, b.pmi]; });
     check('regla PMI propia: AAE y RCA se miden desde ella (PMI a 190° → AAE +10°, RCA −10°)', Math.abs(pm[0] - 45) < .01 && Math.abs(pm[1] - 45) < .01 && Math.abs(pm[2] - 55) < .01 && Math.abs(pm[3] - 35) < .01, JSON.stringify(pm)); }
 
+  check('animación con las reglas AAA·RCE·AAE·RCA: con AAA 25° la admisión ya abre a 340° (con el típico de 10°, no)', await E(() => {
+    ph.auto = false; ph.T = view.span / 2; ph.t0 = view.t0; eng.on = true; eng.A = null; pms.on = true; pms.t = engA(); const d = ph.T / 720, P = pms.t, c = eng.c0 || 1, li = g => amCyl(P + g * d, c).li;
+    const a = li(340); vv.ia = P - 25 * d; vv.fe = P + 15 * d; vv.ie = P + 130 * d; vv.fa = P + 220 * d; const b = li(340), v = amVal(); vv.ia = vv.fe = vv.ie = vv.fa = null; return a === 0 && b > 0 && v.med && v.aaa === 25; }));
   console.log('\nF7 · Barra de grados con animación al arrastrar');
   { await E(() => { ph.auto = false; ph.t0 = view.t0 + view.span * .1; ph.T = view.span * .8; eng.on = true; eng.A = null; draw(); gdOn(true); });
     const bx = await p.$eval('#cv', c => { const r = c.getBoundingClientRect(); return { x: r.x, y: r.y }; }), gx = await E(() => gdX()), gy = await E(() => M.t + PH() / 2);

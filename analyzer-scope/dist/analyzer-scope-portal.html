@@ -2595,9 +2595,11 @@ function amPaint(g2,W,Hh,t,ov){
   g2.textAlign='center';
   for(let n=1;n<=N;n++){const q=amCyl(t,n,V),cx=x0+cw*(n-.5),cyc0=top+ph0/2+R+L+6,py=cyc0-(R*Math.cos(q.th)+Math.sqrt(L*L-R*R*Math.sin(q.th)**2)),pt=py-ph0/2,col=ST4[q.st][1];
     /* mezcla: puntos fijos por cilindro; entran en ADM, se aprietan en COMP, arden en EXP y salen en ESC */
-    const ch=Math.max(1,pt-top),np=28,vis=q.st===0?q.s:q.st===3?q.s:1,burn=q.st===2&&q.a<60;
+    /* la mezcla sigue a las válvulas (AAA·RCE·AAE·RCA): entra mientras abre la admisión y sale mientras abre el escape */
+    const ia=360-V.aaa,ic=540+V.rca,ea=180-V.aae,ec=360+V.rce,cl=x=>Math.max(0,Math.min(1,x)),fresh=q.a>=ia,
+      ch=Math.max(1,pt-top),np=28,vis=fresh?(q.a<ic?cl((q.a-ia)/(ic-ia)):1):(q.a>=ea?1-cl((q.a-ea)/(ec-ea)):1),burn=q.a<60;
     for(let k=0;k<np;k++){if(k/np>=vis)break;const r1=Math.abs(Math.sin(n*12.9898+k*78.233)*43758.5453)%1,r2=Math.abs(Math.sin(n*39.3468+k*11.135)*24634.6345)%1;
-      g2.fillStyle=burn?(k%3?'#ffb14d':'#ff6b4d'):q.st>=2?'#9aa6b3':'#3da5ff';g2.globalAlpha=burn?.95:.8;
+      g2.fillStyle=burn?(k%3?'#ffb14d':'#ff6b4d'):fresh?'#3da5ff':'#9aa6b3';g2.globalAlpha=burn?.95:.8;
       g2.beginPath();g2.arc(cx-bw/2+3+r1*(bw-6),top+2+r2*(ch-4),q.st===1?1.6+.8*(1-q.s):1.5,0,6.2832);g2.fill()}
     g2.globalAlpha=1;
     if(burn){g2.globalAlpha=.35*Math.max(0,1-q.a/60);g2.fillStyle='#ffb14d';g2.fillRect(cx-bw/2,top,bw,ch);g2.globalAlpha=1}
