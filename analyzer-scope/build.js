@@ -15,6 +15,7 @@
  *   {{base64:ruta}}   archivo en base64 (para data: URI)
  *   {{ejemplos:dir}}  los .csv de src/dir como JSON [{name, txt}] (el desarrollador añade ejemplos soltándolos ahí)
  *   {{reglas:dir}}    los .json de src/dir (paquetes de reglas base) como JSON [paquete]
+ *   {{scripts:dir}}   los .json de src/dir (scripts de captura base, docs/SCRIPTS.md) como JSON [script]
  *   {{appcfg}}        APP_CFG = {modo, ver, portalUrl, apiUrl}
  *   {{js/*.js}}       todos los .js de src/js en orden alfabético (un solo <script>, ámbito global compartido)
  * Sin dependencias. */
@@ -37,6 +38,12 @@ function build(modo) {
       const d = k.slice(7), dir = path.join(SRC, d);
       const list = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => /\.json$/i.test(f)).sort().map(f => JSON.parse(rd(d + '/' + f))) : [];
       list.forEach(p => { if (!p.paquete || !Array.isArray(p.reglas)) throw new Error('paquete de reglas mal escrito: ' + d); });
+      return JSON.stringify(list).replace(/<\//g, '<\\/').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+    }
+    if (k.startsWith('scripts:')) {  // scripts de captura base (src/scripts/*.json); los del usuario van en su navegador
+      const d = k.slice(8), dir = path.join(SRC, d);
+      const list = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => /\.json$/i.test(f)).sort((a, b) => a.localeCompare(b, 'es', { numeric: true })).map(f => JSON.parse(rd(d + '/' + f))) : [];
+      list.forEach(s => { if (s.formato !== 'analyzer-scope-script/1' || !s.id || !Array.isArray(s.pasos) || !s.pasos.length) throw new Error('script mal escrito: ' + d + ' ' + (s.id || '')); });
       return JSON.stringify(list).replace(/<\//g, '<\\/').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
     }
     if (k === 'appcfg') {

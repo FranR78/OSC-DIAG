@@ -211,3 +211,31 @@ body:not(.fix) #tZm{font-weight:600;display:inline-flex;align-items:center}
 body:not(.fix) header>*{min-width:0}body:not(.fix) #bOpen,body:not(.fix) #bVw{flex:0 1 auto;min-width:0;overflow:hidden;white-space:nowrap}body:not(.fix) #bMore,body:not(.fix) .logo{flex:none}
 #chips{min-width:0}
 .ver{color:var(--mu);font-size:11.5px;font-variant-numeric:tabular-nums}#hMore .ver{padding:4px 2px 0;text-align:center}body.fix #verM{align-self:center}
+/* ---- Scripts de captura (32-scripts.js) ---- */
+.skw{display:grid;grid-template-columns:260px minmax(0,1fr);gap:14px;align-items:start}@media(max-width:860px){.skw{grid-template-columns:minmax(0,1fr)}}
+.skL{border:1px solid var(--bd);border-radius:12px;padding:10px;display:grid;gap:4px;background:var(--card)}
+.skH{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:8px 0 4px}.skL .skH:first-child{margin-top:0}
+.skH2{display:block;font-size:16px;margin-bottom:8px}
+.skI{display:grid;gap:1px;text-align:left;width:100%;background:transparent;border:1px solid transparent;padding:7px 9px}.skI small{color:var(--mu);font-size:12px}
+.skI.on{background:rgba(61,139,255,.16);border-color:var(--ac)}
+.skM{display:grid;gap:12px;min-width:0}#kPaso{display:grid;gap:12px;min-width:0}
+.skC{border:1px solid var(--bd);border-radius:12px;padding:12px 14px;background:var(--card);min-width:0}
+.skCab{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;justify-content:space-between}.skTt{min-width:0;flex:1 1 300px}.skTt h2{margin:0;font-size:19px}.skTt .hint{margin:4px 0 0}
+.skB{font-size:10.5px;padding:1px 7px;border-radius:9px;border:1px solid var(--gold);color:var(--gold);vertical-align:3px;letter-spacing:.04em}
+.skSteps{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.skS{flex:none;display:flex;align-items:center;gap:7px;border-radius:20px;padding:5px 11px}.skS i{font-style:normal;width:21px;height:21px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;border:1px solid var(--bd)}
+.skS.on{border-color:var(--ac)}.skS.on i{background:var(--ac);color:#fff;border-color:var(--ac)}.skS.ok i{background:#22a35a;color:#fff;border-color:#22a35a}
+.skG2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}@media(max-width:1100px){.skG2{grid-template-columns:minmax(0,1fr)}}.skMin{min-width:0}
+.skTw{overflow-x:auto}.skTb{border-collapse:collapse;width:100%;font-size:13px}.skTb th,.skTb td{text-align:left;padding:5px 7px;border-bottom:1px solid var(--bd);vertical-align:top}.skTb th{color:var(--mu);font-weight:600;font-size:12px}.skTb .nw{white-space:nowrap}
+.skCh{display:inline-grid;place-items:center;width:23px;height:23px;border-radius:6px;color:#000;font-weight:700;font-size:12px}
+.skO{margin:0;padding-left:20px}.skO li{margin:4px 0}
+.skP{width:100%;height:auto;display:block}
+.skLg{display:flex;flex-wrap:wrap;gap:3px 12px;font-size:12px;color:var(--mu);margin-top:4px}.skLg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.skKv{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}.skKv div{border:1px solid var(--bd);border-radius:8px;padding:5px 9px}.skKv small{display:block;color:var(--mu);font-size:11.5px}.skKv b{font-variant-numeric:tabular-nums;font-size:15px}
+.skCk{display:grid;gap:6px;margin-top:10px}
+.skA{display:grid;grid-template-columns:20px 1fr;gap:6px;padding:6px 10px;border-radius:8px;font-size:13px}.skA>span{color:var(--tx)}
+.skA.ok{background:rgba(34,197,94,.14);color:#4ade80}.skA.warn{background:rgba(245,165,36,.15);color:#ffc266}.skA.bad{background:rgba(255,77,77,.15);color:#ff7a7a}
+body.light .skA.ok{background:#e3f6ea;color:#15803d}body.light .skA.warn{background:#fff1d6;color:#a85d00}body.light .skA.bad{background:#fde8e8;color:#b42323}
+.skC .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.skC .row .sp{flex:1}.skC label{display:flex;align-items:center;gap:6px;font-size:13px}
+.skTx{width:100%;min-height:360px;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;resize:vertical}
+.skS.wa i{background:#d98a00;color:#fff;border-color:#d98a00}

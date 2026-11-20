@@ -1,0 +1,11 @@
+{ "formato": "analyzer-scope-script/1", "id": "FR-COMP-01", "nombre": "Compresión relativa", "autor": "Fran Rosales", "version": "2026.11.20", "estado": "borrador",
+  "combustible": ["gasolina", "diesel"], "skills": ["compresion-relativa"],
+  "descripcion": "Una sola captura de arrastre con pinza de corriente y sincronismo del cilindro 1.",
+  "pasos": [
+    { "id": "P1", "titulo": "Compresión relativa",
+      "canales": [ { "canal": "A", "senal": "Corriente de arranque", "sonda": "Pinza amperimétrica", "rango": "±600 A", "entidad": "pinza arranque" },
+                   { "canal": "B", "senal": "Bobina 1 (o inyector 1 en common rail)", "sonda": "Pinza inductiva / punta 10:1", "rango": "±20 V", "entidad": "encendido" } ],
+      "como": [ "Cortar la inyección (fusible o relé de la bomba) para que el motor no arranque.", "Pinza en el cable del motor de arranque, flecha hacia el motor.", "Sincronismo en el cilindro 1: marca su PMS de compresión." ],
+      "maniobra": [ { "fase": "Reposo", "tipo": "reposo", "s": 1, "rpm": [0, 0] }, { "fase": "Arrastre", "tipo": "arrastre", "s": 6, "rpm": [250, 250] }, { "fase": "Soltar llave", "tipo": "parada", "s": 1, "rpm": [250, 0] } ],
+      "requisitos": { "fs_min": 20000, "rpm_max": 330, "criterio": "grados" },
+      "fuente": "Curso de scripts, pág. 95–96: 170–330 RPM de arrastre, 5–10 ciclos, cada cilindro 90–100 %." } ] }

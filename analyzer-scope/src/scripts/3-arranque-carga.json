@@ -1,0 +1,12 @@
+{ "formato": "analyzer-scope-script/1", "id": "FR-POW-01", "nombre": "Arranque y carga", "autor": "Fran Rosales", "version": "2026.11.20", "estado": "borrador",
+  "combustible": ["gasolina", "diesel"], "skills": ["bateria", "arranque", "carga"],
+  "descripcion": "Batería, motor de arranque, bujías de incandescencia y alternador en una captura (método El Power).",
+  "pasos": [
+    { "id": "P1", "titulo": "Batería, arranque y carga",
+      "canales": [ { "canal": "A", "senal": "Tensión de batería", "sonda": "Puntas en los bornes", "rango": "±20 V", "entidad": "batería" },
+                   { "canal": "B", "senal": "Corriente de batería", "sonda": "Pinza amperimétrica en el negativo", "rango": "±600 A", "entidad": "pinza batería" } ],
+      "como": [ "Batería cargada y vehículo en reposo 1 h.", "Empezar a grabar con el contacto quitado.", "Diésel: dar contacto y esperar a que se apaguen las bujías.", "Arrancar, dejar a ralentí con consumidores y subir a 2500 RPM." ],
+      "maniobra": [ { "fase": "Contacto quitado", "tipo": "reposo", "s": 3, "rpm": [0, 0] }, { "fase": "Contacto", "tipo": "contacto", "s": 6, "rpm": [0, 0] }, { "fase": "Arranque", "tipo": "arrastre", "s": 2, "rpm": [250, 800] },
+                    { "fase": "Ralentí", "tipo": "ralenti", "s": 12, "rpm": [800, 800] }, { "fase": "2500 RPM", "tipo": "suave", "s": 12, "rpm": [2500, 2500] } ],
+      "requisitos": { "fs_min": 10000, "rpm_max": 2500, "criterio": "ninguno" },
+      "fuente": "Curso de scripts, pág. 87–99: no bajar de 9 V al arrancar; carga 13,8–15 V." } ] }

@@ -30,7 +30,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
 
   console.log('\n1 · Arranque');
   check('título con los créditos', (await p.title()).includes('J.A.Ortúñez') && (await p.title()).includes('Fran Rosales'));
-  check('ocho pestañas', (await p.$$eval('#tabs .tab', e => e.map(x => x.textContent))).join('|') === 'Osciloscopio|Diagrama de distribución|Compresión relativa|Diagnóstico|Unir y convertir CSV|GIF|Instrucciones|Objetivo');
+  check('nueve pestañas', (await p.$$eval('#tabs .tab', e => e.map(x => x.textContent))).join('|') === 'Osciloscopio|Diagrama de distribución|Compresión relativa|Scripts|Diagnóstico|Unir y convertir CSV|GIF|Instrucciones|Objetivo');
   check('ajustes de canales visibles por defecto', await E(() => !document.getElementById('leftp').classList.contains('nos')));
   check('sección «Sincronización» plegada por defecto', await E(() => document.getElementById('sBox').hidden));
   check('«Regla de fase» e «Identificación de cilindros» desplegadas al iniciar', await E(() => !$('bPh').hidden && !$('bCy').hidden && $('oPh').checked && $('oCy').checked));
@@ -109,7 +109,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
   await click('#lEN'); await p.waitForTimeout(300);
   const left = [];
   const tabTxt = () => E(() => { let bt = document.body.innerText; [...document.querySelectorAll('#ex option')].slice(1).forEach(op => { bt = bt.split(op.textContent).join(''); }); const o = [bt]; document.querySelectorAll('[title],[placeholder]').forEach(e => { ['title', 'placeholder'].forEach(a => { const v = e.getAttribute(a); if (v) o.push(v); }); }); return o.join('\n'); });
-  for (const t of ['#tabS', '#tabD', '#tabC', '#tabX', '#tabF', '#tabG', '#tabI', '#tabO']) { await click(t); await p.waitForTimeout(150); left.push(...spanish(await tabTxt())); }
+  for (const t of ['#tabS', '#tabD', '#tabC', '#tabK', '#tabX', '#tabF', '#tabG', '#tabI', '#tabO']) { await click(t); await p.waitForTimeout(150); if (t === '#tabK') await E(() => document.querySelectorAll('.skD').forEach(e => { e.hidden = true; })); left.push(...spanish(await tabTxt())); }
   check('sin texto en español en inglés (todas las pestañas)', left.length === 0, JSON.stringify([...new Set(left)]));
   check('mensajes de estado traducidos', await E(() => { st('Nada que exportar.'); return document.getElementById('st').textContent; }) === 'Nothing to export.');
   await click('#tabS'); await click('#lES'); await p.waitForTimeout(200);
@@ -565,6 +565,31 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('reglas de 720° bloqueadas: al llevarlas a otra zona van con ellas los cilindros, el PMS y las reglas de distribución y avance (mismos grados)', await q.evaluate(() => { ph.lk = true; ph.t0 = view.t0 + view.span * .3; eng.A = ph.t0 + ph.T / 2 + 0.001; const A0 = engA(), t0 = ph.t0, dt = view.span * .1; pms.t = t0 + .01; vv.ia = t0 + .02; vv.fe = t0 + .03; adv.t = t0 + .004; adv.i1 = t0 + .005; drag = { snap: { t0: t0, A: A0, pms: pms.t, vv: { ia: vv.ia, fa: vv.fa, ie: vv.ie, fe: vv.fe }, adv: { t: adv.t, i1: adv.i1, i2: adv.i2 } } }; const rd = () => JSON.stringify(distCalc(), (k, v) => typeof v === 'number' ? +v.toFixed(6) : v), dc0 = rd(); const ok = lockMove({ k: 'p1' }, dt) && Math.abs(ph.t0 - (t0 + dt)) < 1e-12 && Math.abs(engA() - (A0 + dt)) < 1e-12 && Math.abs(pms.t - (t0 + .01 + dt)) < 1e-12 && Math.abs(vv.ia - (t0 + .02 + dt)) < 1e-12 && Math.abs(vv.fe - (t0 + .03 + dt)) < 1e-12 && Math.abs(adv.t - (t0 + .004 + dt)) < 1e-12 && Math.abs(adv.i1 - (t0 + .005 + dt)) < 1e-12 && rd() === dc0; drag = null; ph.lk = false; return ok; }));
     check('unidades, rueda y lupa: sin errores JS', qe.length === 0, qe.join(' | '));
     await c7.close();
+  }
+
+  console.log('\nF8 · Scripts de captura (pasos guiados para PicoScope)');
+  {
+    const k = await ctx.newPage(); const ke = []; k.on('pageerror', e => ke.push(String(e))); k.setDefaultTimeout(6000);
+    await k.goto(APP); await k.waitForTimeout(400); await k.click('#tabK'); await k.waitForTimeout(150);
+    const KE = fn => k.evaluate(fn);
+    check('originales: los scripts de src/scripts, de solo lectura', await KE(() => SCRIPTS_BASE.length >= 5 && document.querySelectorAll('#kL .skI').length >= 5 && /solo lectura/.test($('kCab').textContent) && !$('kEd')));
+    check('pasos en orden: configurar, 3 capturas y resumen', await KE(() => [...document.querySelectorAll('#kSteps .skS')].map(b => b.textContent).join('|') === '0Configurar PicoScope|1Compresión relativa|2Admisión y cárter|3Escape|★Resumen'));
+    await k.click('#kSteps .skS[data-s="2"]'); await k.selectOption('#kTb', '0.005'); await k.waitForTimeout(100);
+    check('5 ms/div: avisa de que no se ve el proceso completo y propone 2 s/div', /✗Tiempo\. Con 5 ms\/div la pantalla dura 50 ms.*Sube a 2 s\/div/.test(await k.textContent('#kCk')), await k.textContent('#kCk'));
+    await k.click('#kRec'); await k.waitForTimeout(100);
+    check('«Usar lo recomendado»: tiempo, muestreo, resolución y tamaño en verde', await KE(() => $('kTb').value === '2' && [...document.querySelectorAll('#kCk .skA')].every(a => a.classList.contains('ok'))), await k.textContent('#kCk'));
+    const [fc] = await Promise.all([k.waitForEvent('filechooser'), k.click('#kLoad')]); await fc.setFiles(CAPS[0]); await k.waitForTimeout(600);
+    check('CSV del paso: comprueba canales, duración y muestreo frente al paso', await KE(() => /canales \(el paso pide 4\)/.test($('kDrop').textContent) && /Dura .* \(la maniobra necesita 18 s\)/.test($('kDrop').textContent) && document.querySelector('#kSteps .skS[data-s="2"]').classList.contains('wa')), await k.textContent('#kDrop'));
+    await k.click('#kVer'); await k.waitForTimeout(200);
+    check('«Ver en el osciloscopio» abre la captura', await KE(() => curTab === 'S' && PG.length >= 1 && CH[0].x));
+    await k.click('#tabK'); await k.click('#kDup'); await k.waitForTimeout(150);
+    check('duplicar: copia en «Mis scripts», con editor y sin tocar el original', await KE(() => { const u = JSON.parse(localStorage.getItem('as_scripts')); return u.length === 1 && u[0].origen.id === 'FR-MEC-01' && !!$('kTx') && SCRIPTS_BASE[0].nombre === 'Mecánica sin desmontar'; }));
+    await k.evaluate(() => { $('kTx').value = $('kTx').value.replace('"pasos": [', '"pasos": [], "x": ['); }); await k.click('#kGu');
+    check('editor: un script mal escrito no se guarda y dice por qué', /No se guarda: no tiene pasos/.test(await k.textContent('#kESt')), await k.textContent('#kESt'));
+    await k.evaluate(() => { const o = JSON.parse(JSON.stringify(SCRIPTS_BASE[0])); o.nombre = 'Mi mecánica'; $('kTx').value = JSON.stringify(o); }); await k.click('#kGu');
+    check('editor: guarda los cambios en la copia', await KE(() => JSON.parse(localStorage.getItem('as_scripts'))[0].nombre === 'Mi mecánica' && /Mi mecánica/.test($('kL').textContent)));
+    check('scripts: sin errores JS', ke.length === 0, ke.join(' | '));
+    await k.close();
   }
 
   console.log(`\nRESULTADO: ${ok} correctas, ${bad} fallidas`);

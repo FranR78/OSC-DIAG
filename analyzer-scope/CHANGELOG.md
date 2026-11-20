@@ -3,6 +3,13 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.20
+- **Pestaña «Scripts»:** pruebas guiadas para PicoScope. Cada script dice qué medir (canal, señal, sonda, rango), cómo y la maniobra en orden, con su perfil de RPM.
+- **Comprobación de PicoScope por paso:** con la base de tiempos y las muestras que pongas, avisa si la pantalla no abarca la maniobra (p. ej. 5 ms/div), si el muestreo o la resolución no llegan y del tamaño del CSV; «Usar lo recomendado».
+- **CSV por paso:** se carga en su paso y se comprueba (canales, duración, muestreo); se abre en el osciloscopio.
+- **Originales y copias:** 5 scripts base (borrador) de solo lectura; «Duplicar y editar», importar y exportar (.json). Formato en `docs/SCRIPTS.md`.
+- **Qué probar:** paso 2 de «Mecánica sin desmontar» con 5 ms/div y luego «Usar lo recomendado»; cargar un CSV real de PicoScope; duplicar y cambiar una duración.
+
 ## 2026.11.19b
 - **Skills = reglas + notas:** cada paquete puede llevar notas (explicación, valores de referencia, procedimiento), enlazadas a sus reglas por el tema; plantilla de notas en hoja de cálculo; botón 📖 en el hallazgo y en el PDF.
 - **Servidor propio** (`apps-script-scope/`): los clientes ejecutan sobre la copia del dueño, sin entrar en el portal.
