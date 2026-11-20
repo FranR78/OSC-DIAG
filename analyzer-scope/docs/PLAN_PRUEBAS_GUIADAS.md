@@ -6,16 +6,33 @@ Inspiración: los scripts de Autoscope (Px, CSS, El Power) del curso de referenc
 
 ---------------------------------------------------------------------------------------------------
 
+## 0. Decisiones (2026-11-20)
+
+* Dentro de Analyzer Scope, como vista nueva. Un CSV por paso. Scripts editables.
+* La app tiene **tres apartados**:
+
+| Apartado | Qué es | Base (solo lectura) | Del usuario |
+|---|---|---|---|
+| **Skills** | Saber qué pasa: reglas + notas (lo que ya existe, `REGLAS.md`) | Ortu, Fran | «Mis skills», desde plantilla o duplicando |
+| **Scripts** | Saber qué hacer: pasos de captura guiada (antes «protocolo») | Los que suba Fran (Px-mecánica, Power…) | Duplicar y modificar. **Nunca** se modifica un original |
+| **Portal (VIP)** | Fuente de conocimiento del portal + skills y scripts VIP | Solo con acceso de pago | — |
+
+* **Duplicar** = copia en «Mis scripts» / «Mis skills» con `origen: { id, version, autor }`. El original sigue intacto y
+  puede actualizarse; la copia avisa «hay versión nueva del original» y no se toca sola.
+* **VIP**: se reutiliza el control de acceso que ya hay en el portal (`API_DIAGNOSTICO.md` §13: permisos por correo, rol, caducidad).
+  Sin acceso → la app funciona con skills y scripts locales y enseña el contenido VIP como «🔒 Portal VIP». El contenido VIP
+  llega solo por el portal (`paquete_bajar`, y lo análogo `script_bajar`); **nunca** va incrustado en la versión libre.
+
 ## 1. Conceptos
 
 | Concepto | Qué es |
 |---|---|
-| **Protocolo** | Receta de diagnóstico (p. ej. «Motor gasolina · mecánica completa»). Lista ordenada de pasos. JSON, mismo modelo que los paquetes de reglas (base en git + propios del usuario). |
+| **Script** | Receta de captura (p. ej. «Gasolina · mecánica completa», «Power»). Lista ordenada de pasos + skills que usa. JSON, mismo modelo que los paquetes de reglas: base en git o portal (solo lectura) + propios del usuario. |
 | **Paso** | Una captura = un CSV. Define canales, sondas, ajustes de PicoScope y maniobras. |
 | **Fase** | Tramo dentro de un paso: `ralenti`, `acel_suave`, `acel_brusca`, `parada`, `arranque`. La app las detecta sola. |
-| **Sesión** | Un protocolo aplicado a un vehículo: los CSV cargados, sus resultados y el informe. Se guarda/abre como archivo. |
+| **Sesión** | Un script aplicado a un vehículo: los CSV cargados, sus resultados y el informe. Se guarda/abre como archivo. |
 
-## 2. Protocolo inicial (el del profesor)
+## 2. Script inicial (Fran)
 
 | Paso | Canales | Maniobra |
 |---|---|---|
@@ -27,10 +44,11 @@ Bobina + inyector del cil. 1 en P2 y P3 = **referencia de fase común**: permite
 en todos los pasos (lo mismo que hace la pestaña de distribución hoy).
 El tramo **parada** sirve de cero de referencia del transductor (presión atmosférica) y para ver la caída de giro.
 
-## 3. Formato del protocolo (`analyzer-scope-protocolo/1`)
+## 3. Formato del script (`analyzer-scope-script/1`)
 
 ```json
-{ "formato": "analyzer-scope-protocolo/1", "id": "GAS-MEC-01", "nombre": "Gasolina · mecánica completa",
+{ "formato": "analyzer-scope-script/1", "id": "GAS-MEC-01", "nombre": "Gasolina · mecánica completa",
+  "autor": "", "version": "", "origen": null, "acceso": "libre | vip", "skills": ["compresion-relativa", "admision", "escape"],
   "combustible": ["gasolina"], "objetivo": "Localizar fallo mecánico por cilindro (compresión, válvulas, segmentos, escape)",
   "pasos": [
     { "id": "P2", "titulo": "Admisión + cárter",
@@ -44,11 +62,13 @@ El tramo **parada** sirve de cero de referencia del transductor (presión atmosf
       "requisitos": { "min_s": 12, "min_kS": 20 } } ] }
 ```
 * `entidad` usa los mismos nombres que `DX_ENT` (`16-diagnostico.js`): el canal queda identificado por el **slot**, no por el nombre del CSV.
+* `skills`: temas que evalúa el informe; se usan las skills activas de ese tema (base, propias o VIP).
+* `acceso: vip`: solo se sirve desde el portal a quien tenga permiso.
 * `requisitos`: la app rechaza o avisa al cargar (duración corta, muestreo insuficiente, faltan canales, no se ve la parada).
 
 ## 4. Flujo en la app (vista nueva «Prueba guiada»)
 
-1. **Elegir** protocolo (o síntoma → protocolo sugerido). Ficha del vehículo (reutiliza `19-ficha.js`).
+1. **Elegir** script (o síntoma → script sugerido). «Duplicar» para hacer uno propio; editor como el de reglas. Ficha del vehículo (reutiliza `19-ficha.js`).
 2. **Checklist de pasos**: cada paso muestra conexión de canales, ajustes de PicoScope, maniobras y un hueco «Cargar CSV».
 3. **Validación al cargar**: canales, muestreo, duración y fases detectadas → ✓ / ⚠ con motivo («no se detecta aceleración brusca»).
 4. **Análisis por paso y fase** con los motores que ya existen (compresión relativa, distribución, `dxCyl`, mediciones).
@@ -59,7 +79,7 @@ El tramo **parada** sirve de cero de referencia del transductor (presión atmosf
 
 * Curva de RPM a lo largo de la captura a partir de bobina o inyector (`trigEvents`).
 * `ralenti`: RPM estable (variación < ~5 %) durante ≥ 2 s · `acel_suave`: subida lenta · `acel_brusca`: dRPM/dt sobre umbral ·
-  `parada`: sin disparos y RPM → 0. Umbrales en el protocolo, no en el código.
+  `parada`: sin disparos y RPM → 0. Umbrales en el script, no en el código.
 * Corrección manual: barra de fases sobre la gráfica, arrastrable.
 
 ## 6. Medidas nuevas (catálogo `API_DIAGNOSTICO.md` §4.2)
@@ -88,15 +108,16 @@ Cada hallazgo dice qué pasos lo sostienen; si falta un paso, el informe lo marc
 
 | Fase | Entrega | Depende de |
 |---|---|---|
-| F1 | Formato de protocolo + protocolo inicial + vista guiada con checklist, carga y validación de CSV | — |
+| F1 | Formato de script + script inicial + duplicar/editar + vista guiada con checklist, carga y validación de CSV | — |
 | F2 | Detección de fases + medidas existentes por fase | F1 |
 | F3 | Medidas nuevas de admisión / escape / cárter | F2 + capturas reales |
 | F4 | Reglas cruzadas + informe combinado (PDF) + guardar/abrir sesión | F3 |
-| F5 | Validación con capturas de taller; protocolos para diésel (CSS diésel) y batería/arranque (El Power) | Ortu |
+| F4b | Scripts VIP por el portal (`scripts_lista`, `script_bajar`, `script_publicar`), mismos permisos que §13 | F4 + repo del portal |
+| F5 | Validación con capturas de taller; scripts para diésel (CSS diésel) y batería/arranque (El Power) | Ortu |
 
 ## 9. Riesgos
 
-* **Tamaño del CSV de PicoScope**: 20 s × 4 canales a 50 kS/s ≈ 4 M valores (decenas de MB). Recomendar muestreo en el protocolo y
+* **Tamaño del CSV de PicoScope**: 20 s × 4 canales a 50 kS/s ≈ 4 M valores (decenas de MB). Recomendar muestreo en el script y
   validar rendimiento del parser con un CSV real antes de F2.
 * Formato de exportación distinto entre PicoScope 6 y 7 (cabeceras, unidades, varios búferes): probar ambos en `tests/data/`.
 * Los umbrales de admisión/escape/cárter no están en las fuentes con transductor de pulso: quedan `borrador` hasta validar.
