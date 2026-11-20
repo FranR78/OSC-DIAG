@@ -1,0 +1,220 @@
+<title>Scripts de captura</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap">
+<style>
+/* Maqueta de la vista «Scripts» de Analyzer Scope: lista de scripts a la izquierda, pasos guiados a la derecha */
+:root{
+  --bg:#eaf3fb;--panel:#ffffff;--panel2:#f4f8fc;--line:rgba(20,85,143,.22);--tx:#12263a;--mu:#52697f;
+  --ac:#1f6fb5;--ttl:#14558f;--ok:#15803d;--okbg:#e3f6ea;--warn:#a85d00;--warnbg:#fff1d6;--bad:#b42323;--badbg:#fde8e8;
+  --chA:#1f6fb5;--chB:#d32f2f;--chC:#1e9e4a;--chD:#c99a00;--grid:rgba(20,85,143,.12);--win:rgba(31,111,181,.12);
+  --font:"Open Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#060b14;--panel:#0d1a2e;--panel2:#0a1424;--line:rgba(255,255,255,.14);--tx:#eef3fa;--mu:#9fb2c8;
+  --ac:#3b8cff;--ttl:#cfe3ff;--ok:#4ade80;--okbg:rgba(34,197,94,.14);--warn:#ffc266;--warnbg:rgba(245,165,36,.15);--bad:#ff7a7a;--badbg:rgba(255,77,77,.15);
+  --chA:#4d9bff;--chB:#ff5a5a;--chC:#3ddc84;--chD:#ffd34d;--grid:rgba(255,255,255,.08);--win:rgba(59,140,255,.16);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#060b14;--panel:#0d1a2e;--panel2:#0a1424;--line:rgba(255,255,255,.14);--tx:#eef3fa;--mu:#9fb2c8;
+  --ac:#3b8cff;--ttl:#cfe3ff;--ok:#4ade80;--okbg:rgba(34,197,94,.14);--warn:#ffc266;--warnbg:rgba(245,165,36,.15);--bad:#ff7a7a;--badbg:rgba(255,77,77,.15);
+  --chA:#4d9bff;--chB:#ff5a5a;--chC:#3ddc84;--chD:#ffd34d;--grid:rgba(255,255,255,.08);--win:rgba(59,140,255,.16);color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font:14px/1.45 var(--font);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 28px}
+button,select,input{font:inherit;color:var(--tx);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:5px 10px}
+button{cursor:pointer}button:hover{border-color:var(--ac)}button:focus-visible,select:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+button.p{background:var(--ac);border-color:var(--ac);color:#fff}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.top h1{font-size:17px;margin:0;color:var(--ttl)}.top .sub{color:var(--mu);font-size:12.5px}
+.tabs{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}.tabs span{padding:5px 12px;border:1px solid var(--line);border-radius:7px;color:var(--mu);font-size:13px}
+.tabs span.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.maq{font-size:12px;color:var(--mu);margin:0 0 12px}
+main{display:grid;grid-template-columns:270px minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:820px){main{grid-template-columns:minmax(0,1fr)}}
+.side{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;gap:10px}
+.side h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:4px 2px 0}
+.sc{display:grid;gap:2px;text-align:left;width:100%;background:transparent;border:1px solid transparent;padding:7px 9px}
+.sc:hover{background:var(--panel2)}.sc.on{background:var(--win);border-color:var(--ac)}
+.sc b{font-weight:600}.sc small{color:var(--mu);font-size:12px}
+.tag{display:inline-block;font-size:10.5px;padding:0 6px;border-radius:9px;border:1px solid var(--line);color:var(--mu);margin-left:4px;vertical-align:1px}
+.main{display:grid;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+.head{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.head h2{margin:0;font-size:18px;color:var(--ttl);text-wrap:balance}
+.head .sp{flex:1}.desc{color:var(--mu);margin:6px 0 0}
+.lock{font-size:12px;color:var(--mu)}
+.steps{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.st{flex:none;display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:20px;border:1px solid var(--line);background:var(--panel);color:var(--tx)}
+.st i{font-style:normal;width:21px;height:21px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--panel2);border:1px solid var(--line)}
+.st.on{border-color:var(--ac)}.st.on i{background:var(--ac);color:#fff;border-color:var(--ac)}
+.st.done i{background:var(--ok);color:#fff;border-color:var(--ok)}
+h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:14px 0 6px}
+h3:first-child{margin-top:0}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mu);font-weight:600;font-size:12px}
+.chip{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:6px;color:#fff;font-weight:700;font-size:12px}
+ol.how{margin:0;padding-left:20px}ol.how li{margin:4px 0}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}@media(max-width:980px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.prof{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--mu);margin-top:4px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;background:var(--c)}
+.cfg{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.cfg label{display:grid;gap:3px;font-size:12px;color:var(--mu)}
+.out{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px}
+.kv{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 9px}
+.kv small{display:block;color:var(--mu);font-size:11.5px}.kv b{font-variant-numeric:tabular-nums;font-size:15px}
+.chk{display:grid;gap:6px;margin-top:10px}
+.al{display:grid;grid-template-columns:22px 1fr;gap:6px;padding:7px 10px;border-radius:8px;font-size:13px;border:1px solid transparent}
+.al.ok{background:var(--okbg);color:var(--ok)}.al.warn{background:var(--warnbg);color:var(--warn)}.al.bad{background:var(--badbg);color:var(--bad)}
+.al b{color:inherit}.al span{color:var(--tx)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:12px;display:grid;gap:8px}
+.drop .t{color:var(--mu);font-size:13px}
+.res{display:flex;flex-wrap:wrap;gap:6px}.res span{font-size:12px;padding:2px 8px;border-radius:10px;background:var(--okbg);color:var(--ok)}
+.pre{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.pre ol{margin:0;padding-left:20px}.pre li{margin:4px 0}
+.foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.foot .sp{flex:1}
+.mu{color:var(--mu);font-size:12.5px}
+#paso{display:grid;gap:12px;min-width:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="top">
+  <div><h1>Analyzer Scope</h1><div class="sub">J.A. Ortúñez y Fran Rosales</div></div>
+  <div class="tabs"><span>Osciloscopio</span><span>Distribución</span><span>Compresión</span><span class="on">Scripts</span><span>Diagnóstico</span></div>
+</div>
+<p class="maq">Maqueta de la vista «Scripts». Los ajustes de PicoScope y las duraciones son una propuesta, pendiente de validar en taller.</p>
+
+<main>
+  <aside class="side" id="side"></aside>
+  <section class="main">
+    <div class="card" id="cab"></div>
+    <div class="steps" id="steps" role="tablist"></div>
+    <div id="paso"></div>
+  </section>
+</main>
+
+<script>
+const TB=[[.001,'1 ms'],[.002,'2 ms'],[.005,'5 ms'],[.01,'10 ms'],[.02,'20 ms'],[.05,'50 ms'],[.1,'100 ms'],[.2,'200 ms'],[.5,'500 ms'],[1,'1 s'],[2,'2 s'],[5,'5 s']];
+const MS=[[1e5,'100 kS'],[5e5,'500 kS'],[1e6,'1 MS'],[2e6,'2 MS'],[5e6,'5 MS'],[1e7,'10 MS'],[2e7,'20 MS'],[5e7,'50 MS']];
+const CC={A:'var(--chA)',B:'var(--chB)',C:'var(--chC)',D:'var(--chD)'};
+const FC={ralenti:'#7d8da1',suave:'#2f9e8f',brusca:'#e07b00',parada:'#9b5cff',arrastre:'#1f6fb5',reposo:'#7d8da1',contacto:'#c99a00',corte:'#9b5cff'};
+// mani: fases {n,tipo,s,r0,r1}; req: fsMin (S/s), rpmMax, criterio (grados|diente)
+const P_COMP={t:'Compresión relativa',canales:[['A','Corriente de arranque','Pinza amperimétrica','±600 A'],['B','Bobina 1 (o inyector 1 en common rail)','Pinza inductiva / punta 10:1','±20 V']],
+  como:['Cortar la inyección (fusible o relé de la bomba) para que el motor no arranque.','Pinza en el cable del motor de arranque, flecha hacia el motor.','Sincronismo en el cilindro 1: marca su PMS de compresión.'],
+  mani:[{n:'Reposo',tipo:'reposo',s:1,r0:0,r1:0},{n:'Arrastre',tipo:'arrastre',s:6,r0:250,r1:250},{n:'Soltar llave',tipo:'parada',s:1,r0:250,r1:0}],fsMin:2e4,rpmMax:330,crit:'grados',
+  fuente:'Curso, pág. 95–96: 170–330 RPM de arrastre, 5–10 ciclos, cada cilindro 90–100 %.'};
+const maniMot=[{n:'Ralentí',tipo:'ralenti',s:5,r0:800,r1:800},{n:'Acel. suave',tipo:'suave',s:4,r0:800,r1:2500},{n:'Vuelta',tipo:'ralenti',s:2,r0:2500,r1:800},{n:'Acel. brusca',tipo:'brusca',s:1.5,r0:800,r1:4500},{n:'Soltar',tipo:'ralenti',s:2,r0:4500,r1:800},{n:'Apagar grabando',tipo:'parada',s:3.5,r0:800,r1:0}];
+const SCR=[
+ {id:'mec',n:'Mecánica sin desmontar',a:'Fran',o:true,c:'Gasolina',d:'Compresión relativa + pulsos de admisión, cárter y escape. Localiza válvulas, segmentos y escape por cilindro.',
+  pasos:[P_COMP,
+   {t:'Admisión y cárter',canales:[['A','Bobina 1','Pinza inductiva','±20 V'],['B','Inyector 1','Punta 10:1','±50 V'],['C','Transductor de admisión','Transductor de pulso','±2 V'],['D','Transductor de cárter','Transductor de pulso (varilla de aceite)','±1 V']],
+    como:['Motor a temperatura, consumidores apagados.','Transductor de admisión en una toma de vacío del colector, después de la mariposa.','Transductor de cárter en el tubo de la varilla de aceite, bien sellado.','No cortar la grabación al apagar: la caída sin combustión es la parte mecánica.'],
+    mani:maniMot,fsMin:5e4,rpmMax:4500,crit:'grados',fuente:'Maniobra del CSS diésel (pág. 70); apagar grabando equivale al corte con mariposa abierta (pág. 67).'},
+   {t:'Escape',canales:[['A','Bobina 1','Pinza inductiva','±20 V'],['B','Inyector 1','Punta 10:1','±50 V'],['C','Transductor de escape','Transductor de pulso en la salida','±2 V']],
+    como:['Transductor en la salida del escape, con adaptador estanco.','Misma maniobra que el paso anterior, en el mismo orden.'],
+    mani:maniMot,fsMin:5e4,rpmMax:4500,crit:'grados',fuente:'Escape obstruido o catalizador: presión que sube en aceleración brusca y tarda en bajar (pág. 4, 48).'}]},
+ {id:'comp',n:'Compresión relativa',a:'Fran',o:true,c:'Gasolina y diésel',d:'Una sola captura de arrastre con pinza de corriente.',pasos:[P_COMP]},
+ {id:'pow',n:'Arranque y carga',a:'Ortu',o:true,c:'Gasolina y diésel',d:'Batería, motor de arranque, bujías de incandescencia y alternador (método El Power).',
+  pasos:[{t:'Batería, arranque y carga',canales:[['A','Tensión de batería','Puntas en bornes','±20 V'],['B','Corriente de batería','Pinza amperimétrica en el negativo','±600 A']],
+   como:['Batería cargada y vehículo en reposo 1 h.','Grabar con el contacto quitado.','Diésel: dar contacto y esperar a que se apaguen las bujías.','Arrancar, dejar a ralentí con consumidores y subir a 2500 RPM.'],
+   mani:[{n:'Contacto quitado',tipo:'reposo',s:3,r0:0,r1:0},{n:'Contacto',tipo:'contacto',s:6,r0:0,r1:0},{n:'Arranque',tipo:'arrastre',s:2,r0:250,r1:800},{n:'Ralentí',tipo:'ralenti',s:12,r0:800,r1:800},{n:'2500 RPM',tipo:'suave',s:12,r0:2500,r1:2500}],
+   fsMin:1e4,rpmMax:2500,crit:'ninguno',fuente:'Curso, pág. 87–99: no bajar de 9 V al arrancar; carga 13,8–15 V.'}]},
+ {id:'cssg',n:'Cigüeñal (CSS) gasolina',a:'Ortu',o:true,c:'Gasolina',d:'Contribución por cilindro con el sensor de cigüeñal.',
+  pasos:[{t:'Sensor de cigüeñal',canales:[['A','Sensor de cigüeñal (CKP)','Punta 1:1','±20 V'],['B','Bobina 1','Pinza inductiva','±20 V']],
+   como:['Pinchar la señal del CKP sin desconectar el sensor.','Por encima de 3000 RPM cortar el encendido con la mariposa abierta hasta que se pare.'],
+   mani:[{n:'Ralentí',tipo:'ralenti',s:5,r0:800,r1:800},{n:'Acelerar',tipo:'brusca',s:3,r0:800,r1:3500},{n:'Corte de encendido',tipo:'corte',s:5,r0:3500,r1:0}],
+   fsMin:2e5,rpmMax:3500,crit:'diente',fuente:'Curso, pág. 67: la caída con encendido cortado solo depende de la mecánica.'}]},
+ {id:'mio',n:'Mecánica sin desmontar (copia)',a:'yo',o:false,c:'Gasolina',d:'Copia de «Mecánica sin desmontar» con el escape antes que la admisión.',pasos:null,ref:'mec'}
+];
+let S=SCR[0],step=1,cfg={},loaded={};
+const $=id=>document.getElementById(id);
+const fmtS=s=>s===0?'0 s':s>=1?(+s.toFixed(1)).toLocaleString('es')+' s':(s*1000>=1?(+(s*1000).toFixed(1)).toLocaleString('es')+' ms':(s*1e6).toFixed(0)+' µs');
+const fmtF=f=>f>=1e6?(+(f/1e6).toFixed(2)).toLocaleString('es')+' MS/s':(+(f/1e3).toFixed(1)).toLocaleString('es')+' kS/s';
+const pasos=s=>s.pasos||SCR.find(x=>x.id===s.ref).pasos;
+const dur=p=>p.mani.reduce((a,f)=>a+f.s,0);
+
+function side(){
+  const g=(t,arr)=>'<h2>'+t+'</h2>'+arr.map(s=>'<button class="sc'+(s===S?' on':'')+'" data-id="'+s.id+'"><b>'+s.n+(s.o?'<span class="tag">original</span>':'<span class="tag">mío</span>')+'</b><small>'+s.a+' · '+s.c+' · '+pasos(s).length+(pasos(s).length>1?' capturas':' captura')+'</small></button>').join('');
+  $('side').innerHTML=g('Originales',SCR.filter(s=>s.o))+g('Mis scripts',SCR.filter(s=>!s.o))+'<button>+ Nuevo desde plantilla</button>';
+  $('side').querySelectorAll('.sc').forEach(b=>b.onclick=()=>{S=SCR.find(x=>x.id===b.dataset.id);step=0;render()});
+}
+function cab(){
+  $('cab').innerHTML='<div class="head"><h2>'+S.n+'</h2><span class="sp"></span>'+(S.o?'<span class="lock">Original de '+S.a+': solo lectura</span><button>Duplicar y editar</button>':'<button>Editar</button>')+'</div><p class="desc">'+S.d+'</p>';
+}
+function steps(){
+  const P=pasos(S);
+  $('steps').innerHTML='<button class="st'+(step===0?' on':'')+'" data-s="0"><i>0</i>Configurar PicoScope</button>'+P.map((p,i)=>'<button class="st'+(step===i+1?' on':'')+(loaded[S.id+(i+1)]?' done':'')+'" data-s="'+(i+1)+'"><i>'+(loaded[S.id+(i+1)]?'✓':i+1)+'</i>'+p.t+'</button>').join('')+
+    '<button class="st'+(step===P.length+1?' on':'')+'" data-s="'+(P.length+1)+'"><i>★</i>Informe</button>';
+  $('steps').querySelectorAll('.st').forEach(b=>b.onclick=()=>{step=+b.dataset.s;render()});
+}
+function profile(p,win){
+  const W=640,H=190,L=42,R=10,T=26,B=40,tot=dur(p),xm=Math.max(tot,win),rmax=Math.max(...p.mani.map(f=>Math.max(f.r0,f.r1)))*1.15||1;
+  const X=t=>L+(W-L-R)*t/xm,Y=r=>T+(H-T-B)*(1-r/rmax);
+  let s='<svg class="prof" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Perfil de RPM de la maniobra y tramo que cabe en una pantalla">';
+  const ticks=[0,1000,2000,3000,4000,5000].filter(r=>r<=rmax);
+  ticks.forEach(r=>s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(r)+'" y2="'+Y(r)+'" stroke="var(--grid)"/><text x="'+(L-6)+'" y="'+(Y(r)+4)+'" text-anchor="end" font-size="10" fill="var(--mu)">'+r+'</text>');
+  let t=0;p.mani.forEach(f=>{s+='<rect x="'+X(t)+'" y="'+(H-B+6)+'" width="'+Math.max(1,X(t+f.s)-X(t)-1)+'" height="8" rx="2" fill="'+FC[f.tipo]+'"/>';t+=f.s});
+  s+='<rect x="'+X(0)+'" y="'+T+'" width="'+(X(Math.min(win,xm))-X(0))+'" height="'+(H-T-B)+'" fill="var(--win)" stroke="var(--ac)" stroke-dasharray="4 3"/>';
+  let d='',tt=0;p.mani.forEach(f=>{d+=(d?'L':'M')+X(tt).toFixed(1)+' '+Y(f.r0).toFixed(1)+' L'+X(tt+f.s).toFixed(1)+' '+Y(f.r1).toFixed(1)+' ';tt+=f.s});
+  s+='<path d="'+d+'" fill="none" stroke="var(--tx)" stroke-width="2" stroke-linejoin="round"/>';
+  const lbl=win<tot?'Una pantalla: '+fmtS(win)+' de '+fmtS(tot):'Una pantalla: '+fmtS(win)+' (cabe todo)';
+  s+='<text x="'+Math.min(X(Math.min(win,xm))+4,W-R-4)+'" y="'+(T-6)+'" font-size="11" fill="var(--ac)" text-anchor="'+(X(win)>W-170?'end':'start')+'">'+lbl+'</text>';
+  [0,tot/2,tot].forEach(v=>s+='<text x="'+X(v)+'" y="'+(H-6)+'" font-size="10" fill="var(--mu)" text-anchor="'+(v===0?'start':v===tot?'end':'middle')+'">'+fmtS(v)+'</text>');
+  s+='<text x="4" y="11" font-size="10" fill="var(--mu)">RPM</text></svg>';
+  const tipos=[...new Set(p.mani.map(f=>f.tipo))];
+  return s+'<div class="legend">'+p.mani.map(f=>'<span style="--c:'+FC[f.tipo]+'">'+f.n+' '+fmtS(f.s)+'</span>').join('')+'</div>';
+}
+function rec(p){const need=dur(p)*1.1;const tb=TB.find(x=>x[0]*10>=need)||TB[TB.length-1];const ms=MS.find(x=>x[0]/(tb[0]*10)>=p.fsMin)||MS[MS.length-1];return{tb:tb[0],ms:ms[0]}}
+function checks(p,c){
+  const win=c.tb*10,fs=c.ms/win,tot=dur(p),n=p.canales.length,out=[];
+  const rpmI=p.mani.find(f=>f.tipo==='ralenti'||f.tipo==='arrastre');const cyc=rpmI?120/rpmI.r0:0;
+  if(win>=tot)out.push(['ok','Tiempo','La pantalla dura '+fmtS(win)+' y la maniobra '+fmtS(tot)+': cabe entera en una sola captura.']);
+  else if(cyc&&win>=cyc*2)out.push(['bad','Tiempo','Con '+TB.find(x=>x[0]===c.tb)[1]+'/div la pantalla dura '+fmtS(win)+': verás unos '+Math.floor(win/cyc)+' ciclos, pero no el proceso completo ('+fmtS(tot)+'). PicoScope guardará varias pantallas y sustituirá las primeras. Sube a '+TB.find(x=>x[0]===rec(p).tb)[1]+'/div.']);
+  else out.push(['bad','Tiempo','Con '+TB.find(x=>x[0]===c.tb)[1]+'/div la pantalla dura '+fmtS(win)+(cyc?': ni un ciclo completo a ralentí ('+fmtS(cyc)+').':'.')+' Sirve para ver la forma de la señal, no para grabar el script. Sube a '+TB.find(x=>x[0]===rec(p).tb)[1]+'/div.']);
+  if(fs>=p.fsMin)out.push(['ok','Muestreo',fmtF(fs)+' (mínimo '+fmtF(p.fsMin)+').']);
+  else out.push(['bad','Muestreo',fmtF(fs)+' es poco: el script necesita '+fmtF(p.fsMin)+'. Sube las muestras a '+MS.find(x=>x[0]===rec(p).ms)[1]+'.']);
+  if(p.crit==='grados'){const g=6*p.rpmMax/fs;out.push([g<=1?'ok':g<=3?'warn':'bad','Resolución',(+g.toPrecision(2)).toLocaleString('es')+'° de cigüeñal por muestra a '+p.rpmMax+' RPM'+(g<=1?'.':': se pierden detalles de las válvulas (objetivo ≤ 1°).')])}
+  if(p.crit==='diente'){const tooth=1/(p.rpmMax/60*60),k=tooth*fs;out.push([k>=50?'ok':k>=20?'warn':'bad','Resolución',Math.round(k)+' muestras por diente (60-2) a '+p.rpmMax+' RPM'+(k>=50?'.':': poca precisión para medir la aceleración de cada cilindro (objetivo ≥ 50).')])}
+  const mb=c.ms*(12+11*n)/1e6;
+  out.push([mb<150?'ok':mb<400?'warn':'bad','Tamaño del CSV','≈ '+Math.round(mb)+' MB con '+n+' canales'+(mb<150?'.':mb<400?': la app tardará en abrirlo.':': demasiado grande, baja las muestras.')]);
+  return{win,fs,out};
+}
+function pasoHTML(i){
+  const P=pasos(S);
+  if(i===0)return '<div class="card"><h3>Antes de empezar</h3><div class="pre"><p class="mu" style="margin:0 0 8px">Autoscope graba sin límite hasta llenar el disco. PicoScope guarda pantallas en un búfer y, si tardas, las nuevas sustituyen a las primeras. Por eso se configura antes de cada captura:</p><ol>'+
+    '<li><b>Prueba de señal</b>: base de tiempos corta, ajustar escalas y comprobar que cada canal se ve bien.</li>'+
+    '<li><b>Subir la base de tiempos</b> a 1–2 s/div para que una pantalla contenga la maniobra completa. Cada paso indica cuánto necesita.</li>'+
+    '<li><b>Muestras</b> suficientes para el muestreo mínimo del paso.</li>'+
+    '<li><b>Disparo único</b> sobre la bobina: graba una pantalla y se para (por confirmar).</li>'+
+    '<li><b>Exportar a CSV</b> solo la pantalla con la maniobra: Archivo → Guardar como → CSV, forma de onda actual. Un CSV por paso.</li></ol></div>'+
+    '<div class="foot" style="margin-top:12px"><span class="mu">'+P.length+(P.length>1?' capturas':' captura')+' en este script.</span><span class="sp"></span><button class="p" data-go="1">Empezar: paso 1</button></div></div>';
+  if(i>P.length){const ok=P.every((_,k)=>loaded[S.id+(k+1)]);
+    return '<div class="card"><h3>Informe combinado</h3><p class="mu" style="margin:0 0 10px">Junta los '+P.length+' CSV, separa las fases y cruza los resultados por cilindro.</p>'+
+    '<div class="chk">'+P.map((p,k)=>'<div class="al '+(loaded[S.id+(k+1)]?'ok':'warn')+'"><b>'+(loaded[S.id+(k+1)]?'✓':'!')+'</b><span>Paso '+(k+1)+' · '+p.t+(loaded[S.id+(k+1)]?' — CSV cargado':' — falta el CSV')+'</span></div>').join('')+'</div>'+
+    '<div class="row"><button class="p"'+(ok?'':' disabled')+'>Generar informe (pantalla y PDF)</button>'+(ok?'':'<span class="mu">Faltan pasos. El informe saldría marcado «sin confirmar» en lo que dependa de ellos.</span>')+'</div></div>';}
+  const p=P[i-1],key=S.id+i,c=cfg[key]||(cfg[key]=(i===2&&S.id==='mec')?{tb:.005,ms:1e6}:rec(p)),r=checks(p,c);
+  const ld=loaded[key];
+  return '<div class="card"><div class="head"><h2 style="font-size:16px">Paso '+i+' de '+P.length+' · '+p.t+'</h2></div>'+
+  '<div class="grid2" style="margin-top:10px"><div style="min-width:0"><h3>Qué medir</h3><div class="tbl"><table><thead><tr><th>Canal</th><th>Señal</th><th>Sonda</th><th>Rango</th></tr></thead><tbody>'+
+   p.canales.map(ch=>'<tr><td><span class="chip" style="background:'+CC[ch[0]]+'">'+ch[0]+'</span></td><td>'+ch[1]+'</td><td>'+ch[2]+'</td><td style="white-space:nowrap">'+ch[3]+'</td></tr>').join('')+'</tbody></table></div>'+
+   '<h3>Cómo</h3><ol class="how">'+p.como.map(x=>'<li>'+x+'</li>').join('')+'</ol></div>'+
+   '<div style="min-width:0"><h3>Maniobra, en este orden</h3>'+profile(p,r.win)+'<p class="mu" style="margin:6px 0 0">'+p.fuente+'</p></div></div></div>'+
+  '<div class="card"><h3>Tu configuración de PicoScope</h3><div class="cfg">'+
+   '<label for="tb">Base de tiempos<select id="tb">'+TB.map(x=>'<option value="'+x[0]+'"'+(x[0]===c.tb?' selected':'')+'>'+x[1]+'/div</option>').join('')+'</select></label>'+
+   '<label for="ms">Muestras<select id="ms">'+MS.map(x=>'<option value="'+x[0]+'"'+(x[0]===c.ms?' selected':'')+'>'+x[1]+'</option>').join('')+'</select></label>'+
+   '<label>&nbsp;<button id="rec">Usar lo recomendado</button></label></div>'+
+   '<div class="out"><div class="kv"><small>Una pantalla dura</small><b>'+fmtS(r.win)+'</b></div><div class="kv"><small>Maniobra</small><b>'+fmtS(dur(p))+'</b></div><div class="kv"><small>Muestreo</small><b>'+fmtF(r.fs)+'</b></div><div class="kv"><small>Canales</small><b>'+p.canales.length+'</b></div></div>'+
+   '<div class="chk">'+r.out.map(o=>'<div class="al '+o[0]+'"><b>'+(o[0]==='ok'?'✓':o[0]==='warn'?'!':'✗')+'</b><span><b>'+o[1]+'.</b> '+o[2]+'</span></div>').join('')+'</div></div>'+
+  '<div class="card"><h3>Cargar la captura</h3><div class="drop"><div class="t">'+(ld?'Paso '+i+' cargado (ejemplo de comprobación):':'Suelta aquí el CSV exportado de PicoScope o pulsa para elegirlo.')+'</div>'+
+   (ld?'<div class="res"><span>✓ '+p.canales.length+' canales</span><span>✓ '+fmtS(dur(p)+1.2)+'</span><span>✓ '+fmtF(Math.max(p.fsMin,5e4))+'</span>'+[...new Set(p.mani.map(f=>f.n))].map(n=>'<span>✓ '+n+'</span>').join('')+'</div>':'')+
+   '<div class="row" style="margin:0"><button id="load">'+(ld?'Quitar':'Simular carga del CSV')+'</button></div></div>'+
+   '<div class="foot" style="margin-top:12px"><button data-go="'+(i-1)+'">← Anterior</button><span class="sp"></span><button class="p" data-go="'+(i+1)+'">'+(i<P.length?'Siguiente: paso '+(i+1):'Ir al informe')+' →</button></div></div>';
+}
+function render(){
+  side();cab();steps();$('paso').innerHTML=pasoHTML(step);
+  $('paso').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{step=+b.dataset.go;render();});
+  const key=S.id+step,P=pasos(S);
+  if($('tb')){$('tb').onchange=e=>{cfg[key].tb=+e.target.value;render()};$('ms').onchange=e=>{cfg[key].ms=+e.target.value;render()};$('rec').onclick=()=>{cfg[key]=rec(P[step-1]);render()};
+    $('load').onclick=()=>{loaded[key]=!loaded[key];render()}}
+}
+step=2;render();
+</script>
