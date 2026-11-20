@@ -3,6 +3,12 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.22
+- **Analizar el sensor de cigüeñal** (pruebas con CKP: Equilibrio de cilindros, Encendido, Inyección y caída de giro): detecta los dientes y el hueco de la rueda fónica, calcula la velocidad de cada diente y el aporte de cada cilindro en su propia carrera de trabajo (el señalado es el responsable, sin restar uno).
+- Por regímenes: **estable, aceleración y sin combustión**. Si el cilindro flojo está bien sin combustión → fallo de combustión (encendido o inyección); si también queda bajo → fuga de compresión (integridad mecánica). Conclusiones con [Medido] / [Inferido].
+- **Señal de ejemplo** (60-2, cilindro 3 flojo) para probarlo sin captura. Umbral del 85 % en borrador: se ajusta con capturas reales.
+- **Qué probar:** Equilibrio de cilindros → «Probar con una señal de ejemplo» → «Analizar»; el lunes, con el CSV real de CKP + inyector 1.
+
 ## 2026.11.21
 - **Scripts por sistema:** cinco apartados que se eligen por lo que le pasa al coche: **Arranque y carga**, **Integridad mecánica**, **Equilibrio de cilindros**, **Encendido** e **Inyección**. Cada uno dice cuándo entrar y lleva sus pruebas (una captura cada una).
 - **Compresión relativa** ya no es un apartado: va dentro de Arranque y carga (principio de la gráfica) y de Integridad mecánica (oscilaciones estables). Cada prueba dice **qué mirar**.

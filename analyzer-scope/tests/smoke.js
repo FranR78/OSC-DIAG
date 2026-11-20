@@ -595,6 +595,14 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('editor: un script mal escrito no se guarda y dice por qué', /No se guarda: no tiene pasos/.test(await k.textContent('#kESt')), await k.textContent('#kESt'));
     await k.evaluate(() => { const o = JSON.parse(JSON.stringify(SCRIPTS_BASE[0])); o.nombre = 'Mi mecánica'; $('kTx').value = JSON.stringify(o); }); await k.click('#kGu');
     check('editor: guarda los cambios en la copia', await KE(() => JSON.parse(localStorage.getItem('as_scripts'))[0].nombre === 'Mi mecánica' && /Mi mecánica/.test($('kL').textContent)));
+    const ck = await KE(() => { const o = { ick: 0, isy: 1, order: [1, 3, 4, 2], off: 0 }, r = {};
+      for (const [k, q] of [['flojo', { flojo: 3 }], ['fuga', { flojo: 3, fuga: 3 }], ['bien', {}], ['flojo2', { flojo: 2 }]]) { const a = ckpAnaliza(ckpDemo(q), o); r[k] = { a, d: a.err ? [] : ckpDiag(a, 'diesel').map(x => x[0] + ':' + x[2]) }; } return r; });
+    check('CKP: detecta la rueda 60-2 (58 dientes, hueco de 2)', ck.flojo.a.N === 60 && ck.flojo.a.T === 58 && ck.flojo.a.m === 2, JSON.stringify([ck.flojo.a.err, ck.flojo.a.N, ck.flojo.a.T]));
+    check('CKP: señala al responsable (cil. 3 flojo, cil. 2 flojo) y no a otro', /^bad:Cilindro 3:/.test(ck.flojo.d[0]) && /^bad:Cilindro 2:/.test(ck.flojo2.d[0]) && ck.flojo.d.filter(x => /^bad:Cilindro/.test(x)).length === 1, JSON.stringify([ck.flojo.d, ck.flojo2.d]));
+    check('CKP: separa combustión (mecánica bien) de fuga (también sin combustión)', /combustión/.test(ck.flojo.d[1]) && /fuga de compresión en el cilindro 3/.test(ck.fuga.d[1]), JSON.stringify([ck.flojo.d, ck.fuga.d]));
+    check('CKP: motor sano → aporte uniforme', /^ok:Aporte uniforme/.test(ck.bien.d[0]), JSON.stringify(ck.bien.d));
+    await k.click('#kL .skI[data-k="FR-EQ-01"]'); await k.click('#kSteps .skS[data-s="1"]'); await k.click('#kDemo'); await k.click('#kCkGo'); await k.waitForTimeout(500);
+    check('CKP en la app: señal de ejemplo → tabla por cilindro, gráfica y conclusión', await KE(() => /60-2/.test($('kPaso').textContent) && /\[Medido\] Cilindro 3/.test($('kPaso').textContent) && document.querySelectorAll('.ckT tbody tr').length === 4));
     check('scripts: sin errores JS', ke.length === 0, ke.join(' | '));
     await k.close();
   }

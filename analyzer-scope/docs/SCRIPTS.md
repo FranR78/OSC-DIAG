@@ -39,3 +39,14 @@ Una copia guarda `origen: { id, nombre, version }` y avisa si el original cambia
 * `requisitos.fs_min`: muestreo mínimo (muestras/s). `criterio`: `grados` (objetivo ≤ 1° de cigüeñal por muestra a `rpm_max`), `diente` (≥ 50 muestras por diente de una rueda 60-2 a `rpm_max`).
 * La recomendación de PicoScope sale sola: la base de tiempos más corta con pantalla ≥ maniobra + 10 %, y las muestras justas para `fs_min`.
 * Un script mal escrito no se guarda ni se importa: la app dice qué falta.
+
+## Analizar el sensor de cigüeñal (`33-ckp.js`)
+Sale en las pruebas con `requisitos.criterio: "diente"` en cuanto hay CSV (o la señal de ejemplo).
+1. **Dientes**: flanco de subida con histéresis (Hall o inductivo). **Hueco**: periodo > 1,6 × los anteriores → `N-m` (p. ej. 60-2).
+2. **Velocidad por diente**: ángulo del periodo / duración (RPM), suavizada en 3 dientes.
+3. **Fase**: el pulso de sincronismo + `Desfase (°)` = PMS del cilindro 1; con el orden de encendido, cada cilindro tiene su ventana de 720°/n desde su PMS.
+4. **Aporte**: en su ventana, el pico de velocidad sobre la recta PMS→PMS siguiente (quita la tendencia). % del mejor, mediana por régimen.
+5. **Regímenes por ciclo**: estable, aceleración (+3 %), sin combustión (sin pulsos de sincronismo, > 150 RPM).
+6. **Conclusión**: cilindro < 85 % del mejor → [Medido]; sin combustión bien → fallo de combustión, también bajo → fuga de compresión → [Inferido].
+* En gasolina el sincronismo bueno es la **bobina 1** (el inyector secuencial inyecta en admisión, ~360° antes). En diésel, el inyector 1.
+* Umbral y método en borrador: validar con capturas reales (cilindro con fallo conocido).
