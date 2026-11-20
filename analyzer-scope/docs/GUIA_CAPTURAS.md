@@ -62,6 +62,15 @@ Etiquetas: **[Fuente]** = lo dice el curso · **[Inferido]** = propuesta para Pi
 
 ## Comunes para PicoScope [Inferido]
 
+Autoscope graba sin límite (hasta llenar el disco). PicoScope acumula pantallas en el búfer y, si tardas, sustituye las
+primeras. Por eso **todo script empieza configurando el osciloscopio**:
+
+1. Prueba de señal con base de tiempos corta: escalas y canales correctos.
+2. Subir a **1–2 s/div** (10–20 s por pantalla): una pantalla = la maniobra completa.
+3. Muestras suficientes para ≥ 50 kS/s (≥ 200 kS/s en CSS).
+4. Disparo único (Single) sobre la bobina para que no se sobrescriba (por confirmar).
+5. Exportar a CSV solo el tramo indicado (pantalla del búfer con la maniobra), un CSV por paso.
+
 * Motor a temperatura (salvo prueba en frío), consumidores apagados salvo que el paso diga lo contrario.
 * Sin disparo (grabación continua) y **un solo búfer**; exportar «búfer actual» a CSV.
 * Nombrar los canales en PicoScope igual que en el paso: la app los reconoce por el hueco, pero ayuda a revisar.
