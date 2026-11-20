@@ -572,7 +572,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     const k = await ctx.newPage(); const ke = []; k.on('pageerror', e => ke.push(String(e))); k.setDefaultTimeout(6000);
     await k.goto(APP); await k.waitForTimeout(400); await k.click('#tabK'); await k.waitForTimeout(150);
     const KE = fn => k.evaluate(fn);
-    check('apartados por sistema: Arranque y carga, Integridad mecánica, Equilibrio de cilindros, Encendido, Inyección', await KE(() => SCRIPTS_BASE.map(s => s.nombre).join('|') === 'Arranque y carga|Integridad mecánica|Equilibrio de cilindros|Encendido|Inyección'));
+    check('apartados por sistema: Arranque y carga, Integridad mecánica, Equilibrio de cilindros, Encendido, Inyección, Red CAN', await KE(() => SCRIPTS_BASE.map(s => s.nombre).join('|') === 'Arranque y carga|Integridad mecánica|Equilibrio de cilindros|Encendido|Inyección|Red CAN'));
     check('originales: los scripts de src/scripts, de solo lectura', await KE(() => SCRIPTS_BASE.length >= 5 && document.querySelectorAll('#kL .skI').length >= 5 && /solo lectura/.test($('kCab').textContent) && !$('kEd')));
     await k.click('#kL .skI:nth-of-type(3)'); await k.waitForTimeout(100);
     check('cambiar de script: cada original se abre al pulsarlo', await KE(() => { const r = []; document.querySelectorAll('#kL .skI').forEach((b, i) => { b.click(); r.push($('kCab').querySelector('h2').textContent); }); return new Set(r).size === r.length && r.length >= 5; }));
@@ -603,6 +603,13 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('CKP: motor sano → aporte uniforme', /^ok:Aporte uniforme/.test(ck.bien.d[0]), JSON.stringify(ck.bien.d));
     await k.click('#kL .skI[data-k="FR-EQ-01"]'); await k.click('#kSteps .skS[data-s="1"]'); await k.click('#kDemo'); await k.click('#kCkGo'); await k.waitForTimeout(500);
     check('CKP en la app: señal de ejemplo → tabla por cilindro, gráfica y conclusión', await KE(() => /60-2/.test($('kPaso').textContent) && /\[Medido\] Cilindro 3/.test($('kPaso').textContent) && document.querySelectorAll('.ckT tbody tr').length === 4));
+    const cn = await KE(() => { const a = canAnaliza(canDemo(), { ih: 0, il: 1 }), b = canAnaliza(canDemo({ bajo: false }), { ih: 0, il: 1 }), z = canDemo(); z.chs[1].y = z.chs[1].y.map(() => 0.02); const c = canAnaliza(z, { ih: 0, il: 1 });
+      return { rate: a.rate, tramas: a.tramas, crc: a.crcMal, ids: a.U.map(u => canId(u)).sort().join(), mal: a.U.filter(u => u.mal.length).map(u => canId(u)).join(), da: canDiag(a).map(x => x[2]).join(' | '), db: canDiag(b).map(x => x[2]).join(' | '), dc: canDiag(c).map(x => x[2]).join(' | ') }; });
+    check('CAN: 500 kbit/s, tramas decodificadas con CRC correcto y los 4 ID', cn.rate === 5e5 && cn.tramas > 50 && cn.crc === 0 && cn.ids === '0x0C9,0x1A0,0x2F1,0x3E0', JSON.stringify(cn));
+    check('CAN: señala la unidad con el nivel dominante bajo (0x2F1) y solo esa', cn.mal === '0x2F1' && /Unidad con ID 0x2F1: nivel bajo/.test(cn.da), cn.da);
+    check('CAN: red sana → todo correcto; CAN-L a masa → lo dice', /correctos en todas las unidades/.test(cn.db) && /CAN-L a masa/.test(cn.dc), cn.db + ' // ' + cn.dc);
+    await k.click('#kL .skI[data-k="FR-CAN-01"]'); await k.click('#kSteps .skS[data-s="1"]'); await k.click('#kDemo'); await k.click('#kCnGo'); await k.waitForTimeout(600);
+    check('CAN en la app: señal de ejemplo → tabla por unidad y conclusión', await KE(() => /500 kbit\/s/.test($('kPaso').textContent) && /Unidad con ID 0x2F1/.test($('kPaso').textContent) && document.querySelectorAll('.ckT tbody tr').length === 4));
     check('scripts: sin errores JS', ke.length === 0, ke.join(' | '));
     await k.close();
   }

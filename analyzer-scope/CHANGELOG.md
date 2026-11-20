@@ -3,6 +3,12 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.23
+- **Apartado «Red CAN»:** captura guiada de CAN-H y CAN-L (dos canales respecto a masa) y análisis trama a trama: velocidad, ID de cada unidad (con CRC comprobado), niveles de H y L, diferencial, flancos (subida y sobreoscilación) y tramas de error.
+- **Dónde y qué:** la unidad cuyo nivel se aparta del resto sale señalada; por niveles dice H o L a masa o a positivo, H y L unidos o bus en reposo, terminación que falta o de más. Referencia ISO 11898-2 como [Teórico].
+- **Señal de ejemplo:** 500 kbit/s, 4 unidades, la 0x2F1 con el nivel bajo.
+- **Qué probar:** Red CAN → «Probar con una señal de ejemplo» → «Analizar»; con una captura real del conector de diagnosis (pines 6 y 14).
+
 ## 2026.11.22
 - **Analizar el sensor de cigüeñal** (pruebas con CKP: Equilibrio de cilindros, Encendido, Inyección y caída de giro): detecta los dientes y el hueco de la rueda fónica, calcula la velocidad de cada diente y el aporte de cada cilindro en su propia carrera de trabajo (el señalado es el responsable, sin restar uno).
 - Por regímenes: **estable, aceleración y sin combustión**. Si el cilindro flojo está bien sin combustión → fallo de combustión (encendido o inyección); si también queda bajo → fuga de compresión (integridad mecánica). Conclusiones con [Medido] / [Inferido].

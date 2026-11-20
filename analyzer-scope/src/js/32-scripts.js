@@ -5,7 +5,7 @@ const SK_TB=[[.001,'1 ms'],[.002,'2 ms'],[.005,'5 ms'],[.01,'10 ms'],[.02,'20 ms
 const SK_MS=[[1e5,'100 kS'],[2e5,'200 kS'],[5e5,'500 kS'],[1e6,'1 MS'],[2e6,'2 MS'],[5e6,'5 MS'],[1e7,'10 MS'],[2e7,'20 MS'],[5e7,'50 MS']];
 const SK_FC={reposo:'#7d8da1',contacto:'#c99a00',arrastre:'#3d8bff',ralenti:'#8a9bb0',suave:'#1fa98f',brusca:'#ff8a00',parada:'#9b5cff',corte:'#d0479a'};
 const SK_CH={A:0,B:1,C:2,D:3,E:4,F:5,G:6,H:7};
-const SK={sel:null,step:0,cfg:{},csv:{},edit:false,del:false,fuel:'gasolina',ckp:{},ckpO:{}};
+const SK={sel:null,step:0,cfg:{},csv:{},edit:false,del:false,fuel:'gasolina',ckp:{},ckpO:{},can:{},canO:{}};
 /* pasos visibles según el combustible elegido (un paso con «combustible» solo sale para ese combustible) y clave estable de cada paso */
 const skPasos=S=>S.pasos.filter(p=>!p.combustible||p.combustible.includes(SK.fuel));
 const skKey=(S,p)=>S.id+'|'+(p.id||p.titulo);
@@ -46,6 +46,7 @@ function skChecks(p,c){
   if(fs>=r.fs_min)o.push(['ok','Muestreo',skF(fs)+' (mínimo '+skF(r.fs_min)+').']);
   else o.push(['bad','Muestreo',skF(fs)+' es poco: el paso necesita '+skF(r.fs_min)+'. Sube las muestras a '+skMsN(rec.ms)+'.']);
   if(r.criterio==='grados'&&r.rpm_max){const g=6*r.rpm_max/fs;o.push([g<=1?'ok':g<=3?'warn':'bad','Resolución',(+g.toPrecision(2)).toLocaleString('es')+'° de cigüeñal por muestra a '+r.rpm_max+' RPM'+(g<=1?'.':': se pierden detalles de las válvulas (objetivo ≤ 1°).')])}
+  if(r.criterio==='can'){const br=r.bitrate||5e5,k=fs/br;o.push([k>=20?'ok':k>=10?'warn':'bad','Resolución',Math.round(k)+' muestras por bit a '+br/1e3+' kbit/s'+(k>=20?'.':': flancos y niveles poco fiables (objetivo ≥ 20).')])}
   if(r.criterio==='diente'&&r.rpm_max){const k=fs/(r.rpm_max/60*60);o.push([k>=50?'ok':k>=20?'warn':'bad','Resolución',Math.round(k)+' muestras por diente (rueda 60-2) a '+r.rpm_max+' RPM'+(k>=50?'.':': poca precisión para la aceleración de cada cilindro (objetivo ≥ 50).')])}
   const mb=c.ms*(12+11*p.canales.length)/1e6;
   o.push([mb<150?'ok':mb<400?'warn':'bad','Tamaño del CSV','≈ '+Math.round(mb)+' MB con '+p.canales.length+' canales'+(mb<150?'.':mb<400?': la app tardará en abrirlo.':': demasiado grande, baja las muestras.')]);
@@ -111,8 +112,8 @@ function skPaso(S,i){
     '<div class="skKv"><div><small>Una pantalla dura</small><b>'+skT(r.win)+'</b></div><div><small>Maniobra</small><b>'+skT(skDur(p))+'</b></div><div><small>Muestreo</small><b>'+skF(r.fs)+'</b></div><div><small>Canales</small><b>'+p.canales.length+'</b></div></div>'+
     '<div class="skCk" id="kCk">'+r.o.map(o=>'<div class="skA '+o[0]+'"><b>'+(o[0]==='ok'?'✓':o[0]==='warn'?'!':'✗')+'</b><span><b>'+o[1]+'.</b> '+o[2]+'</span></div>').join('')+'</div></div>'+
    '<div class="skC"><b class="skH">Cargar la captura</b><div class="drop" id="kDrop">'+(cv?'<b>'+skE(cv.name)+'</b><div class="skCk">'+cv.chk.map(o=>'<div class="skA '+o[0]+'"><b>'+(o[0]==='ok'?'✓':'!')+'</b><span>'+o[1]+'</span></div>').join('')+'</div>':
-     'Suelta aquí el CSV exportado de PicoScope')+'<div class="row" style="justify-content:center;margin-top:8px"><button id="kLoad">'+(cv?'Cambiar CSV…':'Elegir CSV…')+'</button>'+(!cv&&p.requisitos.criterio==='diente'?'<button id="kDemo">Probar con una señal de ejemplo</button>':'')+(cv?'<button id="kVer">Ver en el osciloscopio</button><button id="kQuit">Quitar</button>':'')+'</div></div>'+
-    '<div class="row" style="margin-top:10px"><button data-go="'+(i-1)+'">← Anterior</button><span class="sp"></span><button class="p" data-go="'+(i+1)+'">'+(i<n?'Siguiente: paso '+(i+1):'Ir al resumen')+' →</button></div></div>'+(cv&&p.requisitos.criterio==='diente'?ckpCard(key,cv):'');
+     'Suelta aquí el CSV exportado de PicoScope')+'<div class="row" style="justify-content:center;margin-top:8px"><button id="kLoad">'+(cv?'Cambiar CSV…':'Elegir CSV…')+'</button>'+(!cv&&(p.requisitos.criterio==='diente'||p.requisitos.criterio==='can')?'<button id="kDemo">Probar con una señal de ejemplo</button>':'')+(cv?'<button id="kVer">Ver en el osciloscopio</button><button id="kQuit">Quitar</button>':'')+'</div></div>'+
+    '<div class="row" style="margin-top:10px"><button data-go="'+(i-1)+'">← Anterior</button><span class="sp"></span><button class="p" data-go="'+(i+1)+'">'+(i<n?'Siguiente: paso '+(i+1):'Ir al resumen')+' →</button></div></div>'+(cv&&p.requisitos.criterio==='diente'?ckpCard(key,cv):'')+(cv&&p.requisitos.criterio==='can'?canCard(key,cv):'');
 }
 function skEditor(S){
   const v=JSON.stringify(Object.assign({},S,{_o:undefined}),null,2);
@@ -128,7 +129,7 @@ async function skCargaCsv(S,i,f){
     chk.push([dur>=need*.9?'ok':'warn','Dura '+skT(dur)+(dur>=need*.9?'':' (la maniobra necesita '+skT(need)+')')]);
     chk.push([fs>=r.fs_min*.95?'ok':'warn',skF(fs)+(fs>=r.fs_min*.95?'':' (mínimo '+skF(r.fs_min)+')')]);
     if(ds.length>1)chk.push(['warn','El archivo trae '+ds.length+' pantallas: se usa la primera']);
-    SK.csv[key]={name:f.name,ds:ds.slice(0,1),chk,bad:chk.some(c=>c[0]!=='ok')};delete SK.ckp[key];delete SK.ckpO[key];st(f.name+': cargado en el paso '+i+' de «'+S.nombre+'».');
+    SK.csv[key]={name:f.name,ds:ds.slice(0,1),chk,bad:chk.some(c=>c[0]!=='ok')};[SK.ckp,SK.ckpO,SK.can,SK.canO].forEach(o=>delete o[key]);st(f.name+': cargado en el paso '+i+' de «'+S.nombre+'».');
   }catch(e){st(f.name+': '+e.message);$('st').classList.add('err')}
   skTab();
 }
@@ -153,9 +154,11 @@ function skWire(S){
   if($('kTb')){$('kTb').onchange=e=>{SK.cfg[key].tb=+e.target.value;skTab()};$('kMs').onchange=e=>{SK.cfg[key].ms=+e.target.value;skTab()};
     $('kRec').onclick=()=>{SK.cfg[key]=skRec(P[SK.step-1]);skTab()}}
   on('kLoad',()=>$('kIn').click());
-  on('kQuit',()=>{delete SK.csv[key];delete SK.ckp[key];delete SK.ckpO[key];skTab()});
-  on('kDemo',()=>{SK.csv[key]={name:'ejemplo_ckp_inyector1.csv',ds:[ckpDemo({flojo:3})],chk:[['ok','Señal de ejemplo: rueda 60-2, 4 cilindros (1-3-4-2), cilindro 3 flojo; ralentí, aceleración y corte de inyección.']],bad:false};delete SK.ckp[key];delete SK.ckpO[key];skTab()});
-  if(key&&SK.csv[key])ckpWire(key);
+  on('kQuit',()=>{delete SK.csv[key];[SK.ckp,SK.ckpO,SK.can,SK.canO].forEach(o=>delete o[key]);skTab()});
+  on('kDemo',()=>{const cn=P[SK.step-1].requisitos.criterio==='can';[SK.ckp,SK.ckpO,SK.can,SK.canO].forEach(o=>delete o[key]);
+    SK.csv[key]=cn?{name:'ejemplo_can_500k.csv',ds:[canDemo()],chk:[['ok','Señal de ejemplo: CAN 500 kbit/s, 4 unidades; la del ID 0x2F1 con el nivel dominante bajo.']],bad:false}:
+      {name:'ejemplo_ckp_inyector1.csv',ds:[ckpDemo({flojo:3})],chk:[['ok','Señal de ejemplo: rueda 60-2, 4 cilindros (1-3-4-2), cilindro 3 flojo; ralentí, aceleración y corte de inyección.']],bad:false};skTab()});
+  if(key&&SK.csv[key]){ckpWire(key);canWire(key)}
   on('kVer',()=>{addPages(SK.csv[key].ds);showTab('S')});
   on('kAll',()=>{const l=[];P.forEach((p,k)=>{const c=SK.csv[skKey(S,p)];if(c)c.ds.forEach(d=>l.push(Object.assign({},d,{name:'Paso '+(k+1)+' · '+p.titulo+' · '+c.name})))});if(l.length){addPages(l);showTab('S')}});
   const dr=$('kDrop');if(dr){dr.ondragover=e=>{e.preventDefault();dr.classList.add('on')};dr.ondragleave=()=>dr.classList.remove('on');

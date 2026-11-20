@@ -1,0 +1,63 @@
+{
+ "formato": "analyzer-scope-script/1",
+ "id": "FR-CAN-01",
+ "nombre": "Red CAN",
+ "autor": "Fran Rosales",
+ "version": "2026.11.23",
+ "estado": "borrador",
+ "combustible": [
+  "gasolina",
+  "diesel"
+ ],
+ "sintomas": "Varios testigos encendidos a la vez, la diagnosis no comunica, averías intermitentes de red, unidades que no responden.",
+ "descripcion": "CAN de alta velocidad: niveles de CAN-H y CAN-L, flancos y tramas por unidad. Dice qué falla (a masa, a positivo, terminación) y qué unidad se aparta del resto.",
+ "skills": [
+  "can"
+ ],
+ "pasos": [
+  {
+   "id": "CAN",
+   "titulo": "CAN-H y CAN-L",
+   "canales": [
+    {
+     "canal": "A",
+     "senal": "CAN-H",
+     "sonda": "Punta 1:1 respecto a masa",
+     "rango": "±10 V",
+     "entidad": "CAN"
+    },
+    {
+     "canal": "B",
+     "senal": "CAN-L",
+     "sonda": "Punta 1:1 respecto a masa",
+     "rango": "±10 V",
+     "entidad": "CAN"
+    }
+   ],
+   "como": [
+    "Pinchar CAN-H y CAN-L en el conector de diagnosis (pines 6 y 14) o en el de la unidad sospechosa.",
+    "Masa de las dos puntas en la masa del vehículo, no una sonda diferencial.",
+    "Contacto puesto o motor a ralentí: tiene que haber tráfico.",
+    "La terminación (60 Ω entre H y L) se mide aparte, con el contacto quitado y el polímetro."
+   ],
+   "maniobra": [
+    {
+     "fase": "Contacto puesto, con tráfico",
+     "tipo": "contacto",
+     "s": 0.1,
+     "rpm": [
+      0,
+      0
+     ]
+    }
+   ],
+   "requisitos": {
+    "fs_min": 10000000,
+    "bitrate": 500000,
+    "criterio": "can"
+   },
+   "mirar": "Recesivo H ≈ L ≈ 2,5 V; dominante H ≈ 3,5 V y L ≈ 1,5 V (2 V de diferencia). La unidad cuyo nivel se aparta del resto es la sospechosa.",
+   "fuente": "ISO 11898-2 (CAN de alta velocidad). El CAN de baja velocidad tolerante a fallos tiene otros niveles."
+  }
+ ]
+}

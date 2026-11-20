@@ -1,7 +1,7 @@
 # Scripts de captura (pestaña «Scripts»)
 
 Los scripts se agrupan por **sistema**, para que quien tiene una avería entre por lo que le pasa al coche y no haga pruebas a ciegas:
-**Arranque y carga · Integridad mecánica · Equilibrio de cilindros · Encendido · Inyección**. Cada apartado es un script y sus pasos son las pruebas (una captura cada una).
+**Arranque y carga · Integridad mecánica · Equilibrio de cilindros · Encendido · Inyección · Red CAN**. Cada apartado es un script y sus pasos son las pruebas (una captura cada una).
 
 Un **script** dice **qué hacer**: qué capturas tomar con PicoScope, con qué canales y sondas, cómo y en qué orden.
 Las **skills** (paquetes de reglas y notas, `REGLAS.md`) dicen **qué pasa**. Plan completo: `PLAN_PRUEBAS_GUIADAS.md`; origen de cada maniobra: `GUIA_CAPTURAS.md`.
@@ -50,3 +50,12 @@ Sale en las pruebas con `requisitos.criterio: "diente"` en cuanto hay CSV (o la 
 6. **Conclusión**: cilindro < 85 % del mejor → [Medido]; sin combustión bien → fallo de combustión, también bajo → fuga de compresión → [Inferido].
 * En gasolina el sincronismo bueno es la **bobina 1** (el inyector secuencial inyecta en admisión, ~360° antes). En diésel, el inyector 1.
 * Umbral y método en borrador: validar con capturas reales (cilindro con fallo conocido).
+
+## Analizar la red CAN (`34-can.js`)
+Sale en las pruebas con `requisitos.criterio: "can"` (`requisitos.bitrate` para el comprobador, 500 kbit/s por defecto).
+1. **Diferencial** H−L con histéresis (dominante > 0,9 V, recesivo < 0,5 V) → tramos. **Velocidad**: tramo corto típico = 1 bit → velocidad normalizada más cercana.
+2. **Tramas**: separadas por ≥ 7 bits recesivos; se quitan los bits de relleno, se lee el ID (11 o 29 bits) y se comprueba el **CRC-15**. Un dominante de ≥ 6 bits = trama de error.
+3. **Niveles por trama** en el centro de los bits, desde el bit 20 (pasado el arbitraje) y sin el ACK: solo transmite esa unidad. **Flancos**: subida 10–90 % y sobreoscilación.
+4. **Por unidad (ID)**: diferencial que se aparta > 12 % de la mediana, fuera de 1,5–3 V, sobreoscilación > 25 % o CRC mal → sospechosa.
+5. **Sin tramas**: por niveles, H/L a masa (< 0,5 V), a positivo (> 5 V), o H = L (reposo o unidos).
+* Referencia [Teórico]: ISO 11898-2, CAN de alta velocidad. El CAN de baja velocidad tolerante a fallos no está cubierto.
