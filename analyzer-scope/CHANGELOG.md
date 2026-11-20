@@ -3,6 +3,12 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.21
+- **Scripts por sistema:** cinco apartados que se eligen por lo que le pasa al coche: **Arranque y carga**, **Integridad mecánica**, **Equilibrio de cilindros**, **Encendido** e **Inyección**. Cada uno dice cuándo entrar y lleva sus pruebas (una captura cada una).
+- **Compresión relativa** ya no es un apartado: va dentro de Arranque y carga (principio de la gráfica) y de Integridad mecánica (oscilaciones estables). Cada prueba dice **qué mirar**.
+- **Gasolina / Diésel** en los apartados con pruebas distintas; **presión en cilindro (Px)** y avance, como pruebas opcionales para quien tenga transductor de cilindro.
+- **Qué probar:** Integridad mecánica en gasolina y en diésel; la prueba de corriente de inyector (captura corta).
+
 ## 2026.11.20b
 - **Arreglo:** en «Scripts» solo se podía abrir el primer script; ahora se abre cualquiera.
 

@@ -5,7 +5,10 @@ const SK_TB=[[.001,'1 ms'],[.002,'2 ms'],[.005,'5 ms'],[.01,'10 ms'],[.02,'20 ms
 const SK_MS=[[1e5,'100 kS'],[2e5,'200 kS'],[5e5,'500 kS'],[1e6,'1 MS'],[2e6,'2 MS'],[5e6,'5 MS'],[1e7,'10 MS'],[2e7,'20 MS'],[5e7,'50 MS']];
 const SK_FC={reposo:'#7d8da1',contacto:'#c99a00',arrastre:'#3d8bff',ralenti:'#8a9bb0',suave:'#1fa98f',brusca:'#ff8a00',parada:'#9b5cff',corte:'#d0479a'};
 const SK_CH={A:0,B:1,C:2,D:3,E:4,F:5,G:6,H:7};
-const SK={sel:null,step:0,cfg:{},csv:{},edit:false,del:false};
+const SK={sel:null,step:0,cfg:{},csv:{},edit:false,del:false,fuel:'gasolina'};
+/* pasos visibles según el combustible elegido (un paso con «combustible» solo sale para ese combustible) y clave estable de cada paso */
+const skPasos=S=>S.pasos.filter(p=>!p.combustible||p.combustible.includes(SK.fuel));
+const skKey=(S,p)=>S.id+'|'+(p.id||p.titulo);
 const skUser=()=>{let a=null;try{a=JSON.parse(LS.get('as_scripts')||'null')}catch(e){}return Array.isArray(a)?a:[]};
 const skSave=a=>LS.set('as_scripts',JSON.stringify(a));
 const skAll=()=>[...SCRIPTS_BASE.map(s=>Object.assign({},s,{_o:true})),...skUser()];
@@ -67,38 +70,39 @@ function skPerfil(p,win){
 /* ---- pintado ---- */
 function skTab(){
   const S=skCur();if(!S)return;SK.sel=S.id;const U=skUser();
-  const it=s=>'<button class="skI'+(s.id===S.id?' on':'')+'" data-k="'+esc(s.id)+'"><b>'+skE(s.nombre)+'</b><small>'+skE(s.autor||'')+(s.autor?' · ':'')+s.pasos.length+(s.pasos.length>1?' capturas':' captura')+(s._o?' · original':'')+'</small></button>';
-  $('kL').innerHTML='<b class="skH">Originales</b>'+SCRIPTS_BASE.map(s=>it(Object.assign({},s,{_o:true}))).join('')+
+  const it=s=>'<button class="skI'+(s.id===S.id?' on':'')+'" data-k="'+esc(s.id)+'"><b>'+skE(s.nombre)+'</b><small>'+(s.sintomas?skE(s.sintomas):skE(s.autor||''))+'</small></button>';
+  $('kL').innerHTML='<b class="skH">Qué quieres comprobar</b>'+SCRIPTS_BASE.map(s=>it(Object.assign({},s,{_o:true}))).join('')+
     '<b class="skH">Mis scripts</b>'+(U.length?U.map(it).join(''):'<p class="hint">Duplica un original para hacer el tuyo.</p>')+
     '<div class="row"><button id="kImpB">Importar script (.json)…</button></div>';
   const ori=S._o?null:SCRIPTS_BASE.find(b=>S.origen&&b.id===S.origen.id),nuevo=ori&&S.origen.version&&ori.version!==S.origen.version;
-  $('kCab').innerHTML='<div class="skCab"><div class="skTt"><h2>'+skE(S.nombre)+(S.estado==='borrador'?' <span class="skB">BORRADOR</span>':'')+'</h2><p class="hint">'+skE(S.descripcion||'')+'</p>'+
+  $('kCab').innerHTML='<div class="skCab"><div class="skTt"><h2>'+skE(S.nombre)+(S.estado==='borrador'?' <span class="skB">BORRADOR</span>':'')+'</h2>'+(S.sintomas?'<p class="skSi"><b>Cuándo entrar:</b> '+skE(S.sintomas)+'</p>':'')+'<p class="hint">'+skE(S.descripcion||'')+'</p>'+
+    ((S.combustible||[]).length>1&&S.pasos.some(p=>p.combustible)?'<div class="row skFu"><span class="hint">Motor:</span><button id="kFg" class="'+(SK.fuel==='gasolina'?'on':'')+'">Gasolina</button><button id="kFd" class="'+(SK.fuel==='diesel'?'on':'')+'">Diésel</button></div>':'')+
     (S.origen?'<p class="hint">Copia de «'+skE(S.origen.nombre||S.origen.id)+'»'+(nuevo?' · <b>hay una versión nueva del original</b> ('+skE(ori.version)+')':'')+'</p>':'')+'</div><div class="row">'+
     (S._o?'<span class="hint">Original de '+skE(S.autor||'')+': solo lectura</span><button class="p" id="kDup">Duplicar y editar</button>':
       '<button id="kEd">Editar</button><button id="kDup">Duplicar</button><button id="kExp">Exportar (.json)</button><button id="kDel">'+(SK.del?'¿Borrar? Pulsa otra vez':'Borrar')+'</button>')+'</div></div>';
-  const n=S.pasos.length,ok=k=>SK.csv[S.id+'|'+k];
+  const P=skPasos(S),n=P.length,ok=k=>SK.csv[skKey(S,P[k-1])];if(SK.step>n+1)SK.step=0;
   $('kSteps').innerHTML='<button class="skS'+(SK.step===0?' on':'')+'" data-s="0"><i>0</i>Configurar PicoScope</button>'+
-    S.pasos.map((p,k)=>'<button class="skS'+(SK.step===k+1?' on':'')+(ok(k+1)?(ok(k+1).bad?' wa':' ok'):'')+'" data-s="'+(k+1)+'"><i>'+(ok(k+1)?(ok(k+1).bad?'!':'✓'):k+1)+'</i>'+skE(p.titulo)+'</button>').join('')+
+    P.map((p,k)=>'<button class="skS'+(SK.step===k+1?' on':'')+(ok(k+1)?(ok(k+1).bad?' wa':' ok'):'')+'" data-s="'+(k+1)+'"><i>'+(ok(k+1)?(ok(k+1).bad?'!':'✓'):k+1)+'</i>'+skE(p.titulo)+(p.opcional?' <small>(opcional)</small>':'')+'</button>').join('')+
     '<button class="skS'+(SK.step===n+1?' on':'')+'" data-s="'+(n+1)+'"><i>★</i>Resumen</button>';
   $('kPaso').innerHTML=SK.edit?skEditor(S):skPaso(S,SK.step);
   skWire(S);
 }
 function skPaso(S,i){
-  const n=S.pasos.length;
+  const P=skPasos(S),n=P.length;
   if(i===0)return '<div class="skC"><b class="skH">Antes de empezar</b><p class="hint">Autoscope graba sin límite hasta llenar el disco. PicoScope guarda pantallas en un búfer y, si tardas, las nuevas sustituyen a las primeras. Por eso se configura antes de cada captura:</p><ol class="skO">'+
     '<li><b>Prueba de señal</b>: base de tiempos corta, ajustar escalas y comprobar que cada canal se ve bien.</li>'+
     '<li><b>Subir la base de tiempos</b> a 1–2 s/div para que una pantalla contenga la maniobra completa. Cada paso dice cuánto necesita y comprueba tu configuración.</li>'+
     '<li><b>Muestras</b> suficientes para el muestreo mínimo del paso.</li>'+
     '<li><b>Disparo único</b> sobre la bobina: graba una pantalla y se para (por confirmar en taller).</li>'+
     '<li><b>Exportar a CSV</b> solo la pantalla con la maniobra (forma de onda actual). Un CSV por paso.</li></ol>'+
-    '<div class="row"><span class="hint">'+n+(n>1?' capturas':' captura')+' en este script.</span><span class="sp"></span><button class="p" data-go="1">Empezar: paso 1</button></div></div>';
-  if(i>n){const L=S.pasos.map((p,k)=>SK.csv[S.id+'|'+(k+1)]);
-    return '<div class="skC"><b class="skH">Resumen de las capturas</b><div class="skCk">'+S.pasos.map((p,k)=>{const c=L[k];
-      return '<div class="skA '+(c?(c.bad?'warn':'ok'):'warn')+'"><b>'+(c?(c.bad?'!':'✓'):'!')+'</b><span>Paso '+(k+1)+' · '+skE(p.titulo)+(c?' — '+skE(c.name):' — falta el CSV')+'</span></div>'}).join('')+'</div>'+
+    '<div class="row"><span class="hint">'+n+(n>1?' pruebas':' prueba')+', una captura cada una.</span><span class="sp"></span><button class="p" data-go="1">Empezar: paso 1</button></div></div>';
+  if(i>n){const L=P.map(p=>SK.csv[skKey(S,p)]);
+    return '<div class="skC"><b class="skH">Resumen de las capturas</b><div class="skCk">'+P.map((p,k)=>{const c=L[k];
+      return '<div class="skA '+(c?(c.bad?'warn':'ok'):'warn')+'"><b>'+(c?(c.bad?'!':'✓'):'!')+'</b><span>Paso '+(k+1)+' · '+skE(p.titulo)+(c?' — '+skE(c.name):p.opcional?' — opcional, sin CSV':' — falta el CSV')+'</span></div>'}).join('')+'</div>'+
       '<div class="row"><button class="p" id="kAll"'+(L.some(Boolean)?'':' disabled')+'>Abrir las capturas en el osciloscopio</button></div>'+
       '<p class="hint">Cada captura se abre como una página. El informe combinado (fases y cruce de pruebas por cilindro) llegará en una próxima versión.</p></div>';}
-  const p=S.pasos[i-1],key=S.id+'|'+i,c=SK.cfg[key]||(SK.cfg[key]=skRec(p)),r=skChecks(p,c),cv=SK.csv[key];
-  return '<div class="skC"><b class="skH2">Paso '+i+' de '+n+' · '+skE(p.titulo)+'</b><div class="skG2"><div class="skMin"><b class="skH">Qué medir</b><div class="skTw"><table class="skTb"><thead><tr><th>Canal</th><th>Señal</th><th>Sonda</th><th>Rango</th></tr></thead><tbody>'+
+  const p=P[i-1],key=skKey(S,p),c=SK.cfg[key]||(SK.cfg[key]=skRec(p)),r=skChecks(p,c),cv=SK.csv[key];
+  return '<div class="skC"><b class="skH2">Paso '+i+' de '+n+' · '+skE(p.titulo)+'</b>'+(p.opcional?'<p class="skSi"><b>Opcional:</b> '+skE(p.condicion||'')+'</p>':'')+(p.mirar?'<p class="skSi"><b>Qué mirar:</b> '+skE(p.mirar)+'</p>':'')+'<div class="skG2"><div class="skMin"><b class="skH">Qué medir</b><div class="skTw"><table class="skTb"><thead><tr><th>Canal</th><th>Señal</th><th>Sonda</th><th>Rango</th></tr></thead><tbody>'+
     p.canales.map(ch=>'<tr><td><span class="skCh" style="background:'+COL[SK_CH[ch.canal]]+'">'+ch.canal+'</span></td><td>'+skE(ch.senal)+'</td><td>'+skE(ch.sonda||'')+'</td><td class="nw">'+skE(ch.rango||'')+'</td></tr>').join('')+'</tbody></table></div>'+
     (p.como&&p.como.length?'<b class="skH">Cómo</b><ol class="skO">'+p.como.map(x=>'<li>'+skE(x)+'</li>').join('')+'</ol>':'')+'</div>'+
     '<div class="skMin"><b class="skH">Maniobra, en este orden</b>'+skPerfil(p,r.win)+(p.fuente?'<p class="hint">'+skE(p.fuente)+'</p>':'')+'</div></div></div>'+
@@ -117,7 +121,7 @@ function skEditor(S){
 }
 /* ---- acciones ---- */
 async function skCargaCsv(S,i,f){
-  const p=S.pasos[i-1],key=S.id+'|'+i;
+  const p=skPasos(S)[i-1];if(!p)return;const key=skKey(S,p);
   try{st('Leyendo '+f.name+'…');const ds=await readAny(f,u=>st('Leyendo '+f.name+'… '+Math.round(u*100)+' %'));const d=ds[0];
     const x=d.chs[0].x,n=x.length,dur=n>1?x[n-1]-x[0]:0,fs=dur>0?(n-1)/dur:0,need=skDur(p),r=p.requisitos,chk=[];
     chk.push([d.chs.length>=p.canales.length?'ok':'warn',d.chs.length+(d.chs.length>1?' canales':' canal')+(d.chs.length>=p.canales.length?'':' (el paso pide '+p.canales.length+')')]);
@@ -144,13 +148,14 @@ function skWire(S){
     const U=skUser().map(x=>x.id===S.id?o:x);skSave(U);SK.edit=false;skTab();st('Script guardado.')});
   on('kExp',()=>saveFile((S.nombre||'script')+'.json',new Blob([JSON.stringify(Object.assign({},S,{_o:undefined}),null,2)],{type:'application/json'})));
   on('kDel',()=>{if(!SK.del){SK.del=true;skTab();return}SK.del=false;skSave(skUser().filter(x=>x.id!==S.id));SK.sel=null;SK.step=0;skTab();st('Script borrado.')});
-  const key=S.id+'|'+SK.step;
+  const P=skPasos(S),key=P[SK.step-1]?skKey(S,P[SK.step-1]):'';
+  on('kFg',()=>{SK.fuel='gasolina';SK.step=0;skTab()});on('kFd',()=>{SK.fuel='diesel';SK.step=0;skTab()});
   if($('kTb')){$('kTb').onchange=e=>{SK.cfg[key].tb=+e.target.value;skTab()};$('kMs').onchange=e=>{SK.cfg[key].ms=+e.target.value;skTab()};
-    $('kRec').onclick=()=>{SK.cfg[key]=skRec(S.pasos[SK.step-1]);skTab()}}
+    $('kRec').onclick=()=>{SK.cfg[key]=skRec(P[SK.step-1]);skTab()}}
   on('kLoad',()=>$('kIn').click());
   on('kQuit',()=>{delete SK.csv[key];skTab()});
   on('kVer',()=>{addPages(SK.csv[key].ds);showTab('S')});
-  on('kAll',()=>{const l=[];S.pasos.forEach((p,k)=>{const c=SK.csv[S.id+'|'+(k+1)];if(c)c.ds.forEach(d=>l.push(Object.assign({},d,{name:'Paso '+(k+1)+' · '+p.titulo+' · '+c.name})))});if(l.length){addPages(l);showTab('S')}});
+  on('kAll',()=>{const l=[];P.forEach((p,k)=>{const c=SK.csv[skKey(S,p)];if(c)c.ds.forEach(d=>l.push(Object.assign({},d,{name:'Paso '+(k+1)+' · '+p.titulo+' · '+c.name})))});if(l.length){addPages(l);showTab('S')}});
   const dr=$('kDrop');if(dr){dr.ondragover=e=>{e.preventDefault();dr.classList.add('on')};dr.ondragleave=()=>dr.classList.remove('on');
     dr.ondrop=e=>{e.preventDefault();e.stopPropagation();dr.classList.remove('on');const f=e.dataTransfer.files[0];if(f)skCargaCsv(S,SK.step,f)}}
 }

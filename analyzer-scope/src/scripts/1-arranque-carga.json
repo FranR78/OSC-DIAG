@@ -1,0 +1,102 @@
+{
+ "formato": "analyzer-scope-script/1",
+ "id": "FR-ARR-01",
+ "nombre": "Arranque y carga",
+ "autor": "Fran Rosales",
+ "version": "2026.11.21",
+ "estado": "borrador",
+ "combustible": [
+  "gasolina",
+  "diesel"
+ ],
+ "sintomas": "Arranca con dificultad, no arranca, se descarga la batería, testigo de carga encendido.",
+ "descripcion": "Batería, motor de arranque, bujías de incandescencia, compresión durante el arranque y alternador, en una sola captura.",
+ "skills": [
+  "bateria",
+  "arranque",
+  "carga",
+  "compresion-relativa"
+ ],
+ "pasos": [
+  {
+   "id": "POWER",
+   "titulo": "Batería, arranque y carga",
+   "canales": [
+    {
+     "canal": "A",
+     "senal": "Tensión de batería",
+     "sonda": "Puntas en los bornes",
+     "rango": "±20 V",
+     "entidad": "batería"
+    },
+    {
+     "canal": "B",
+     "senal": "Corriente de batería",
+     "sonda": "Pinza amperimétrica en el negativo",
+     "rango": "±600 A",
+     "entidad": "pinza batería"
+    }
+   ],
+   "como": [
+    "Batería cargada y vehículo en reposo 1 h.",
+    "Empezar a grabar con el contacto quitado.",
+    "Diésel: dar contacto y esperar a que se apaguen las bujías.",
+    "Arrancar, dejar a ralentí con consumidores y subir a 2500 RPM."
+   ],
+   "maniobra": [
+    {
+     "fase": "Contacto quitado",
+     "tipo": "reposo",
+     "s": 3,
+     "rpm": [
+      0,
+      0
+     ]
+    },
+    {
+     "fase": "Contacto",
+     "tipo": "contacto",
+     "s": 6,
+     "rpm": [
+      0,
+      0
+     ]
+    },
+    {
+     "fase": "Arranque",
+     "tipo": "arrastre",
+     "s": 2,
+     "rpm": [
+      250,
+      800
+     ]
+    },
+    {
+     "fase": "Ralentí",
+     "tipo": "ralenti",
+     "s": 12,
+     "rpm": [
+      800,
+      800
+     ]
+    },
+    {
+     "fase": "2500 RPM",
+     "tipo": "suave",
+     "s": 12,
+     "rpm": [
+      2500,
+      2500
+     ]
+    }
+   ],
+   "requisitos": {
+    "fs_min": 10000,
+    "rpm_max": 2500,
+    "criterio": "ninguno"
+   },
+   "mirar": "Principio de la gráfica: tensión en reposo, caída al arrancar (no menos de 9 V), solenoide y pico de arranque; durante el arrastre, la compresión relativa; al final, carga (13,8–15 V) y rizado del alternador.",
+   "fuente": "Curso de scripts, script El Power, pág. 87–100."
+  }
+ ]
+}

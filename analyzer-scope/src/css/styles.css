@@ -239,3 +239,4 @@ body.light .skA.ok{background:#e3f6ea;color:#15803d}body.light .skA.warn{backgro
 .skC .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.skC .row .sp{flex:1}.skC label{display:flex;align-items:center;gap:6px;font-size:13px}
 .skTx{width:100%;min-height:360px;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;resize:vertical}
 .skS.wa i{background:#d98a00;color:#fff;border-color:#d98a00}
+.skSi{margin:6px 0 0;font-size:13px}.skFu{margin-top:8px}.skFu button.on{background:var(--ac);border-color:var(--ac);color:#fff}.skS small{color:var(--mu);font-size:11px}

@@ -1,0 +1,150 @@
+{
+ "formato": "analyzer-scope-script/1",
+ "id": "FR-ENC-01",
+ "nombre": "Encendido",
+ "autor": "Fran Rosales",
+ "version": "2026.11.21",
+ "estado": "borrador",
+ "combustible": [
+  "gasolina"
+ ],
+ "sintomas": "Falla al acelerar o con carga, pierde fuerza, testigo de avería parpadea.",
+ "descripcion": "Fallos de encendido por cilindro y avance.",
+ "skills": [
+  "encendido",
+  "avance"
+ ],
+ "pasos": [
+  {
+   "id": "ENC",
+   "titulo": "Encendido por cilindro",
+   "canales": [
+    {
+     "canal": "A",
+     "senal": "Sensor de cigüeñal (CKP)",
+     "sonda": "Punta 1:1",
+     "rango": "±20 V",
+     "entidad": "sensor cigüeñal"
+    },
+    {
+     "canal": "B",
+     "senal": "Bobina 1",
+     "sonda": "Pinza inductiva",
+     "rango": "±20 V",
+     "entidad": "encendido"
+    }
+   ],
+   "como": [
+    "Pinchar la señal del CKP sin desconectar el sensor.",
+    "Motor a temperatura; si el fallo sale con carga, provocar carga (acelerones)."
+   ],
+   "maniobra": [
+    {
+     "fase": "Ralentí",
+     "tipo": "ralenti",
+     "s": 5,
+     "rpm": [
+      800,
+      800
+     ]
+    },
+    {
+     "fase": "Acel. suave",
+     "tipo": "suave",
+     "s": 4,
+     "rpm": [
+      800,
+      2500
+     ]
+    },
+    {
+     "fase": "Ralentí",
+     "tipo": "ralenti",
+     "s": 2,
+     "rpm": [
+      2500,
+      800
+     ]
+    },
+    {
+     "fase": "Acel. brusca",
+     "tipo": "brusca",
+     "s": 2,
+     "rpm": [
+      800,
+      4500
+     ]
+    },
+    {
+     "fase": "Ralentí",
+     "tipo": "ralenti",
+     "s": 3,
+     "rpm": [
+      4500,
+      800
+     ]
+    }
+   ],
+   "requisitos": {
+    "fs_min": 200000,
+    "rpm_max": 4500,
+    "criterio": "diente"
+   },
+   "mirar": "Un cilindro que deja de aportar al acelerar o con carga, y no a ralentí, apunta a encendido.",
+   "fuente": "Curso de scripts, pág. 64 (fallo del sistema de encendido)."
+  },
+  {
+   "id": "AVANCE",
+   "titulo": "Avance de encendido",
+   "opcional": true,
+   "condicion": "si tienes transductor de presión de cilindro.",
+   "canales": [
+    {
+     "canal": "A",
+     "senal": "Transductor de presión en el cilindro",
+     "sonda": "Transductor de cilindro (hueco de la bujía)",
+     "rango": "según transductor",
+     "entidad": "transductor cilindro"
+    },
+    {
+     "canal": "B",
+     "senal": "Chispa del mismo cilindro",
+     "sonda": "Pinza inductiva en el cable o la bobina",
+     "rango": "±20 V",
+     "entidad": "encendido"
+    }
+   ],
+   "como": [
+    "Quitar la bujía del cilindro y roscar el transductor; la bobina sigue saltando fuera.",
+    "Grabar ralentí y acelerones a plena carga."
+   ],
+   "maniobra": [
+    {
+     "fase": "Ralentí",
+     "tipo": "ralenti",
+     "s": 5,
+     "rpm": [
+      800,
+      800
+     ]
+    },
+    {
+     "fase": "Acelerones",
+     "tipo": "brusca",
+     "s": 6,
+     "rpm": [
+      800,
+      5000
+     ]
+    }
+   ],
+   "requisitos": {
+    "fs_min": 50000,
+    "rpm_max": 5000,
+    "criterio": "grados"
+   },
+   "mirar": "Avance a ralentí 5–15° y estable (±1°); a plena carga según RPM.",
+   "fuente": "Curso de scripts, pág. 49."
+  }
+ ]
+}

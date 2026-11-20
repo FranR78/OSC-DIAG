@@ -1,0 +1,479 @@
+{
+ "formato": "analyzer-scope-script/1",
+ "id": "FR-MEC-01",
+ "nombre": "Integridad mecánica",
+ "autor": "Fran Rosales",
+ "version": "2026.11.21",
+ "estado": "borrador",
+ "combustible": [
+  "gasolina",
+  "diesel"
+ ],
+ "sintomas": "Petardea o no va fino al acelerar, pierde fuerza, consume aceite, humo, ruidos de motor.",
+ "descripcion": "Compresión, válvulas, segmentos, distribución y escape por cilindro.",
+ "skills": [
+  "compresion-relativa",
+  "admision",
+  "escape",
+  "carter",
+  "distribucion"
+ ],
+ "pasos": [
+  {
+   "id": "COMP",
+   "titulo": "Compresión relativa",
+   "canales": [
+    {
+     "canal": "A",
+     "senal": "Corriente de arranque",
+     "sonda": "Pinza amperimétrica",
+     "rango": "±600 A",
+     "entidad": "pinza arranque"
+    },
+    {
+     "canal": "B",
+     "senal": "Bobina 1 (o inyector 1 en diésel)",
+     "sonda": "Pinza inductiva / punta 10:1",
+     "rango": "±20 V",
+     "entidad": "encendido"
+    }
+   ],
+   "como": [
+    "Cortar la inyección (fusible o relé de la bomba) para que el motor no arranque.",
+    "Pinza en el cable del motor de arranque, flecha hacia el motor.",
+    "Sincronismo en el cilindro 1: marca su PMS de compresión."
+   ],
+   "maniobra": [
+    {
+     "fase": "Reposo",
+     "tipo": "reposo",
+     "s": 1,
+     "rpm": [
+      0,
+      0
+     ]
+    },
+    {
+     "fase": "Arrastre",
+     "tipo": "arrastre",
+     "s": 6,
+     "rpm": [
+      250,
+      250
+     ]
+    },
+    {
+     "fase": "Soltar llave",
+     "tipo": "parada",
+     "s": 1,
+     "rpm": [
+      250,
+      0
+     ]
+    }
+   ],
+   "requisitos": {
+    "fs_min": 20000,
+    "rpm_max": 330,
+    "criterio": "grados"
+   },
+   "mirar": "Las oscilaciones de la corriente cuando el arrastre ya es estable: cada pico es un cilindro; uno más bajo tiene menos compresión (90–100 % del mejor).",
+   "fuente": "Curso de scripts, pág. 95–96: 170–330 RPM de arrastre, 5–10 ciclos, cada cilindro 90–100 %."
+  },
+  {
+   "id": "ADM",
+   "titulo": "Admisión y cárter",
+   "canales": [
+    {
+     "canal": "A",
+     "senal": "Bobina 1",
+     "sonda": "Pinza inductiva",
+     "rango": "±20 V",
+     "entidad": "encendido"
+    },
+    {
+     "canal": "B",
+     "senal": "Inyector 1",
+     "sonda": "Punta 10:1",
+     "rango": "±50 V",
+     "entidad": "inyector"
+    },
+    {
+     "canal": "C",
+     "senal": "Transductor de admisión",
+     "sonda": "Transductor de pulso",
+     "rango": "±2 V",
+     "entidad": "transductor admisión"
+    },
+    {
+     "canal": "D",
+     "senal": "Transductor de cárter",
+     "sonda": "Transductor de pulso (tubo de la varilla de aceite)",
+     "rango": "±1 V",
+     "entidad": "transductor cárter"
+    }
+   ],
+   "como": [
+    "Motor a temperatura, consumidores apagados.",
+    "Transductor de admisión en una toma de vacío del colector, después de la mariposa.",
+    "Transductor de cárter en el tubo de la varilla de aceite, bien sellado.",
+    "No cortar la grabación al apagar: la caída sin combustión es la parte mecánica."
+   ],
+   "maniobra": [
+    {
+     "fase": "Ralentí",
+     "tipo": "ralenti",
+     "s": 5,
+     "rpm": [
+      800,
+      800
+     ]
+    },
+    {
+     "fase": "Acel. suave",
+     "tipo": "suave",
+     "s": 4,
+     "rpm": [
+      800,
+      2500
+     ]
+    },
+    {
+     "fase": "Vuelta",
+     "tipo": "ralenti",
+     "s": 2,
+     "rpm": [
+      2500,
+      800
+     ]
+    },
+    {
+     "fase": "Acel. brusca",
+     "tipo": "brusca",
+     "s": 1.5,
+     "rpm": [
+      800,
+      4500
+     ]
+    },
+    {
+     "fase": "Soltar",
+     "tipo": "ralenti",
+     "s": 2,
+     "rpm": [
+      4500,
+      800
+     ]
+    },
+    {
+     "fase": "Apagar grabando",
+     "tipo": "parada",
+     "s": 3.5,
+     "rpm": [
+      800,
+      0
+     ]
+    }
+   ],
+   "requisitos": {
+    "fs_min": 50000,
+    "rpm_max": 4500,
+    "criterio": "grados"
+   },
+   "mirar": "Pulso de admisión por cilindro (válvula de admisión) y pulso de cárter en fase con un cilindro (segmentos).",
+   "fuente": "Maniobra del CSS diésel (pág. 70); apagar grabando equivale al corte con mariposa abierta (pág. 67)."
+  },
+  {
+   "id": "ESC",
+   "titulo": "Escape",
+   "canales": [
+    {
+     "canal": "A",
+     "senal": "Bobina 1",
+     "sonda": "Pinza inductiva",
+     "rango": "±20 V",
+     "entidad": "encendido"
+    },
+    {
+     "canal": "B",
+     "senal": "Inyector 1",
+     "sonda": "Punta 10:1",
+     "rango": "±50 V",
+     "entidad": "inyector"
+    },
+    {
+     "canal": "C",
+     "senal": "Transductor de escape",
+     "sonda": "Transductor de pulso en la salida",
+     "rango": "±2 V",
+     "entidad": "transductor escape"
+    }
+   ],
+   "como": [
+    "Transductor en la salida del escape, con adaptador estanco.",
+    "Misma maniobra que la prueba de admisión, en el mismo orden."
+   ],
+   "maniobra": [
+    {
+     "fase": "Ralentí",
+     "tipo": "ralenti",
+     "s": 5,
+     "rpm": [
+      800,
+      800
+     ]
+    },
+    {
+     "fase": "Acel. suave",
+     "tipo": "suave",
+     "s": 4,
+     "rpm": [
+      800,
+      2500
+     ]
+    },
+    {
+     "fase": "Vuelta",
+     "tipo": "ralenti",
+     "s": 2,
+     "rpm": [
+      2500,
+      800
+     ]
+    },
+    {
+     "fase": "Acel. brusca",
+     "tipo": "brusca",
+     "s": 1.5,
+     "rpm": [
+      800,
+      4500
+     ]
+    },
+    {
+     "fase": "Soltar",
+     "tipo": "ralenti",
+     "s": 2,
+     "rpm": [
+      4500,
+      800
+     ]
+    },
+    {
+     "fase": "Apagar grabando",
+     "tipo": "parada",
+     "s": 3.5,
+     "rpm": [
+      800,
+      0
+     ]
+    }
+   ],
+   "requisitos": {
+    "fs_min": 50000,
+    "rpm_max": 4500,
+    "criterio": "grados"
+   },
+   "mirar": "Pulso de escape por cilindro (válvula de escape) y presión que sube en la aceleración brusca y tarda en bajar (escape o catalizador obstruido).",
+   "fuente": "Curso de scripts, pág. 4 y 48."
+  },
+  {
+   "id": "CAIDA-G",
+   "titulo": "Caída de giro con encendido cortado",
+   "combustible": [
+    "gasolina"
+   ],
+   "canales": [
+    {
+     "canal": "A",
+     "senal": "Sensor de cigüeñal (CKP)",
+     "sonda": "Punta 1:1",
+     "rango": "±20 V",
+     "entidad": "sensor cigüeñal"
+    },
+    {
+     "canal": "B",
+     "senal": "Bobina 1",
+     "sonda": "Pinza inductiva",
+     "rango": "±20 V",
+     "entidad": "encendido"
+    }
+   ],
+   "como": [
+    "Pinchar la señal del CKP sin desconectar el sensor.",
+    "Por encima de 3000 RPM cortar el encendido con la mariposa abierta hasta que el motor se pare."
+   ],
+   "maniobra": [
+    {
+     "fase": "Ralentí",
+     "tipo": "ralenti",
+     "s": 5,
+     "rpm": [
+      800,
+      800
+     ]
+    },
+    {
+     "fase": "Acelerar",
+     "tipo": "brusca",
+     "s": 3,
+     "rpm": [
+      800,
+      3500
+     ]
+    },
+    {
+     "fase": "Corte de encendido",
+     "tipo": "corte",
+     "s": 5,
+     "rpm": [
+      3500,
+      0
+     ]
+    }
+   ],
+   "requisitos": {
+    "fs_min": 200000,
+    "rpm_max": 3500,
+    "criterio": "diente"
+   },
+   "mirar": "La caída sin combustión solo depende de la mecánica: el cilindro que empuja menos tiene fuga de compresión.",
+   "fuente": "Curso de scripts, pág. 67."
+  },
+  {
+   "id": "CAIDA-D",
+   "titulo": "Caída de giro al apagar",
+   "combustible": [
+    "diesel"
+   ],
+   "canales": [
+    {
+     "canal": "A",
+     "senal": "Sensor de cigüeñal (CKP)",
+     "sonda": "Punta 1:1",
+     "rango": "±20 V",
+     "entidad": "sensor cigüeñal"
+    },
+    {
+     "canal": "B",
+     "senal": "Inyector 1",
+     "sonda": "Pinza de corriente o punta 10:1",
+     "rango": "±20 V",
+     "entidad": "inyector"
+    }
+   ],
+   "como": [
+    "Pinchar la señal del CKP sin desconectar el sensor.",
+    "Acelerón y apagar el motor sin parar la grabación."
+   ],
+   "maniobra": [
+    {
+     "fase": "Ralentí",
+     "tipo": "ralenti",
+     "s": 5,
+     "rpm": [
+      800,
+      800
+     ]
+    },
+    {
+     "fase": "Acelerón",
+     "tipo": "brusca",
+     "s": 3,
+     "rpm": [
+      800,
+      2700
+     ]
+    },
+    {
+     "fase": "Apagar",
+     "tipo": "parada",
+     "s": 5,
+     "rpm": [
+      2700,
+      0
+     ]
+    }
+   ],
+   "requisitos": {
+    "fs_min": 200000,
+    "rpm_max": 2700,
+    "criterio": "diente"
+   },
+   "mirar": "La caída sin inyección solo depende de la mecánica: el cilindro que empuja menos tiene fuga de compresión.",
+   "fuente": "Curso de scripts, pág. 70–71."
+  },
+  {
+   "id": "PX",
+   "titulo": "Presión en cilindro",
+   "opcional": true,
+   "condicion": "si tienes transductor de presión de cilindro.",
+   "canales": [
+    {
+     "canal": "A",
+     "senal": "Transductor de presión en el cilindro",
+     "sonda": "Transductor de cilindro (en el hueco de la bujía o del calentador)",
+     "rango": "según transductor",
+     "entidad": "transductor cilindro"
+    },
+    {
+     "canal": "B",
+     "senal": "Bobina o inyector de ese cilindro",
+     "sonda": "Pinza inductiva / punta 10:1",
+     "rango": "±20 V",
+     "entidad": "encendido"
+    }
+   ],
+   "como": [
+    "Quitar la bujía (o el calentador en diésel) del cilindro a medir y roscar el transductor.",
+    "Ese cilindro no trabaja durante la prueba: es normal.",
+    "Sincronismo del mismo cilindro para el avance (opcional)."
+   ],
+   "maniobra": [
+    {
+     "fase": "Ralentí",
+     "tipo": "ralenti",
+     "s": 5,
+     "rpm": [
+      800,
+      800
+     ]
+    },
+    {
+     "fase": "Acel. suave",
+     "tipo": "suave",
+     "s": 4,
+     "rpm": [
+      800,
+      2500
+     ]
+    },
+    {
+     "fase": "Ralentí",
+     "tipo": "ralenti",
+     "s": 2,
+     "rpm": [
+      2500,
+      800
+     ]
+    },
+    {
+     "fase": "Acelerones",
+     "tipo": "brusca",
+     "s": 3,
+     "rpm": [
+      800,
+      4000
+     ]
+    }
+   ],
+   "requisitos": {
+    "fs_min": 50000,
+    "rpm_max": 4000,
+    "criterio": "grados"
+   },
+   "mirar": "Distribución: AAE 130–160°, RCE 360–395°, AAA 350–385°, RCA 585–615°; fugas 15–20 %; pico 3–6 bar a ralentí.",
+   "fuente": "Curso de scripts, script Px, pág. 2–55."
+  }
+ ]
+}

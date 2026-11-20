@@ -1,0 +1,133 @@
+{
+ "formato": "analyzer-scope-script/1",
+ "id": "FR-INY-01",
+ "nombre": "Inyección",
+ "autor": "Fran Rosales",
+ "version": "2026.11.21",
+ "estado": "borrador",
+ "combustible": [
+  "gasolina",
+  "diesel"
+ ],
+ "sintomas": "Humo negro, golpeteo, consumo alto, falla un inyector, arranque en frío difícil.",
+ "descripcion": "Aporte por cilindro en diésel y forma de la corriente del inyector.",
+ "skills": [
+  "inyeccion"
+ ],
+ "pasos": [
+  {
+   "id": "INY-D",
+   "titulo": "Contribución por cilindro (diésel)",
+   "combustible": [
+    "diesel"
+   ],
+   "canales": [
+    {
+     "canal": "A",
+     "senal": "Sensor de cigüeñal (CKP)",
+     "sonda": "Punta 1:1",
+     "rango": "±20 V",
+     "entidad": "sensor cigüeñal"
+    },
+    {
+     "canal": "B",
+     "senal": "Inyector 1",
+     "sonda": "Pinza de corriente o punta 10:1",
+     "rango": "±20 V",
+     "entidad": "inyector"
+    }
+   ],
+   "como": [
+    "Pinchar la señal del CKP sin desconectar el sensor.",
+    "Grabar un ralentí largo: la ECU compensa los inyectores a ralentí."
+   ],
+   "maniobra": [
+    {
+     "fase": "Ralentí",
+     "tipo": "ralenti",
+     "s": 10,
+     "rpm": [
+      800,
+      800
+     ]
+    },
+    {
+     "fase": "Acel. suave",
+     "tipo": "suave",
+     "s": 4,
+     "rpm": [
+      800,
+      2000
+     ]
+    },
+    {
+     "fase": "Acel. brusca",
+     "tipo": "brusca",
+     "s": 3,
+     "rpm": [
+      2000,
+      3500
+     ]
+    },
+    {
+     "fase": "Ralentí",
+     "tipo": "ralenti",
+     "s": 3,
+     "rpm": [
+      3500,
+      800
+     ]
+    }
+   ],
+   "requisitos": {
+    "fs_min": 200000,
+    "rpm_max": 3500,
+    "criterio": "diente"
+   },
+   "mirar": "A ralentí la ECU iguala el aporte; al acelerar la compensación se desactiva y aparece el inyector débil.",
+   "fuente": "Curso de scripts, casos diésel, pág. 72–86."
+  },
+  {
+   "id": "INY-I",
+   "titulo": "Corriente de inyector",
+   "canales": [
+    {
+     "canal": "A",
+     "senal": "Tensión del inyector",
+     "sonda": "Punta 10:1",
+     "rango": "±50 V",
+     "entidad": "inyector"
+    },
+    {
+     "canal": "B",
+     "senal": "Corriente del inyector",
+     "sonda": "Pinza de corriente",
+     "rango": "±20 A",
+     "entidad": "inyector"
+    }
+   ],
+   "como": [
+    "Pinza de corriente en un cable del inyector y punta en el lado de mando.",
+    "Capturar una sola inyección a ralentí."
+   ],
+   "maniobra": [
+    {
+     "fase": "Una inyección a ralentí",
+     "tipo": "ralenti",
+     "s": 0.01,
+     "rpm": [
+      800,
+      800
+     ]
+    }
+   ],
+   "requisitos": {
+    "fs_min": 1000000,
+    "rpm_max": 800,
+    "criterio": "ninguno"
+   },
+   "mirar": "El escalón en la subida de la corriente marca la apertura de la aguja; si no aparece o se retrasa, inyector obstruido o agarrotado.",
+   "fuente": "Curso de scripts, pág. 66."
+  }
+ ]
+}
