@@ -573,6 +573,9 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await k.goto(APP); await k.waitForTimeout(400); await k.click('#tabK'); await k.waitForTimeout(150);
     const KE = fn => k.evaluate(fn);
     check('originales: los scripts de src/scripts, de solo lectura', await KE(() => SCRIPTS_BASE.length >= 5 && document.querySelectorAll('#kL .skI').length >= 5 && /solo lectura/.test($('kCab').textContent) && !$('kEd')));
+    await k.click('#kL .skI:nth-of-type(3)'); await k.waitForTimeout(100);
+    check('cambiar de script: cada original se abre al pulsarlo', await KE(() => { const r = []; document.querySelectorAll('#kL .skI').forEach((b, i) => { b.click(); r.push($('kCab').querySelector('h2').textContent); }); return new Set(r).size === r.length && r.length >= 5; }));
+    await k.click('#kL .skI'); await k.waitForTimeout(100);
     check('pasos en orden: configurar, 3 capturas y resumen', await KE(() => [...document.querySelectorAll('#kSteps .skS')].map(b => b.textContent).join('|') === '0Configurar PicoScope|1Compresión relativa|2Admisión y cárter|3Escape|★Resumen'));
     await k.click('#kSteps .skS[data-s="2"]'); await k.selectOption('#kTb', '0.005'); await k.waitForTimeout(100);
     check('5 ms/div: avisa de que no se ve el proceso completo y propone 2 s/div', /✗Tiempo\. Con 5 ms\/div la pantalla dura 50 ms.*Sube a 2 s\/div/.test(await k.textContent('#kCk')), await k.textContent('#kCk'));

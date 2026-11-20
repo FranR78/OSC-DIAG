@@ -3,6 +3,9 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.20b
+- **Arreglo:** en «Scripts» solo se podía abrir el primer script; ahora se abre cualquiera.
+
 ## 2026.11.20
 - **Pestaña «Scripts»:** pruebas guiadas para PicoScope. Cada script dice qué medir (canal, señal, sonda, rango), cómo y la maniobra en orden, con su perfil de RPM.
 - **Comprobación de PicoScope por paso:** con la base de tiempos y las muestras que pongas, avisa si la pantalla no abarca la maniobra (p. ej. 5 ms/div), si el muestreo o la resolución no llegan y del tamaño del CSV; «Usar lo recomendado».

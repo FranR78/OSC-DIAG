@@ -67,7 +67,7 @@ function skPerfil(p,win){
 /* ---- pintado ---- */
 function skTab(){
   const S=skCur();if(!S)return;SK.sel=S.id;const U=skUser();
-  const it=s=>'<button class="skI'+(s.id===S.id?' on':'')+'" data-k="'+skE(s.id)+'"><b>'+skE(s.nombre)+'</b><small>'+skE(s.autor||'')+(s.autor?' · ':'')+s.pasos.length+(s.pasos.length>1?' capturas':' captura')+(s._o?' · original':'')+'</small></button>';
+  const it=s=>'<button class="skI'+(s.id===S.id?' on':'')+'" data-k="'+esc(s.id)+'"><b>'+skE(s.nombre)+'</b><small>'+skE(s.autor||'')+(s.autor?' · ':'')+s.pasos.length+(s.pasos.length>1?' capturas':' captura')+(s._o?' · original':'')+'</small></button>';
   $('kL').innerHTML='<b class="skH">Originales</b>'+SCRIPTS_BASE.map(s=>it(Object.assign({},s,{_o:true}))).join('')+
     '<b class="skH">Mis scripts</b>'+(U.length?U.map(it).join(''):'<p class="hint">Duplica un original para hacer el tuyo.</p>')+
     '<div class="row"><button id="kImpB">Importar script (.json)…</button></div>';
