@@ -15,7 +15,7 @@ function amCyl(t,c,V){
 function amPaint(g2,W,Hh,t,ov){
   const cs=getComputedStyle(document.body),lt=BD.classList.contains('light')&&!ov,tx=ov?'#f2f6fb':cs.getPropertyValue('--tx').trim(),bd=lt?'rgba(20,85,143,.55)':'rgba(190,210,235,.6)',
     gas=$('xF')&&$('xF').value==='diesel'?'diesel':'gasolina';
-  const N=eng.n,V=amVal(),cw=Math.min(150,W/N),x0=(W-cw*N)/2,R=Math.max(6,Math.min(20,cw*.17,(Hh-92)/5)),L=R/AM_L,bw=Math.min(cw*.56,R*3.4),top=50,ph0=Math.max(8,R*.7);
+  const N=eng.n,V=amVal(),cw=Math.min(150,W/N),dS=Math.min(Hh-36,170),dg=!ov&&W-cw*N>=dS+24?dS:0,x0=(W-(dg?dg+16:0)-cw*N)/2,R=Math.max(6,Math.min(20,cw*.17,(Hh-92)/5)),L=R/AM_L,bw=Math.min(cw*.56,R*3.4),top=50,ph0=Math.max(8,R*.7);
   const q1=amCyl(t,1,V),cyc=(((t-ph.t0)/ph.T*720)%720+720)%720;
   g2.textAlign='center';
   for(let n=1;n<=N;n++){const q=amCyl(t,n,V),cx=x0+cw*(n-.5),cyc0=top+ph0/2+R+L+6,py=cyc0-(R*Math.cos(q.th)+Math.sqrt(L*L-R*R*Math.sin(q.th)**2)),pt=py-ph0/2,col=ST4[q.st][1];
@@ -50,6 +50,17 @@ function amPaint(g2,W,Hh,t,ov){
     /* grados de cada cilindro en la misma escala que la regla de 720° (cilindro 1 = la regla) */
     const gd=Math.round((((q.a-q1.a+cyc)%720)+720)%720);
     g2.font='600 12px system-ui';g2.fillStyle=tx;g2.fillText('Cil. '+n+' · '+gd+'°',cx,13);g2.font='600 11px system-ui';g2.fillStyle=col;g2.fillText(ST4[q.st][0],cx,Hh-5)}
+  /* lateral: diagrama de distribución del cilindro 1 con el punto del ciclo en que está (0° = PMS de cruce, arriba) */
+  if(dg){const R0=dg/2-16,cx=W-dg/2-4,cy=Hh/2+6,th=((q1.a-360)%720+720)%720,rd=d=>(d-90)*Math.PI/180,
+      arc=(r,a0,a1,c,lw)=>{g2.beginPath();g2.arc(cx,cy,r,rd(a0),rd(a1));g2.strokeStyle=c;g2.lineWidth=lw;g2.stroke()};
+    arc(R0,0,360,bd,1);arc(R0+5,-V.aaa,180+V.rca,'#3da5ff',4);arc(R0-5,180-V.aae,360+V.rce,'#ff6b4d',4);
+    g2.strokeStyle=bd;g2.lineWidth=1;g2.beginPath();g2.moveTo(cx,cy-R0-8);g2.lineTo(cx,cy-18);g2.moveTo(cx,cy+20);g2.lineTo(cx,cy+R0+8);g2.stroke();
+    g2.font='600 10px system-ui';g2.fillStyle=tx;g2.fillText('PMS',cx,cy-R0-11);g2.fillText('PMI',cx,cy+R0+19);
+    const mx=cx+(R0+5)*Math.sin(rd(th)+Math.PI/2),my=cy-(R0+5)*Math.cos(rd(th)+Math.PI/2);
+    g2.strokeStyle=tx;g2.lineWidth=2;g2.beginPath();g2.moveTo(cx,cy);g2.lineTo(mx,my);g2.stroke();
+    g2.fillStyle=ST4[q1.st][1];g2.beginPath();g2.arc(mx,my,5.5,0,6.2832);g2.fill();
+    g2.font='600 11px system-ui';g2.fillStyle=tx;g2.fillText('Cil. 1 · vuelta '+(th<360?1:2),cx,cy-3);
+    g2.fillStyle=ST4[q1.st][1];g2.fillText(ST4[q1.st][0]+' · '+Math.round(cyc)+'°',cx,cy+12)}
   return cyc;
 }
 function amDraw(){

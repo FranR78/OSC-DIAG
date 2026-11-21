@@ -3,6 +3,10 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.24
+- **Reglas T1/T2:** un clic en la señal ya no las saca solas; solo se colocan con «Reglas T1/T2» activas.
+- **Animación de cilindros:** en el lateral, diagrama de distribución del cilindro 1 con el punto del ciclo (vuelta, tiempo y grados). Solo si hay sitio (en móvil no sale).
+
 ## 2026.11.23
 - **Apartado «Red CAN»:** captura guiada de CAN-H y CAN-L (dos canales respecto a masa) y análisis trama a trama: velocidad, ID de cada unidad (con CRC comprobado), niveles de H y L, diferencial, flancos (subida y sobreoscilación) y tramas de error.
 - **Dónde y qué:** la unidad cuyo nivel se aparta del resto sale señalada; por niveles dice H o L a masa o a positivo, H y L unidos o bus en reposo, terminación que falta o de más. Referencia ISO 11898-2 como [Teórico].

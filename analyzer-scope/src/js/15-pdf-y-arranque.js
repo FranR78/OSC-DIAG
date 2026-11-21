@@ -61,7 +61,7 @@ $('tT2').onclick=()=>{tr2.on=!tr2.on;if(tr2.on){if(cur.c==null)cur.c=view.t0+vie
 $('tAmp').onclick=()=>{amp.on=!amp.on;sync();draw()};
 $('bPdf').onclick=report;
 $('rpm').oninput=()=>{const r=+$('rpm').value;if(r>0){ph.T=120/r;ph.auto=false;if(ph.t0==null)ph.t0=view.t0;draw()}};
-$('bO').onclick=()=>{if(cur.a==null)return st('Coloca primero T1 (clic en la señal o botón «Reglas T1/T2»).');ph.t0=cur.a;ph.auto=false;if(!(ph.T>0))ph.T=view.span;draw()};
+$('bO').onclick=()=>{if(cur.a==null)return st('Activa «Reglas T1/T2» y coloca T1 (clic en la señal).');ph.t0=cur.a;ph.auto=false;if(!(ph.T>0))ph.T=view.span;draw()};
 $('bP').onclick=()=>{if(pms.t==null)return st('Activa primero la regla PMS.');ph.t0=pms.t;ph.auto=false;if(!(ph.T>0))ph.T=view.span*720/ph.deg;draw()};
 $('bAB').onclick=()=>{if(cur.a==null||cur.b==null)return st('Coloca T1 (clic) y T2 (Mayús+clic).');ph.t0=Math.min(cur.a,cur.b);ph.T=Math.abs(cur.b-cur.a)*720/ph.deg;ph.auto=false;$('rpm').value=Math.round(120/ph.T);draw()};
 $('bAu').onclick=()=>{ph.auto=true;ph.t0=view.t0;ph.T=view.span*720/ph.deg;$('rpm').value='';draw()};
