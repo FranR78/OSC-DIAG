@@ -89,7 +89,7 @@ function skTab(){
   skWire(S);
 }
 /* texto con etiquetas de origen [Fuente…] [Inferido] [Teórico…] [Medido…] como chapas */
-const skTx=x=>skE(x).replace(/\[(Fuente|Inferido|Teórico|Medido)([^\]]*)\]/g,(m,a,b)=>'<span class="skTag skT'+a[0]+'">'+a+b+'</span>');
+const skTx=x=>skE(x).replace(/\[(Fuente|Inferido|Teórico|Medido|Taller)([^\]]*)\]/g,(m,a,b)=>'<span class="skTag skT'+a[0]+'">'+a+b+'</span>');
 const skLi=(t,l,cl)=>l&&l.length?'<b class="skH">'+t+'</b><ol class="skO'+(cl?' '+cl:'')+'">'+l.map(x=>'<li>'+skTx(x)+'</li>').join('')+'</ol>':'';
 function skPaso(S,i){
   const P=skPasos(S),n=P.length;
@@ -100,7 +100,7 @@ function skPaso(S,i){
     '<li><b>Sin disparo</b>: grabación continua. Empieza la maniobra justo cuando arranca una pantalla nueva y pulsa <b>Stop</b> en cuanto termine.</li>'+
     '<li><b>Busca en el búfer</b> la pantalla que tiene la maniobra entera (del primer ralentí a la parada) y <b>exporta a CSV</b> esa pantalla (forma de onda actual). Un CSV por paso.</li>'+
     '<li><b>Nombra los canales</b> en PicoScope igual que en el paso (A = …, B = …): ayuda a revisar después.</li></ol>'+
-    '<p class="hint">Cada paso trae: preparación y seguridad, conexiones, la maniobra fase a fase, qué comprobar en la captura antes de desmontar y cómo leerla. Etiquetas: <span class="skTag skTF">Fuente</span> lo dice el curso de scripts (Autoscope) o el libro de Bradley, con su página · <span class="skTag skTI">Inferido</span> propuesta nuestra, validar en taller.</p>'+
+    '<p class="hint">Cada paso trae: preparación y seguridad, conexiones, la maniobra fase a fase, qué comprobar en la captura antes de desmontar y cómo leerla. Etiquetas: <span class="skTag skTF">Fuente</span> lo dice el curso de scripts (Autoscope) o el libro de Bradley, con su página · <span class="skTag skTI">Inferido</span> propuesta nuestra, validar en taller · <span class="skTag skTT">Taller</span> experiencia de taller del profesor.</p>'+
     '<div class="row"><span class="hint">'+n+(n>1?' pruebas':' prueba')+', una captura cada una.</span><span class="sp"></span><button class="p" data-go="1">Empezar: paso 1</button></div></div>';
   if(i>n){const L=P.map(p=>SK.csv[skKey(S,p)]);
     return '<div class="skC"><b class="skH">Resumen de las capturas</b><div class="skCk">'+P.map((p,k)=>{const c=L[k];

@@ -3,7 +3,7 @@
  "id": "FR-MEC-01",
  "nombre": "Integridad mecánica",
  "autor": "Fran Rosales",
- "version": "2026.11.25",
+ "version": "2026.11.26",
  "estado": "borrador",
  "combustible": [
   "gasolina",
@@ -36,6 +36,13 @@
      "sonda": "Pinza inductiva en la bobina 1 · en diésel, punta o pinza de corriente en el inyector 1",
      "rango": "±20 V",
      "entidad": "encendido"
+    },
+    {
+     "canal": "C",
+     "senal": "Sensor de cigüeñal (CKP), recomendado",
+     "sonda": "Punta trasera en la señal, sin desconectar",
+     "rango": "±10 V",
+     "entidad": "ckp"
     }
    ],
    "como": [
@@ -43,7 +50,8 @@
     "Sin pinza también vale: puntas en los bornes de la batería y la compresión sale de las caídas de tensión. [Fuente pág. 88]",
     "Canal B, gasolina: pinza inductiva en el cable de la bobina 1 o sobre la bobina COP del cilindro 1. Marca el PMS de compresión del cilindro 1. [Fuente pág. 96]",
     "Canal B, diésel: punta en el cable de mando del inyector 1 o pinza de corriente en uno de sus cables. [Fuente pág. 96]",
-    "Se puede sincronizar con otro inyector o bobina (el curso lo hace con el inyector 4, pág. 86), pero entonces la numeración de cilindros se desplaza según el orden de encendido: indícalo al analizar. [Fuente pág. 86]"
+    "Se puede sincronizar con otro inyector o bobina (el curso lo hace con el inyector 4, pág. 86), pero entonces la numeración de cilindros se desplaza según el orden de encendido: indícalo al analizar. [Fuente pág. 86]",
+    "Canal C (recomendado en Europa): CKP en paralelo. Con el pedal a fondo durante el arrastre, la velocidad del cigüeñal en cada compresión compara los cilindros con la mariposa abierta. Es la forma fiable de hacer aquí la prueba que en el curso se hace al parar con la mariposa abierta. [Inferido]"
    ],
    "maniobra": [
     {
@@ -64,7 +72,7 @@
       250,
       250
      ],
-     "hacer": "Arrastra de forma continua 5–8 s sin soltar la llave. Hacen falta al menos 5 ciclos por cilindro (de 5 a 10) y un arrastre de 170 a 330 RPM. [Fuente pág. 95]"
+     "hacer": "Arrastra de forma continua 5–8 s sin soltar la llave, con el acelerador pisado a fondo (gasolina). Hacen falta al menos 5 ciclos por cilindro (de 5 a 10) y un arrastre de 170 a 330 RPM. [Fuente pág. 95] El pedal a fondo es propuesta nuestra. [Inferido]"
     },
     {
      "fase": "Soltar llave",
@@ -89,7 +97,9 @@
     "Motor a temperatura si es posible: la compresión relativa compara cilindros entre sí, pero en frío el aceite frena más el arrastre. [Inferido]",
     "Cambio en punto muerto (o P) y freno de mano. [Inferido]",
     "Hay que impedir que el motor arranque sin perder la señal de sincronismo. Gasolina: desconecta los conectores de todos los inyectores (la bobina 1 sigue saltando y da el sincronismo). No quites nunca las bobinas dejando los inyectores: la gasolina sin quemar va al catalizador. [Inferido]",
-    "Diésel common rail: el curso sincroniza con el inyector 1 durante el arrastre (pág. 96) pero no explica cómo evita que arranque. Usa la función de bloqueo de arranque o de prueba de compresión del equipo de diagnosis si la tiene. Si no, no improvises: está pendiente de confirmar el método. [Fuente pág. 96] [Inferido]",
+    "Diésel: hay que quitar algo que impida el arranque, y depende de la arquitectura de cada fabricante. El método principal es desconectar los inyectores. Otros: desconectar el sensor de presión del raíl o la válvula reguladora de presión. Desconectar el CKP no suele servir: en muchos motores entonces ni gira el motor de arranque. [Taller]",
+    "Elijas el método que elijas, haz la prueba de señal arrastrando 2 s: el sincronismo tiene que seguir apareciendo. Si desconectas los inyectores, mide el mando del inyector 1 en el lado del mazo (algunas UCE siguen mandando con el inyector desconectado y otras no). Si no hay sincronismo, cambia de método. [Inferido]",
+    "Gasolina con acelerador electrónico: con el contacto puesto la mariposa sigue al pedal, así que en el arrastre puedes pisar a fondo. Muchas UCE de gasolina cortan además la inyección con el pedal a fondo al arrancar (modo de motor ahogado), pero no lo des por hecho: desconecta los inyectores igualmente. [Inferido]",
     "Si desconectas algo, la UCE guardará averías: bórralas al terminar. [Inferido]"
    ],
    "validar": [
@@ -102,7 +112,8 @@
     "Cada pico de corriente es un cilindro comprimiendo; con el sincronismo se sabe cuál es cada uno según el orden de encendido. [Fuente pág. 96]",
     "Cada cilindro debe estar entre el 90 y el 100 % del mejor. [Fuente pág. 95]",
     "Una pérdida que aparece y desaparece de forma cíclica apunta a válvulas que sellan mal (caso Santa Fe 2.2, carbonilla). [Fuente pág. 80]",
-    "Dos cilindros contiguos bajos: junta de culata quemada entre ellos (caso con el inyector 1 de sincronismo). [Fuente pág. 76]"
+    "Dos cilindros contiguos bajos: junta de culata quemada entre ellos (caso con el inyector 1 de sincronismo). [Fuente pág. 76]",
+    "Canal C: en cada compresión el cigüeñal se frena y luego recupera; el cilindro con menos frenada tiene menos compresión. Debe coincidir con la corriente. [Inferido]"
    ],
    "ojo": [
     "La compresión relativa compara cilindros: si todos pierden lo mismo (por ejemplo, distribución desfasada) no lo ve. [Inferido]",
@@ -239,7 +250,8 @@
    ],
    "ojo": [
     "El curso de scripts no usa transductores de pulso (mide dentro del cilindro): los umbrales de esta prueba son provisionales. [Inferido]",
-    "Con acelerador electrónico, al quitar la llave la mariposa puede volver a su posición de emergencia aunque pises a fondo. [Inferido]"
+    "Europa, acelerador electrónico (mariposa motorizada): al quitar la llave la mariposa vuelve a su posición de emergencia, casi cerrada, aunque pises a fondo. La caída sigue siendo solo mecánica y sirve para comparar cilindros entre sí (todos reciben el mismo aire), pero los empujes salen más pequeños. Empieza la caída desde más de 3000 RPM. [Inferido]",
+    "Diésel europeo con mariposa de admisión (anti-sacudidas): al quitar la llave se cierra para parar el motor suave, y la caída tras apagar sale con muy poco aire. Para la mecánica son más fiables las deceleraciones al soltar el acelerador de golpe: hay corte de inyección y la mariposa sigue abierta. [Inferido]"
    ]
   },
   {
@@ -362,7 +374,9 @@
    ],
    "ojo": [
     "El pulso tarda en recorrer el tubo hasta el transductor: depende de la longitud y de las RPM. Valida el desfase provocando un fallo en un cilindro conocido. [Inferido]",
-    "El pulso de escape es una pieza más del puzle: crúzalo con la compresión y con el CKP. [Teórico Bradley]"
+    "El pulso de escape es una pieza más del puzle: crúzalo con la compresión y con el CKP. [Teórico Bradley]",
+    "Europa, acelerador electrónico (mariposa motorizada): al quitar la llave la mariposa vuelve a su posición de emergencia, casi cerrada, aunque pises a fondo. La caída sigue siendo solo mecánica y sirve para comparar cilindros entre sí (todos reciben el mismo aire), pero los empujes salen más pequeños. Empieza la caída desde más de 3000 RPM. [Inferido]",
+    "Diésel europeo con mariposa de admisión (anti-sacudidas): al quitar la llave se cierra para parar el motor suave, y la caída tras apagar sale con muy poco aire. Para la mecánica son más fiables las deceleraciones al soltar el acelerador de golpe: hay corte de inyección y la mariposa sigue abierta. [Inferido]"
    ]
   },
   {
@@ -448,8 +462,9 @@
    ],
    "ojo": [
     "CKP Hall al quitar la llave: muchas UCE mantienen su relé principal unos segundos y el sensor sigue alimentado, pero no todas. Mira en la captura que los dientes siguen hasta que el motor se para; si se cortan antes, esa parte no vale y usa las deceleraciones al soltar el acelerador. [Inferido]",
-    "Con acelerador electrónico, al quitar la llave la mariposa puede volver a su posición de emergencia aunque pises: el curso habla de mariposa abierta, que solo está garantizada con acelerador de cable. [Inferido]",
-    "No cortes la chispa quitando bobinas o fusibles con el motor en marcha: la gasolina sin quemar va al catalizador. La prueba se hace con la llave. [Inferido]"
+    "No cortes la chispa quitando bobinas o fusibles con el motor en marcha: la gasolina sin quemar va al catalizador. La prueba se hace con la llave. [Inferido]",
+    "Europa, acelerador electrónico (mariposa motorizada): al quitar la llave la mariposa vuelve a su posición de emergencia, casi cerrada, aunque pises a fondo. La caída sigue siendo solo mecánica y sirve para comparar cilindros entre sí (todos reciben el mismo aire), pero los empujes salen más pequeños. Empieza la caída desde más de 3000 RPM. [Inferido]",
+    "No bloquees la mariposa a mano ni con una cuña: puede romper los engranajes del cuerpo de mariposa o tragarse el objeto. Para medir la compresión con la mariposa abierta usa el arrastre con el acelerador a fondo (paso «Compresión relativa», canal C). [Inferido]"
    ]
   },
   {
@@ -534,7 +549,8 @@
     "Un cilindro con poca contribución baja también la compresión aparente del siguiente en el orden de inyección: confírmalo con la compresión relativa. [Fuente págs. 71, 75]"
    ],
    "ojo": [
-    "CKP Hall al quitar la llave: muchas UCE mantienen su relé principal unos segundos y el sensor sigue alimentado, pero no todas. Mira en la captura que los dientes siguen hasta que el motor se para; si se cortan antes, esa parte no vale y usa las deceleraciones al soltar el acelerador. [Inferido]"
+    "CKP Hall al quitar la llave: muchas UCE mantienen su relé principal unos segundos y el sensor sigue alimentado, pero no todas. Mira en la captura que los dientes siguen hasta que el motor se para; si se cortan antes, esa parte no vale y usa las deceleraciones al soltar el acelerador. [Inferido]",
+    "Diésel europeo con mariposa de admisión (anti-sacudidas): al quitar la llave se cierra para parar el motor suave, y la caída tras apagar sale con muy poco aire. Para la mecánica son más fiables las deceleraciones al soltar el acelerador de golpe: hay corte de inyección y la mariposa sigue abierta. [Inferido]"
    ]
   },
   {

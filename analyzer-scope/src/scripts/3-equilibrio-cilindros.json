@@ -3,7 +3,7 @@
  "id": "FR-EQ-01",
  "nombre": "Equilibrio de cilindros",
  "autor": "Fran Rosales",
- "version": "2026.11.25",
+ "version": "2026.11.26",
  "estado": "borrador",
  "combustible": [
   "gasolina",
@@ -123,7 +123,8 @@
     "Un cilindro que va bien al ralentí y cae con carga apunta a encendido. [Fuente pág. 60]"
    ],
    "ojo": [
-    "Para la parte mecánica sin combustión haz además «Caída de giro» (Integridad mecánica). [Fuente pág. 67]"
+    "Para la parte mecánica sin combustión haz además «Caída de giro» (Integridad mecánica). [Fuente pág. 67]",
+    "Europa, acelerador electrónico (mariposa motorizada): al quitar la llave la mariposa vuelve a su posición de emergencia, casi cerrada, aunque pises a fondo. La caída sigue siendo solo mecánica y sirve para comparar cilindros entre sí (todos reciben el mismo aire), pero los empujes salen más pequeños. Empieza la caída desde más de 3000 RPM. [Inferido]"
    ]
   },
   {
@@ -235,7 +236,8 @@
     "Si el fallo depende de la temperatura, repite en caliente: en el D4CB el inyector 3 volvió a trabajar al calentar. [Fuente pág. 84]"
    ],
    "ojo": [
-    "CKP Hall al quitar la llave: muchas UCE mantienen su relé principal unos segundos y el sensor sigue alimentado, pero no todas. Mira en la captura que los dientes siguen hasta que el motor se para; si se cortan antes, esa parte no vale y usa las deceleraciones al soltar el acelerador. [Inferido]"
+    "CKP Hall al quitar la llave: muchas UCE mantienen su relé principal unos segundos y el sensor sigue alimentado, pero no todas. Mira en la captura que los dientes siguen hasta que el motor se para; si se cortan antes, esa parte no vale y usa las deceleraciones al soltar el acelerador. [Inferido]",
+    "Diésel europeo con mariposa de admisión (anti-sacudidas): al quitar la llave se cierra para parar el motor suave, y la caída tras apagar sale con muy poco aire. Para la mecánica son más fiables las deceleraciones al soltar el acelerador de golpe: hay corte de inyección y la mariposa sigue abierta. [Inferido]"
    ]
   }
  ]
