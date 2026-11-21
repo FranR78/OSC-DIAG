@@ -3,6 +3,9 @@
 Proyecto aparte del portal: `apps-script-scope/` (`Servidor.gs`, `App.html` y `appsscript.json`).
 Cada usuario ejecuta la app **sobre tu copia**: si cierras el proyecto o le quitas el acceso, deja de entrar.
 `App.html` lo genera `analyzer-scope/build.js` (no se edita a mano).
+**Se actualiza solo:** el servidor baja `App.html` de GitHub (`main`) cada ≤ 10 min; el `App` del proyecto solo es reserva
+si GitHub falla. Para forzarlo ya: ejecutar `appActualizar`. Un cambio en `Servidor.gs` sí exige pegarlo y «Gestionar
+implementaciones → Editar → Versión nueva» (misma URL `/exec`).
 
 ## Montarlo (una vez)
 1. <https://script.google.com> → Proyecto nuevo «Analyzer Scope · servidor». Crea `Servidor.gs` y un archivo HTML `App`
