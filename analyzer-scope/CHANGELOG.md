@@ -3,6 +3,11 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.25
+- **Scripts al detalle:** cada prueba trae preparación y seguridad, conexiones, qué hacer en cada fase de la maniobra, qué comprobar en la captura antes de desmontar, cómo leerla y avisos. Cada frase lleva su origen (curso de scripts con página, Bradley, ISO o propuesta nuestra).
+- **Correcciones con el curso:** cierre de admisión 560–600° (no 585–615°), centro del cruce 370–390° (VVT-i 380–400°), quitado el «avance 5–15°» y las «fugas 15–20 %» que el curso no da; la caída de giro en gasolina se hace quitando el contacto con la llave; páginas citadas corregidas.
+- **Paso 0:** grabación continua sin disparo y Stop al terminar la maniobra.
+
 ## 2026.11.24
 - **Reglas T1/T2:** un clic en la señal ya no las saca solas; solo se colocan con «Reglas T1/T2» activas.
 - **Animación de cilindros:** en el lateral, diagrama de distribución del cilindro 1 con el punto del ciclo (vuelta, tiempo y grados). Solo si hay sitio (en móvil no sale).

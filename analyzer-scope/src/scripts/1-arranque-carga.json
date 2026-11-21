@@ -3,7 +3,7 @@
  "id": "FR-ARR-01",
  "nombre": "Arranque y carga",
  "autor": "Fran Rosales",
- "version": "2026.11.21",
+ "version": "2026.11.25",
  "estado": "borrador",
  "combustible": [
   "gasolina",
@@ -25,23 +25,24 @@
     {
      "canal": "A",
      "senal": "Tensión de batería",
-     "sonda": "Puntas en los bornes",
+     "sonda": "Puntas en los bornes de la batería",
      "rango": "±20 V",
      "entidad": "batería"
     },
     {
      "canal": "B",
      "senal": "Corriente de batería",
-     "sonda": "Pinza amperimétrica en el negativo",
+     "sonda": "Pinza amperimétrica en el negativo de la batería",
      "rango": "±600 A",
      "entidad": "pinza batería"
     }
    ],
    "como": [
-    "Batería cargada y vehículo en reposo 1 h.",
-    "Empezar a grabar con el contacto quitado.",
-    "Diésel: dar contacto y esperar a que se apaguen las bujías.",
-    "Arrancar, dejar a ralentí con consumidores y subir a 2500 RPM."
+    "Canal A: puntas directamente sobre el plomo de los bornes (+ y −), no sobre las grapas de los cables: así mides la batería y no las caídas de los terminales. [Inferido]",
+    "Canal B: pinza de 600 A en el negativo de la batería, abrazando todos los cables que salen del borne negativo. Pon la pinza a cero antes de abrazar el cable. [Inferido]",
+    "Sentido de la pinza: que la corriente de arranque (descarga) salga positiva. Si sale negativa, invierte el canal en la app. [Inferido]",
+    "Sin pinza también se mide la compresión relativa: sale de la tensión de batería durante el arranque. [Fuente pág. 88]",
+    "El esquema de conexión del curso (pág. 89) es una imagen: compruébalo con él. [Fuente pág. 89]"
    ],
    "maniobra": [
     {
@@ -51,7 +52,8 @@
      "rpm": [
       0,
       0
-     ]
+     ],
+     "hacer": "Empieza a grabar con el contacto quitado y todo apagado: es la tensión inicial y el nivel de carga. [Fuente pág. 90]"
     },
     {
      "fase": "Contacto",
@@ -60,7 +62,8 @@
      "rpm": [
       0,
       0
-     ]
+     ],
+     "hacer": "Da contacto sin arrancar. En diésel espera a que se apague el testigo de precalentamiento: esa corriente y ese tiempo son los de las bujías. [Fuente pág. 93]"
     },
     {
      "fase": "Arranque",
@@ -69,7 +72,8 @@
      "rpm": [
       250,
       800
-     ]
+     ],
+     "hacer": "Arranca de una vez, sin pisar el acelerador. Aquí salen la corriente del solenoide, el pico de arranque, la tensión bajo carga y la compresión. [Fuente págs. 90, 95, 97]"
     },
     {
      "fase": "Ralentí",
@@ -78,7 +82,8 @@
      "rpm": [
       800,
       800
-     ]
+     ],
+     "hacer": "Ralentí con consumidores encendidos (luces de cruce, luneta, ventilador a tope): tensión de carga y rizado con el alternador cargado. [Inferido]"
     },
     {
      "fase": "2500 RPM",
@@ -87,7 +92,8 @@
      "rpm": [
       2500,
       2500
-     ]
+     ],
+     "hacer": "Sube y mantén 2500 RPM estables: tensión de carga continua, rizado y falta de fase. [Inferido]"
     }
    ],
    "requisitos": {
@@ -96,7 +102,37 @@
     "criterio": "ninguno"
    },
    "mirar": "Principio de la gráfica: tensión en reposo, caída al arrancar (no menos de 9 V), solenoide y pico de arranque; durante el arrastre, la compresión relativa; al final, carga (13,8–15 V) y rizado del alternador.",
-   "fuente": "Curso de scripts, script El Power, pág. 87–100."
+   "fuente": "Curso de scripts, script El Power, págs. 88–100.",
+   "antes": [
+    "Batería completamente cargada y vehículo en reposo 1 h antes de la prueba: así la tensión inicial y el nivel de carga salen bien. [Fuente pág. 90]",
+    "Sin cargador ni arrancador auxiliar conectados. [Inferido]",
+    "Puertas cerradas y consumidores apagados al empezar: la luz interior y los módulos despiertos falsean la tensión inicial. [Inferido]",
+    "Cambio en punto muerto (o P) y freno de mano. [Inferido]",
+    "Diésel moderno con relé electrónico de bujías que limita la corriente: la parte de bujías no vale (el algoritmo las dará por fundidas); valóralas con el escáner. En diésel antiguo con relé mecánico sí vale. [Fuente pág. 94]"
+   ],
+   "validar": [
+    "Al principio la tensión está estable: no hay un consumo grande con el contacto quitado. [Inferido]",
+    "Se ve el escalón del solenoide antes del pico de arranque. [Fuente pág. 97]",
+    "La corriente de arranque sale positiva y el pico no llega al tope de la pinza (600 A). [Inferido]",
+    "Durante el arrastre hay oscilaciones regulares de corriente (una por cilindro). [Inferido]",
+    "Al final hay tensión de carga estable a ralentí y a 2500 RPM. [Inferido]"
+   ],
+   "leer": [
+    "Tensión bajo carga (en el máximo consumo, al arrancar): no debe bajar de 9 V; por debajo de 7 V hay arranque difícil y fallos de la electrónica. [Fuente pág. 90]",
+    "Corriente de arranque real de la batería frente a la de su etiqueta: por debajo del 50 %, la batería suele estar averiada (ejemplo del curso: 330 A de 640 A). [Fuente págs. 90, 92]",
+    "Bujías de incandescencia: corriente máxima total, tiempo encendidas y número probable de bujías fundidas (ejemplo: 52 A durante 26 s). [Fuente pág. 93]",
+    "Solenoide: corriente de entrada y retención antes de cerrar el contacto principal. Un tiempo de tránsito largo o que varía mucho indica solenoide o inducido «pegajoso». [Fuente pág. 97]",
+    "Corriente de arranque necesaria cerca del límite inferior: cables finos, mal contacto o arrancador con mucha resistencia. Cerca del superior: conviene una batería mayor. [Fuente pág. 97]",
+    "Caídas bruscas de corriente del arrancador: escobillas o colector gastados; además meten interferencias en la instalación. [Fuente pág. 97]",
+    "Compresión: RPM medias de arrastre, compresión relativa de cada cilindro y número de ciclos medidos. [Fuente pág. 95]",
+    "Alternador: tensión máxima por encima de 16 V perjudica a la electrónica; carga continua por debajo de 13,8 V deja la batería a medias y por encima de 15 V daña batería y electrónica. [Fuente pág. 100]",
+    "Rizado alto: puente de diodos o estátor. «Falta corriente de una fase»: una fase del alternador no trabaja. [Fuente pág. 100]"
+   ],
+   "ojo": [
+    "Algunas UCE diésel mantienen las bujías unos minutos después de arrancar: la tensión de carga baja sin que el alternador falle. [Fuente pág. 100]",
+    "Aquí el motor arranca enseguida y hay pocos ciclos de compresión. Para la compresión en serio usa el paso «Compresión relativa» de Integridad mecánica. [Inferido]",
+    "El rizado se ve mejor en una captura aparte de 0,5 s a 100 kS/s con el motor a 2000–2500 RPM. [Inferido]"
+   ]
   }
  ]
 }

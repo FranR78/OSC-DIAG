@@ -30,8 +30,11 @@ Una copia guarda `origen: { id, nombre, version }` y avisa si el original cambia
     "maniobra": [ { "fase": "Arrastre", "tipo": "arrastre", "s": 6, "rpm": [250, 250] } ],
     "requisitos": { "fs_min": 20000, "rpm_max": 330, "criterio": "grados | diente | ninguno" },
     "mirar": "qué mirar en la captura", "combustible": ["gasolina"], "opcional": false, "condicion": "",
+    "antes": [ "preparación y seguridad" ], "validar": [ "qué comprobar en la captura antes de desmontar" ],
+    "leer": [ "cómo leerla" ], "ojo": [ "riesgos y errores" ],
     "fuente": "de dónde sale" } ] }
 ```
+* `antes`, `como`, `validar`, `leer`, `ojo`: listas; cada fase de `maniobra` puede llevar `hacer` (qué hacer exactamente). Cada frase termina con su origen entre corchetes: `[Fuente pág. N]` (curso de scripts), `[Teórico …]` (Bradley, ISO…), `[Medido]` o `[Inferido]`; la app los pinta como chapas.
 * `sintomas`: se ve en la lista y en la cabecera («Cuándo entrar»). `mirar`: sale en la prueba («Qué mirar»).
 * `combustible` en un paso: solo sale con ese motor (selector Gasolina / Diésel en la cabecera). `opcional` + `condicion`: prueba marcada «(opcional)», p. ej. «si tienes transductor de presión de cilindro».
 * `canal`: A…H (colores de PicoScope). `entidad`: los nombres de `DX_ENT` (`16-diagnostico.js`), para el análisis de fases futuras.

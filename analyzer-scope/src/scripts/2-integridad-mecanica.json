@@ -3,7 +3,7 @@
  "id": "FR-MEC-01",
  "nombre": "Integridad mecánica",
  "autor": "Fran Rosales",
- "version": "2026.11.21",
+ "version": "2026.11.25",
  "estado": "borrador",
  "combustible": [
   "gasolina",
@@ -26,22 +26,24 @@
     {
      "canal": "A",
      "senal": "Corriente de arranque",
-     "sonda": "Pinza amperimétrica",
+     "sonda": "Pinza amperimétrica en el cable del motor de arranque",
      "rango": "±600 A",
      "entidad": "pinza arranque"
     },
     {
      "canal": "B",
      "senal": "Bobina 1 (o inyector 1 en diésel)",
-     "sonda": "Pinza inductiva / punta 10:1",
+     "sonda": "Pinza inductiva en la bobina 1 · en diésel, punta o pinza de corriente en el inyector 1",
      "rango": "±20 V",
      "entidad": "encendido"
     }
    ],
    "como": [
-    "Cortar la inyección (fusible o relé de la bomba) para que el motor no arranque.",
-    "Pinza en el cable del motor de arranque, flecha hacia el motor.",
-    "Sincronismo en el cilindro 1: marca su PMS de compresión."
+    "Canal A: pinza de 600 A abrazando el cable gordo del motor de arranque (o el positivo de batería si solo sale ese), con la flecha hacia el motor de arranque. Ponla a cero antes. [Inferido]",
+    "Sin pinza también vale: puntas en los bornes de la batería y la compresión sale de las caídas de tensión. [Fuente pág. 88]",
+    "Canal B, gasolina: pinza inductiva en el cable de la bobina 1 o sobre la bobina COP del cilindro 1. Marca el PMS de compresión del cilindro 1. [Fuente pág. 96]",
+    "Canal B, diésel: punta en el cable de mando del inyector 1 o pinza de corriente en uno de sus cables. [Fuente pág. 96]",
+    "Se puede sincronizar con otro inyector o bobina (el curso lo hace con el inyector 4, pág. 86), pero entonces la numeración de cilindros se desplaza según el orden de encendido: indícalo al analizar. [Fuente pág. 86]"
    ],
    "maniobra": [
     {
@@ -51,7 +53,8 @@
      "rpm": [
       0,
       0
-     ]
+     ],
+     "hacer": "Empieza a grabar con el contacto puesto y el motor parado. [Inferido]"
     },
     {
      "fase": "Arrastre",
@@ -60,7 +63,8 @@
      "rpm": [
       250,
       250
-     ]
+     ],
+     "hacer": "Arrastra de forma continua 5–8 s sin soltar la llave. Hacen falta al menos 5 ciclos por cilindro (de 5 a 10) y un arrastre de 170 a 330 RPM. [Fuente pág. 95]"
     },
     {
      "fase": "Soltar llave",
@@ -69,7 +73,8 @@
      "rpm": [
       250,
       0
-     ]
+     ],
+     "hacer": "Suelta la llave y para la grabación cuando el motor esté quieto. [Inferido]"
     }
    ],
    "requisitos": {
@@ -78,7 +83,31 @@
     "criterio": "grados"
    },
    "mirar": "Las oscilaciones de la corriente cuando el arrastre ya es estable: cada pico es un cilindro; uno más bajo tiene menos compresión (90–100 % del mejor).",
-   "fuente": "Curso de scripts, pág. 95–96: 170–330 RPM de arrastre, 5–10 ciclos, cada cilindro 90–100 %."
+   "fuente": "Curso de scripts, script El Power, págs. 88, 95–96; casos págs. 76 y 80.",
+   "antes": [
+    "Batería bien cargada: con la batería baja el arrastre es lento e irregular y la prueba no vale. [Inferido]",
+    "Motor a temperatura si es posible: la compresión relativa compara cilindros entre sí, pero en frío el aceite frena más el arrastre. [Inferido]",
+    "Cambio en punto muerto (o P) y freno de mano. [Inferido]",
+    "Hay que impedir que el motor arranque sin perder la señal de sincronismo. Gasolina: desconecta los conectores de todos los inyectores (la bobina 1 sigue saltando y da el sincronismo). No quites nunca las bobinas dejando los inyectores: la gasolina sin quemar va al catalizador. [Inferido]",
+    "Diésel common rail: el curso sincroniza con el inyector 1 durante el arrastre (pág. 96) pero no explica cómo evita que arranque. Usa la función de bloqueo de arranque o de prueba de compresión del equipo de diagnosis si la tiene. Si no, no improvises: está pendiente de confirmar el método. [Fuente pág. 96] [Inferido]",
+    "Si desconectas algo, la UCE guardará averías: bórralas al terminar. [Inferido]"
+   ],
+   "validar": [
+    "Las RPM de arrastre están entre 170 y 330 y son estables durante varios ciclos. [Fuente pág. 95]",
+    "Hay al menos 5 ciclos completos (5 pulsos de sincronismo) con arrastre estable. [Fuente pág. 95]",
+    "El sincronismo da un pulso por ciclo (cada dos vueltas) durante todo el arrastre. [Inferido]",
+    "El motor no ha llegado a arrancar: si arrancó, la prueba no vale. [Inferido]"
+   ],
+   "leer": [
+    "Cada pico de corriente es un cilindro comprimiendo; con el sincronismo se sabe cuál es cada uno según el orden de encendido. [Fuente pág. 96]",
+    "Cada cilindro debe estar entre el 90 y el 100 % del mejor. [Fuente pág. 95]",
+    "Una pérdida que aparece y desaparece de forma cíclica apunta a válvulas que sellan mal (caso Santa Fe 2.2, carbonilla). [Fuente pág. 80]",
+    "Dos cilindros contiguos bajos: junta de culata quemada entre ellos (caso con el inyector 1 de sincronismo). [Fuente pág. 76]"
+   ],
+   "ojo": [
+    "La compresión relativa compara cilindros: si todos pierden lo mismo (por ejemplo, distribución desfasada) no lo ve. [Inferido]",
+    "Batería floja o motor de arranque defectuoso dan un arrastre irregular que parece fallo de compresión: mira antes el paso El Power. [Inferido]"
+   ]
   },
   {
    "id": "ADM",
@@ -114,10 +143,11 @@
     }
    ],
    "como": [
-    "Motor a temperatura, consumidores apagados.",
-    "Transductor de admisión en una toma de vacío del colector, después de la mariposa.",
-    "Transductor de cárter en el tubo de la varilla de aceite, bien sellado.",
-    "No cortar la grabación al apagar: la caída sin combustión es la parte mecánica."
+    "Canal A: pinza inductiva en la bobina 1 (gasolina). Canal B: punta en el mando del inyector 1. Con los dos se sabe el PMS y el orden aunque falte uno. [Inferido]",
+    "Canal C, admisión: transductor en una toma de vacío centralizada del colector, después de la mariposa. La manguera de la válvula PCV es un buen punto; una toma de un solo conducto sesga la lectura hacia ese cilindro. [Teórico Bradley]",
+    "Canal D, cárter: transductor en el tubo de la varilla de aceite (o en el circuito de ventilación del cárter) con una manguera de goma bien sellada. [Teórico Bradley]",
+    "Mangueras cortas y sin fugas; una fuga en la manguera de admisión mete aire y falsea los pulsos. [Inferido]",
+    "Anota la longitud de manguera de cada transductor: el pulso llega con retraso respecto a la válvula. [Inferido]"
    ],
    "maniobra": [
     {
@@ -127,7 +157,8 @@
      "rpm": [
       800,
       800
-     ]
+     ],
+     "hacer": "Ralentí estable, sin tocar nada. [Inferido]"
     },
     {
      "fase": "Acel. suave",
@@ -136,7 +167,8 @@
      "rpm": [
       800,
       2500
-     ]
+     ],
+     "hacer": "Acelera suave hasta unas 2500 RPM. [Inferido]"
     },
     {
      "fase": "Vuelta",
@@ -145,7 +177,8 @@
      "rpm": [
       2500,
       800
-     ]
+     ],
+     "hacer": "Suelta y deja que vuelva a ralentí. [Inferido]"
     },
     {
      "fase": "Acel. brusca",
@@ -154,7 +187,8 @@
      "rpm": [
       800,
       4500
-     ]
+     ],
+     "hacer": "Acelerón brusco a fondo y suelta enseguida. [Inferido]"
     },
     {
      "fase": "Soltar",
@@ -163,7 +197,8 @@
      "rpm": [
       4500,
       800
-     ]
+     ],
+     "hacer": "Deja que baje de vueltas. [Inferido]"
     },
     {
      "fase": "Apagar grabando",
@@ -172,7 +207,8 @@
      "rpm": [
       800,
       0
-     ]
+     ],
+     "hacer": "Quita el contacto con la llave sin parar la grabación y espera a que el motor esté quieto: esa caída sin combustión es la parte mecánica. [Fuente págs. 67, 70]"
     }
    ],
    "requisitos": {
@@ -181,7 +217,30 @@
     "criterio": "grados"
    },
    "mirar": "Pulso de admisión por cilindro (válvula de admisión) y pulso de cárter en fase con un cilindro (segmentos).",
-   "fuente": "Maniobra del CSS diésel (pág. 70); apagar grabando equivale al corte con mariposa abierta (pág. 67)."
+   "fuente": "Maniobra: curso de scripts, págs. 67 y 70. Transductores: libro de Bradley (vacío de admisión, presión de cárter).",
+   "antes": [
+    "Motor a temperatura de servicio (ventilador ya ha saltado una vez), salvo que el fallo sea en frío. [Inferido]",
+    "Todos los consumidores apagados: aire acondicionado, luces, luneta y ventilador del habitáculo. [Inferido]",
+    "Cambio en punto muerto (o P en automático) y freno de mano echado: vas a acelerar a fondo con el coche parado. [Inferido]",
+    "Nadie delante ni detrás del vehículo y el capó abierto con los cables de medida lejos de correas y ventilador. [Inferido]",
+    "Transductores de pulso (de presión diferencial, tipo pulgadas de agua) a cero antes de conectarlos al motor. [Inferido]"
+   ],
+   "validar": [
+    "Admisión y cárter muestran pulsos regulares (uno por cilindro) en ralentí. [Inferido]",
+    "Ninguno de los dos transductores llega al tope del rango del canal. [Inferido]",
+    "La bobina y el inyector 1 dan su pulso en cada ciclo hasta que se quita la llave. [Inferido]",
+    "La grabación sigue hasta que el motor se para del todo. [Inferido]"
+   ],
+   "leer": [
+    "Admisión: cada cilindro hace su jalón al bajar el pistón en admisión. El jalón de un cilindro está 360° después de su PMS de compresión. [Teórico Bradley]",
+    "Jalones iguales no garantizan una distribución correcta: solo dicen que los cilindros aportan igual. [Teórico Bradley]",
+    "Cárter: un pulso de presión que sube cuando un cilindro llega a su PMS de compresión apunta a segmentos o pistón de ese cilindro. [Teórico Bradley]",
+    "Las fugas se ven mejor en admisión y escape durante el arranque; en ralentí hay más actividad y cuesta más. [Teórico Bradley]"
+   ],
+   "ojo": [
+    "El curso de scripts no usa transductores de pulso (mide dentro del cilindro): los umbrales de esta prueba son provisionales. [Inferido]",
+    "Con acelerador electrónico, al quitar la llave la mariposa puede volver a su posición de emergencia aunque pises a fondo. [Inferido]"
+   ]
   },
   {
    "id": "ESC",
@@ -210,8 +269,9 @@
     }
    ],
    "como": [
-    "Transductor en la salida del escape, con adaptador estanco.",
-    "Misma maniobra que la prueba de admisión, en el mismo orden."
+    "Canal A: pinza inductiva en la bobina 1. Canal B: punta en el mando del inyector 1. [Inferido]",
+    "Canal C: transductor en la salida del tubo de escape con un adaptador estanco; si hay dos salidas, tapa la otra o mide cada bancada aparte. [Inferido]",
+    "Transductor a cero antes de conectarlo. [Inferido]"
    ],
    "maniobra": [
     {
@@ -221,7 +281,8 @@
      "rpm": [
       800,
       800
-     ]
+     ],
+     "hacer": "Ralentí estable. [Inferido]"
     },
     {
      "fase": "Acel. suave",
@@ -230,7 +291,8 @@
      "rpm": [
       800,
       2500
-     ]
+     ],
+     "hacer": "Acelera suave hasta unas 2500 RPM. [Inferido]"
     },
     {
      "fase": "Vuelta",
@@ -239,7 +301,8 @@
      "rpm": [
       2500,
       800
-     ]
+     ],
+     "hacer": "Suelta y deja volver a ralentí. [Inferido]"
     },
     {
      "fase": "Acel. brusca",
@@ -248,7 +311,8 @@
      "rpm": [
       800,
       4500
-     ]
+     ],
+     "hacer": "Acelerón brusco a fondo y suelta enseguida. [Inferido]"
     },
     {
      "fase": "Soltar",
@@ -257,7 +321,8 @@
      "rpm": [
       4500,
       800
-     ]
+     ],
+     "hacer": "Deja que baje de vueltas. [Inferido]"
     },
     {
      "fase": "Apagar grabando",
@@ -266,7 +331,8 @@
      "rpm": [
       800,
       0
-     ]
+     ],
+     "hacer": "Quita el contacto con la llave sin parar la grabación hasta que el motor se pare. [Fuente págs. 67, 70]"
     }
    ],
    "requisitos": {
@@ -275,11 +341,33 @@
     "criterio": "grados"
    },
    "mirar": "Pulso de escape por cilindro (válvula de escape) y presión que sube en la aceleración brusca y tarda en bajar (escape o catalizador obstruido).",
-   "fuente": "Curso de scripts, pág. 4 y 48."
+   "fuente": "Libro de Bradley (pulsos de escape); curso de scripts, págs. 4 y 48 (escape obstruido, catalizador).",
+   "antes": [
+    "Motor a temperatura de servicio (ventilador ya ha saltado una vez), salvo que el fallo sea en frío. [Inferido]",
+    "Todos los consumidores apagados: aire acondicionado, luces, luneta y ventilador del habitáculo. [Inferido]",
+    "Cambio en punto muerto (o P en automático) y freno de mano echado: vas a acelerar a fondo con el coche parado. [Inferido]",
+    "Nadie delante ni detrás del vehículo y el capó abierto con los cables de medida lejos de correas y ventilador. [Inferido]",
+    "Escape frío al colocar el adaptador, o usa guantes: el tubo quema. [Inferido]"
+   ],
+   "validar": [
+    "Pulsos de escape regulares en ralentí, uno por cilindro. [Inferido]",
+    "El transductor no satura en el acelerón. [Inferido]",
+    "La grabación llega hasta la parada. [Inferido]"
+   ],
+   "leer": [
+    "El pulso de escape va desfasado respecto a la referencia de encendido: 1 evento (180°) en 4 cilindros, 2 (240°) en 6 y 3 (270°) en 8. Con orden 1-3-4-2 los pulsos se leen 2-1-3-4. [Teórico Bradley]",
+    "Un cilindro con combustión empuja al abrir su válvula de escape; jalones iguales en todos son normales. [Teórico Bradley]",
+    "Empujón hacia arriba en el escape cuando un cilindro se acerca a su PMS de compresión: válvula de escape que no sella. [Teórico Bradley]",
+    "Presión que sube en el acelerón y tarda en bajar: escape o catalizador obstruido. [Fuente págs. 4, 48]"
+   ],
+   "ojo": [
+    "El pulso tarda en recorrer el tubo hasta el transductor: depende de la longitud y de las RPM. Valida el desfase provocando un fallo en un cilindro conocido. [Inferido]",
+    "El pulso de escape es una pieza más del puzle: crúzalo con la compresión y con el CKP. [Teórico Bradley]"
+   ]
   },
   {
    "id": "CAIDA-G",
-   "titulo": "Caída de giro con encendido cortado",
+   "titulo": "Caída de giro con el contacto quitado y la mariposa abierta",
    "combustible": [
     "gasolina"
    ],
@@ -300,8 +388,9 @@
     }
    ],
    "como": [
-    "Pinchar la señal del CKP sin desconectar el sensor.",
-    "Por encima de 3000 RPM cortar el encendido con la mariposa abierta hasta que el motor se pare."
+    "Canal A, CKP: punta trasera (back-probe) en el cable de señal del sensor, en paralelo y sin desconectar nada. Masa del osciloscopio en la masa del motor o en el negativo de la batería, no en la carrocería. [Inferido]",
+    "Tipo de CKP: inductivo (2 hilos) genera su propia tensión y no necesita alimentación, rango ±20 V porque la amplitud sube con las RPM; Hall o magnetorresistivo (3 hilos) lo alimenta la UCE: se mide el cable de señal, rango ±10 V. [Inferido]",
+    "Canal B: pinza inductiva en la bobina 1: marca el cilindro 1 mientras hay chispa. [Inferido]"
    ],
    "maniobra": [
     {
@@ -311,7 +400,8 @@
      "rpm": [
       800,
       800
-     ]
+     ],
+     "hacer": "Ralentí estable. [Inferido]"
     },
     {
      "fase": "Acelerar",
@@ -320,16 +410,18 @@
      "rpm": [
       800,
       3500
-     ]
+     ],
+     "hacer": "Acelera hasta pasar de 3000 RPM. [Fuente pág. 67]"
     },
     {
-     "fase": "Corte de encendido",
+     "fase": "Quitar el contacto",
      "tipo": "corte",
      "s": 5,
      "rpm": [
       3500,
       0
-     ]
+     ],
+     "hacer": "Quita el contacto con la llave y mantén el acelerador a fondo (mariposa abierta) hasta que el motor se pare por completo. Sin chispa, el aire comprimido hace de muelle en cada PMS. [Fuente pág. 67]"
     }
    ],
    "requisitos": {
@@ -338,7 +430,27 @@
     "criterio": "diente"
    },
    "mirar": "La caída sin combustión solo depende de la mecánica: el cilindro que empuja menos tiene fuga de compresión.",
-   "fuente": "Curso de scripts, pág. 67."
+   "fuente": "Curso de scripts, script CSS, pág. 67 (fuga de compresión).",
+   "antes": [
+    "Motor a temperatura de servicio (ventilador ya ha saltado una vez), salvo que el fallo sea en frío. [Inferido]",
+    "Todos los consumidores apagados: aire acondicionado, luces, luneta y ventilador del habitáculo. [Inferido]",
+    "Cambio en punto muerto (o P en automático) y freno de mano echado: vas a acelerar a fondo con el coche parado. [Inferido]",
+    "Nadie delante ni detrás del vehículo y el capó abierto con los cables de medida lejos de correas y ventilador. [Inferido]"
+   ],
+   "validar": [
+    "El CKP da dientes hasta que el motor se para del todo. [Inferido]",
+    "Hay varios ciclos de caída con buena amplitud de señal antes de las últimas vueltas. [Inferido]"
+   ],
+   "leer": [
+    "En la caída con el contacto quitado y la mariposa abierta, la forma y la posición de las gráficas solo dependen de la mecánica (neumática) del motor, no del encendido ni del combustible. [Fuente pág. 67]",
+    "Cuanto más aire contiene el cilindro en el PMS, más empuja al cigüeñal: el cilindro que empuja menos tiene fuga de compresión. [Fuente pág. 67]",
+    "Confírmalo con la compresión relativa. [Fuente pág. 71]"
+   ],
+   "ojo": [
+    "CKP Hall al quitar la llave: muchas UCE mantienen su relé principal unos segundos y el sensor sigue alimentado, pero no todas. Mira en la captura que los dientes siguen hasta que el motor se para; si se cortan antes, esa parte no vale y usa las deceleraciones al soltar el acelerador. [Inferido]",
+    "Con acelerador electrónico, al quitar la llave la mariposa puede volver a su posición de emergencia aunque pises: el curso habla de mariposa abierta, que solo está garantizada con acelerador de cable. [Inferido]",
+    "No cortes la chispa quitando bobinas o fusibles con el motor en marcha: la gasolina sin quemar va al catalizador. La prueba se hace con la llave. [Inferido]"
+   ]
   },
   {
    "id": "CAIDA-D",
@@ -363,8 +475,10 @@
     }
    ],
    "como": [
-    "Pinchar la señal del CKP sin desconectar el sensor.",
-    "Acelerón y apagar el motor sin parar la grabación."
+    "Canal A, CKP: punta trasera (back-probe) en el cable de señal del sensor, en paralelo y sin desconectar nada. Masa del osciloscopio en la masa del motor o en el negativo de la batería, no en la carrocería. [Inferido]",
+    "Tipo de CKP: inductivo (2 hilos) genera su propia tensión y no necesita alimentación, rango ±20 V porque la amplitud sube con las RPM; Hall o magnetorresistivo (3 hilos) lo alimenta la UCE: se mide el cable de señal, rango ±10 V. [Inferido]",
+    "Canal B: punta en el cable de mando del inyector 1 o pinza de corriente en uno de sus cables. [Fuente pág. 76]",
+    "Se puede sincronizar con otro inyector o bobina (el curso lo hace con el inyector 4, pág. 86), pero entonces la numeración de cilindros se desplaza según el orden de encendido: indícalo al analizar. [Fuente pág. 86]"
    ],
    "maniobra": [
     {
@@ -374,7 +488,8 @@
      "rpm": [
       800,
       800
-     ]
+     ],
+     "hacer": "Ralentí estable. [Fuente pág. 70]"
     },
     {
      "fase": "Acelerón",
@@ -383,7 +498,8 @@
      "rpm": [
       800,
       2700
-     ]
+     ],
+     "hacer": "Acelerón brusco. [Fuente pág. 70]"
     },
     {
      "fase": "Apagar",
@@ -392,7 +508,8 @@
      "rpm": [
       2700,
       0
-     ]
+     ],
+     "hacer": "Apaga el motor con la llave sin parar la grabación hasta que esté quieto. [Fuente pág. 70]"
     }
    ],
    "requisitos": {
@@ -401,7 +518,24 @@
     "criterio": "diente"
    },
    "mirar": "La caída sin inyección solo depende de la mecánica: el cilindro que empuja menos tiene fuga de compresión.",
-   "fuente": "Curso de scripts, pág. 70–71."
+   "fuente": "Curso de scripts, script CSS diésel, págs. 70–71 y 75.",
+   "antes": [
+    "Motor a temperatura de servicio (ventilador ya ha saltado una vez), salvo que el fallo sea en frío. [Inferido]",
+    "Todos los consumidores apagados: aire acondicionado, luces, luneta y ventilador del habitáculo. [Inferido]",
+    "Cambio en punto muerto (o P en automático) y freno de mano echado: vas a acelerar a fondo con el coche parado. [Inferido]",
+    "Nadie delante ni detrás del vehículo y el capó abierto con los cables de medida lejos de correas y ventilador. [Inferido]"
+   ],
+   "validar": [
+    "El CKP da dientes hasta que el motor se para del todo. [Inferido]",
+    "El inyector 1 deja de pulsar al quitar la llave: a partir de ahí no hay combustión. [Inferido]"
+   ],
+   "leer": [
+    "Sin inyección, la caída de giro solo depende de la mecánica: el cilindro que empuja menos al pasar por su PMS tiene fuga de compresión. [Inferido]",
+    "Un cilindro con poca contribución baja también la compresión aparente del siguiente en el orden de inyección: confírmalo con la compresión relativa. [Fuente págs. 71, 75]"
+   ],
+   "ojo": [
+    "CKP Hall al quitar la llave: muchas UCE mantienen su relé principal unos segundos y el sensor sigue alimentado, pero no todas. Mira en la captura que los dientes siguen hasta que el motor se para; si se cortan antes, esa parte no vale y usa las deceleraciones al soltar el acelerador. [Inferido]"
+   ]
   },
   {
    "id": "PX",
@@ -418,16 +552,17 @@
     },
     {
      "canal": "B",
-     "senal": "Bobina o inyector de ese cilindro",
-     "sonda": "Pinza inductiva / punta 10:1",
+     "senal": "Chispa del mismo cilindro (gasolina), opcional",
+     "sonda": "Pinza inductiva en el cable o la bobina de ese cilindro",
      "rango": "±20 V",
      "entidad": "encendido"
     }
    ],
    "como": [
-    "Quitar la bujía (o el calentador en diésel) del cilindro a medir y roscar el transductor.",
-    "Ese cilindro no trabaja durante la prueba: es normal.",
-    "Sincronismo del mismo cilindro para el avance (opcional)."
+    "Quita la bujía (o el calentador en diésel) del cilindro a medir y rosca el transductor a mano con su adaptador. [Fuente pág. 2]",
+    "Ese cilindro no tiene encendido durante la prueba: es lo que permite analizar la presión sin combustión. [Fuente pág. 2]",
+    "Canal A: transductor de presión en el cilindro, en el rango del transductor. [Fuente pág. 2]",
+    "Canal B (opcional): pinza en la chispa de ese mismo cilindro; con ella sale el avance de encendido según RPM y carga. [Fuente págs. 2, 49]"
    ],
    "maniobra": [
     {
@@ -437,7 +572,8 @@
      "rpm": [
       800,
       800
-     ]
+     ],
+     "hacer": "Ralentí estable: aquí salen la distribución, las pérdidas de gas y la relación de compresión. [Fuente págs. 2–7, 11, 23]"
     },
     {
      "fase": "Acel. suave",
@@ -446,7 +582,8 @@
      "rpm": [
       800,
       2500
-     ]
+     ],
+     "hacer": "Acelera suave hasta unas 2000 RPM: llenado y avance a carga baja. [Fuente págs. 51–52]"
     },
     {
      "fase": "Ralentí",
@@ -455,7 +592,8 @@
      "rpm": [
       2500,
       800
-     ]
+     ],
+     "hacer": "Suelta y vuelve a ralentí; la caída con el acelerador suelto es el modo freno motor. [Fuente pág. 53]"
     },
     {
      "fase": "Acelerones",
@@ -464,7 +602,8 @@
      "rpm": [
       800,
       4000
-     ]
+     ],
+     "hacer": "Acelerones a fondo a varias RPM: carga máxima. [Fuente pág. 40]"
     }
    ],
    "requisitos": {
@@ -472,8 +611,33 @@
     "rpm_max": 4000,
     "criterio": "grados"
    },
-   "mirar": "Distribución: AAE 130–160°, RCE 360–395°, AAA 350–385°, RCA 585–615°; fugas 15–20 %; pico 3–6 bar a ralentí.",
-   "fuente": "Curso de scripts, script Px, pág. 2–55."
+   "mirar": "Distribución: AAE 130–160°, centro del cruce 370–390° (VVT-i 380–400°), cierre de admisión 560–600°; pico 3–6 bar al ralentí; presión 30° antes y después del PMS iguales.",
+   "fuente": "Curso de scripts, script Px, págs. 2–55.",
+   "antes": [
+    "Motor a temperatura y apagado; deja enfriar la culata lo justo para manipular la bujía sin quemarte. [Inferido]",
+    "Gasolina: desconecta el inyector de ese cilindro para que no entre gasolina, que lavaría el cilindro e iría al catalizador. [Inferido]",
+    "La bobina de ese cilindro sigue saltando: conéctale una bujía puesta a masa (o un explosor) fuera del motor. Nunca la dejes saltar al aire: daña la bobina o la UCE. [Inferido]",
+    "Cambio en punto muerto (o P) y freno de mano. [Inferido]"
+   ],
+   "validar": [
+    "Las torres de compresión son simétricas y repetidas ciclo a ciclo. [Fuente pág. 11]",
+    "El pico de presión al ralentí está entre 3 y 6 bar. [Fuente pág. 2]",
+    "Ciclo de 720° bien marcado: del primer pico al segundo (en la app, regla de fase). [Fuente págs. 8–10]"
+   ],
+   "leer": [
+    "Apertura de escape (punto 4): entre 130° y 160° después del PMS (de 50° a 20° antes del PMI). [Fuente pág. 3]",
+    "Sección 7 (escape, 180°–360°): debe ser una meseta a presión casi atmosférica; si sube, apertura de escape incorrecta o escape obstruido. [Fuente pág. 4]",
+    "Apertura de admisión (punto 8) hacia 330°–360°: difícil de ver por el cruce. [Fuente pág. 4]",
+    "Centro de la sección 9 (cruce): entre 370° y 390° después del PMS; con VVT-i, entre 380° y 400°. [Fuente pág. 5]",
+    "Cierre de admisión (punto 12): entre 560° y 600°. [Fuente págs. 6–7]",
+    "Presión en A (30° antes del PMS) igual a la de B (30° después): si A es claramente mayor, fugas (válvula quemada, segmentos, distribución). [Fuente pág. 7]",
+    "Ejemplo del curso a 730 RPM: AAA 356°, RCE 373°, AAE 143°, RCA 589°. Con VVT-i: AAA 369°, RCE 380°, AAE 146°, RCA 603°. [Fuente págs. 23, 26]",
+    "Pérdidas de gas: el curso muestra ejemplos del 16 %, 28 %, 30 %, 42 % y más del 90 %; no da un límite fijo. [Fuente págs. 11–18]"
+   ],
+   "ojo": [
+    "La holgura de válvulas solo se diagnostica en la de escape; la de admisión no. [Fuente pág. 33]",
+    "Relación de compresión baja: carbonilla, biela doblada, culata rectificada de más o junta inadecuada. [Fuente pág. 22]"
+   ]
   }
  ]
 }

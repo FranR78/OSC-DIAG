@@ -3,7 +3,7 @@
  "id": "FR-INY-01",
  "nombre": "Inyección",
  "autor": "Fran Rosales",
- "version": "2026.11.21",
+ "version": "2026.11.25",
  "estado": "borrador",
  "combustible": [
   "gasolina",
@@ -38,8 +38,10 @@
     }
    ],
    "como": [
-    "Pinchar la señal del CKP sin desconectar el sensor.",
-    "Grabar un ralentí largo: la ECU compensa los inyectores a ralentí."
+    "Canal A, CKP: punta trasera (back-probe) en el cable de señal del sensor, en paralelo y sin desconectar nada. Masa del osciloscopio en la masa del motor o en el negativo de la batería, no en la carrocería. [Inferido]",
+    "Tipo de CKP: inductivo (2 hilos) genera su propia tensión y no necesita alimentación, rango ±20 V porque la amplitud sube con las RPM; Hall o magnetorresistivo (3 hilos) lo alimenta la UCE: se mide el cable de señal, rango ±10 V. [Inferido]",
+    "Canal B: punta en el mando del inyector 1 o pinza de corriente en uno de sus cables. [Fuente pág. 76]",
+    "Se puede sincronizar con otro inyector o bobina (el curso lo hace con el inyector 4, pág. 86), pero entonces la numeración de cilindros se desplaza según el orden de encendido: indícalo al analizar. [Fuente pág. 86]"
    ],
    "maniobra": [
     {
@@ -49,7 +51,8 @@
      "rpm": [
       800,
       800
-     ]
+     ],
+     "hacer": "Ralentí largo: la UCE compensa los inyectores y la contribución sale uniforme. [Fuente pág. 72]"
     },
     {
      "fase": "Acel. suave",
@@ -58,7 +61,8 @@
      "rpm": [
       800,
       2000
-     ]
+     ],
+     "hacer": "Acelera suave. [Fuente pág. 74]"
     },
     {
      "fase": "Acel. brusca",
@@ -67,7 +71,8 @@
      "rpm": [
       2000,
       3500
-     ]
+     ],
+     "hacer": "Acelerón brusco y, si el síntoma sale más arriba, mantén por encima de esas RPM (el caso H100 se desviaba a partir de 2300 RPM). [Fuente pág. 72]"
     },
     {
      "fase": "Ralentí",
@@ -76,7 +81,8 @@
      "rpm": [
       3500,
       800
-     ]
+     ],
+     "hacer": "Vuelta a ralentí. [Inferido]"
     }
    ],
    "requisitos": {
@@ -85,7 +91,27 @@
     "criterio": "diente"
    },
    "mirar": "A ralentí la ECU iguala el aporte; al acelerar la compensación se desactiva y aparece el inyector débil.",
-   "fuente": "Curso de scripts, casos diésel, pág. 72–86."
+   "fuente": "Curso de scripts, casos diésel, págs. 72–86.",
+   "antes": [
+    "Motor a temperatura de servicio (ventilador ya ha saltado una vez), salvo que el fallo sea en frío. [Inferido]",
+    "Todos los consumidores apagados: aire acondicionado, luces, luneta y ventilador del habitáculo. [Inferido]",
+    "Cambio en punto muerto (o P en automático) y freno de mano echado: vas a acelerar a fondo con el coche parado. [Inferido]",
+    "Nadie delante ni detrás del vehículo y el capó abierto con los cables de medida lejos de correas y ventilador. [Inferido]",
+    "Si el fallo aparece al arrancar, empieza a grabar antes de arrancar: en el caso D4CB así se vio que arrancaba con dos cilindros. [Fuente pág. 82]"
+   ],
+   "validar": [
+    "El CKP se ve limpio y el inyector 1 pulsa en cada ciclo. [Inferido]"
+   ],
+   "leer": [
+    "Al ralentí todo sale uniforme por la compensación; al acelerar se desactiva y sale la diferencia. [Fuente pág. 72]",
+    "Un cilindro que aporta más suele llevar un inyector que da más gasóleo: la UCE le recorta el pulso, y se confirma midiendo el ancho de pulso. [Fuente pág. 72]",
+    "Contribución por debajo de cero: ese cilindro no trabaja (caso 1KD con P0093, inyector con fuga). [Fuente pág. 81]",
+    "Causas de poca contribución: inyector mal, compresión, asiento del inyector, bobina del inyector, control eléctrico, inyectores sin codificar o mal reparados. [Fuente pág. 74]",
+    "Siguiente paso: hoja de compresión y, si hace falta, compresión relativa; si sale bien, prueba de retornos. [Fuente págs. 74, 78]"
+   ],
+   "ojo": [
+    "Si el fallo cambia con la temperatura, repite en caliente y mira en la hoja de fase cuántas inyecciones da la UCE a ese inyector (caso D4CB). [Fuente págs. 82–86]"
+   ]
   },
   {
    "id": "INY-I",
@@ -107,8 +133,9 @@
     }
    ],
    "como": [
-    "Pinza de corriente en un cable del inyector y punta en el lado de mando.",
-    "Capturar una sola inyección a ralentí."
+    "Canal A: punta 10:1 en el cable de mando del inyector (lado de la UCE). [Inferido]",
+    "Canal B: pinza de corriente de 20 A en uno de los cables del inyector, puesta a cero antes. [Inferido]",
+    "Disparo en el flanco del mando para capturar una sola inyección. [Inferido]"
    ],
    "maniobra": [
     {
@@ -118,7 +145,8 @@
      "rpm": [
       800,
       800
-     ]
+     ],
+     "hacer": "Captura una inyección a ralentí y guarda varias seguidas para comparar. [Inferido]"
     }
    ],
    "requisitos": {
@@ -127,7 +155,20 @@
     "criterio": "ninguno"
    },
    "mirar": "El escalón en la subida de la corriente marca la apertura de la aguja; si no aparece o se retrasa, inyector obstruido o agarrotado.",
-   "fuente": "Curso de scripts, pág. 66."
+   "fuente": "Propuesta nuestra; el curso muestra la forma del pulso en los casos diésel (págs. 83–86).",
+   "antes": [
+    "Motor a ralentí y a temperatura. [Inferido]"
+   ],
+   "validar": [
+    "Se ven la tensión de mando y la corriente completas, sin cortar. [Inferido]"
+   ],
+   "leer": [
+    "El escalón en la subida de la corriente marca el movimiento de la aguja; si no aparece o llega tarde, inyector obstruido o agarrotado. [Inferido]",
+    "En diésel, cuenta las inyecciones (piloto y principal) en la hoja de fase o en la captura. [Fuente págs. 83–85]"
+   ],
+   "ojo": [
+    "El curso no trae valores de la corriente del inyector: compara con un inyector bueno del mismo motor. [Inferido]"
+   ]
   }
  ]
 }
