@@ -58,8 +58,8 @@ cv.addEventListener('pointerup',e=>{
   if(zm.on){zmUp(e);return}
   if(ann.tool!=='none'){annUp(e);return}
   if(TP.delete(e.pointerId)&&pinch){if(TP.size<2)pinch=null;drag=null;return}
-  if(drag&&!drag.mv&&!drag.o&&e.offsetX>=M.l&&e.offsetX<=M.l+PW()&&e.offsetY>=M.t&&e.offsetY<=M.t+PH()){
-    const t=tOf(e);if(e.shiftKey)cur.b=t;else cur.a=t;if(cur.a==null)cur.a=t;if(cur.b==null)cur.b=t;tr.on=true;sync();draw()}
+  if(tr.on&&drag&&!drag.mv&&!drag.o&&e.offsetX>=M.l&&e.offsetX<=M.l+PW()&&e.offsetY>=M.t&&e.offsetY<=M.t+PH()){
+    const t=tOf(e);if(e.shiftKey)cur.b=t;else cur.a=t;if(cur.a==null)cur.a=t;if(cur.b==null)cur.b=t;sync();draw()}
   if(drag&&drag.mv&&drag.o&&drag.o.k==='arrow')ui();
   if(drag&&drag.mv&&drag.o&&drag.o.k==='cyl')cylList();
   drag=null});

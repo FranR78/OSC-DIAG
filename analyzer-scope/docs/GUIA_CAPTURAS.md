@@ -32,7 +32,7 @@ Etiquetas: **[Fuente]** = lo dice el curso · **[Inferido]** = propuesta para Pi
 | | |
 |---|---|
 | Señales | Sensor de cigüeñal (CKP) + sincronismo cil. 1 (bobina o inyector) [Fuente, pág. 57–70] |
-| Maniobra gasolina | Ralentí → aceleración → por encima de 3000 RPM **cortar el encendido con la mariposa abierta** hasta que se pare: esa caída solo depende de la mecánica (fugas de compresión) [Fuente, pág. 67] |
+| Maniobra gasolina | Ralentí → aceleración → por encima de 3000 RPM **quitar el contacto (llave) con la mariposa abierta** hasta que se pare: esa caída solo depende de la mecánica (fugas de compresión) [Fuente, pág. 67] |
 | Maniobra diésel | 1) Ralentí · 2) acelerar suave y **soltar de golpe** (calibra el dentado del CKP) · 3) vuelta a ralentí · 4) acelerón y soltar · 5) acelerón y **apagar el motor** [Fuente, pág. 70] |
 | Ojo | La compresión solo vale en ralentí; un cilindro flojo baja también al siguiente en orden de encendido: confirmar con S1 [Fuente, pág. 71] |
 | PicoScope | 2 canales · CKP ±20 V (inductivo) o ±10 V (Hall) · 20 s · **≥ 200 kS/s** (precisión del paso de dientes) [Inferido] |
@@ -43,7 +43,7 @@ Etiquetas: **[Fuente]** = lo dice el curso · **[Inferido]** = propuesta para Pi
 |---|---|
 | Señales | Transductor de presión en el cilindro (**bujía retirada**, ese cilindro no enciende) + chispa de otro cilindro opcional para el avance [Fuente, pág. 2, 12, 49] |
 | Maniobra | Ralentí y carga máxima a varias RPM (acelerones); el avance se tabula en ralentí y carga máxima [Fuente, pág. 40, 49] |
-| Valores | Ralentí 650…950 RPM · pico 3…6 bar en ralentí · AAE 130…160° · RCE 360…395° · AAA 350…385° · RCA 585…615° · fugas 15…20 % [Fuente, pág. 2, 11] |
+| Valores | Pico 3…6 bar en ralentí [Fuente, pág. 2] · AAE 130…160° [pág. 3] · centro del cruce (sección 9) 370…390°, VVT-i 380…400° [pág. 5] · cierre de admisión 560…600° [pág. 6–7] · ejemplo a 730 RPM: AAA 356°, RCE 373°, AAE 143°, RCA 589° [pág. 23]. Pérdidas de gas: solo ejemplos (16 %…>90 %), sin límite fijo [pág. 11–18] |
 | PicoScope | 2 canales · transductor según su escala · 20 s · 50 kS/s [Inferido] |
 
 ## S5 · Script de Fran: mecánica sin desmontar (transductores de pulso)

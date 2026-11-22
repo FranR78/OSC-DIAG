@@ -3,7 +3,7 @@
  "id": "FR-CAN-01",
  "nombre": "Red CAN",
  "autor": "Fran Rosales",
- "version": "2026.11.23",
+ "version": "2026.11.25",
  "estado": "borrador",
  "combustible": [
   "gasolina",
@@ -35,10 +35,9 @@
     }
    ],
    "como": [
-    "Pinchar CAN-H y CAN-L en el conector de diagnosis (pines 6 y 14) o en el de la unidad sospechosa.",
-    "Masa de las dos puntas en la masa del vehículo, no una sonda diferencial.",
-    "Contacto puesto o motor a ralentí: tiene que haber tráfico.",
-    "La terminación (60 Ω entre H y L) se mide aparte, con el contacto quitado y el polímetro."
+    "Canal A: CAN-H; canal B: CAN-L, en el conector de diagnosis (pines 6 y 14) o en el conector de la unidad sospechosa. [Teórico ISO 11898-2]",
+    "Masa de las dos puntas en la masa del vehículo; no uses sonda diferencial: la app necesita cada línea respecto a masa. [Inferido]",
+    "La terminación (60 Ω entre H y L) se mide aparte, con el contacto quitado, con el polímetro. [Teórico ISO 11898-2]"
    ],
    "maniobra": [
     {
@@ -48,7 +47,8 @@
      "rpm": [
       0,
       0
-     ]
+     ],
+     "hacer": "Captura 0,1 s con tráfico; si buscas un fallo intermitente, repite varias veces. [Inferido]"
     }
    ],
    "requisitos": {
@@ -57,7 +57,21 @@
     "criterio": "can"
    },
    "mirar": "Recesivo H ≈ L ≈ 2,5 V; dominante H ≈ 3,5 V y L ≈ 1,5 V (2 V de diferencia). La unidad cuyo nivel se aparta del resto es la sospechosa.",
-   "fuente": "ISO 11898-2 (CAN de alta velocidad). El CAN de baja velocidad tolerante a fallos tiene otros niveles."
+   "fuente": "ISO 11898-2 (CAN de alta velocidad). El CAN de baja velocidad tolerante a fallos tiene otros niveles.",
+   "antes": [
+    "Contacto puesto o motor a ralentí: tiene que haber tráfico en la red. [Inferido]",
+    "No desconectes unidades con el contacto puesto. [Inferido]"
+   ],
+   "validar": [
+    "Se ven tramas completas en las dos líneas y la base de tiempos permite ver los bits. [Inferido]"
+   ],
+   "leer": [
+    "Recesivo: H y L a unos 2,5 V. Dominante: H a unos 3,5 V y L a 1,5 V (2 V de diferencia). [Teórico ISO 11898-2]",
+    "La unidad cuyo nivel se aparta del resto es la sospechosa. [Inferido]"
+   ],
+   "ojo": [
+    "El CAN de baja velocidad tolerante a fallos tiene otros niveles. [Teórico ISO 11898-3]"
+   ]
   }
  ]
 }

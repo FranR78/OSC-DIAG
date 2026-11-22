@@ -577,9 +577,9 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await k.click('#kL .skI:nth-of-type(3)'); await k.waitForTimeout(100);
     check('cambiar de script: cada original se abre al pulsarlo', await KE(() => { const r = []; document.querySelectorAll('#kL .skI').forEach((b, i) => { b.click(); r.push($('kCab').querySelector('h2').textContent); }); return new Set(r).size === r.length && r.length >= 5; }));
     await k.click('#kL .skI[data-k="FR-MEC-01"]'); await k.waitForTimeout(100);
-    check('Integridad mecánica (gasolina): pruebas en orden y Px opcional', await KE(() => [...document.querySelectorAll('#kSteps .skS')].map(b => b.textContent).join('|') === '0Configurar PicoScope|1Compresión relativa|2Admisión y cárter|3Escape|4Caída de giro con encendido cortado|5Presión en cilindro (opcional)|★Resumen'), await KE(() => [...document.querySelectorAll('#kSteps .skS')].map(b => b.textContent).join('|')));
+    check('Integridad mecánica (gasolina): pruebas en orden y Px opcional', await KE(() => [...document.querySelectorAll('#kSteps .skS')].map(b => b.textContent).join('|') === '0Configurar PicoScope|1Compresión relativa|2Admisión y cárter|3Escape|4Caída de giro con el contacto quitado y la mariposa abierta|5Presión en cilindro (opcional)|★Resumen'), await KE(() => [...document.querySelectorAll('#kSteps .skS')].map(b => b.textContent).join('|')));
     await k.click('#kFd'); await k.waitForTimeout(100);
-    check('diésel: cambia la caída de giro por «al apagar»', await KE(() => /4Caída de giro al apagar/.test($('kSteps').textContent) && !/encendido cortado/.test($('kSteps').textContent)));
+    check('diésel: cambia la caída de giro por «al apagar»', await KE(() => /4Caída de giro al apagar/.test($('kSteps').textContent) && !/contacto quitado/.test($('kSteps').textContent)));
     await k.click('#kFg'); await k.waitForTimeout(100);
     await k.click('#kSteps .skS[data-s="2"]'); await k.selectOption('#kTb', '0.005'); await k.waitForTimeout(100);
     check('5 ms/div: avisa de que no se ve el proceso completo y propone 2 s/div', /✗Tiempo\. Con 5 ms\/div la pantalla dura 50 ms.*Sube a 2 s\/div/.test(await k.textContent('#kCk')), await k.textContent('#kCk'));

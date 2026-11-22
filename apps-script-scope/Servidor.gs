@@ -31,10 +31,36 @@ function doGet(e) {
   if (inv) { try { canjear_(inv); } catch (err) { return sinAcceso_(err.message); } }
   var pm = permisos_();
   if (!pm.ok) return sinAcceso_(pm.motivo);
-  return HtmlService.createHtmlOutputFromFile('App').setTitle('Analyzer Scope')
+  return HtmlService.createHtmlOutput(app_()).setTitle('Analyzer Scope')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
+
+/* La app se baja de GitHub (main): cada versión nueva llega sola en ≤ 10 min, sin pegar App.html ni reimplementar.
+   Propiedad opcional APP_URL (otra rama o un fork). Si GitHub falla, sirve el archivo App del proyecto. */
+var APP_URL_ = 'https://raw.githubusercontent.com/FranR78/OSC-DIAG/main/apps-script-scope/App.html', APP_TROZO_ = 45000;
+function app_() {
+  var c = CacheService.getScriptCache(), n = parseInt(c.get('app:n'), 10);
+  if (n) {
+    var keys = []; for (var i = 0; i < n; i++) keys.push('app:' + i);
+    var t = c.getAll(keys), s = '';
+    for (var j = 0; j < n && s !== null; j++) s = t[keys[j]] == null ? null : s + t[keys[j]];
+    if (s) return s;
+  }
+  try {
+    var url = PropertiesService.getScriptProperties().getProperty('APP_URL') || APP_URL_;
+    var r = UrlFetchApp.fetch(url + '?t=' + Date.now(), { muteHttpExceptions: true });
+    if (r.getResponseCode() === 200) {
+      var txt = r.getContentText('UTF-8'), o = {}, m = Math.ceil(txt.length / APP_TROZO_);
+      for (var k = 0; k < m; k++) o['app:' + k] = txt.slice(k * APP_TROZO_, (k + 1) * APP_TROZO_);
+      try { c.putAll(o, 600); c.put('app:n', String(m), 600); } catch (e) { /* sin caché */ }
+      return txt;
+    }
+  } catch (e) { console.error('app_: ' + e); }
+  return HtmlService.createHtmlOutputFromFile('App').getContent();
+}
+/** Editor: fuerza a bajar ya la última versión (tras publicar una nueva). */
+function appActualizar() { CacheService.getScriptCache().remove('app:n'); return app_().length; }
 
 /** La app llama aquí con google.script.run (mismo nombre que en el portal). */
 function apiDiagnostico(pt) {

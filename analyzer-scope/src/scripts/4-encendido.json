@@ -3,7 +3,7 @@
  "id": "FR-ENC-01",
  "nombre": "Encendido",
  "autor": "Fran Rosales",
- "version": "2026.11.21",
+ "version": "2026.11.25",
  "estado": "borrador",
  "combustible": [
   "gasolina"
@@ -35,8 +35,10 @@
     }
    ],
    "como": [
-    "Pinchar la señal del CKP sin desconectar el sensor.",
-    "Motor a temperatura; si el fallo sale con carga, provocar carga (acelerones)."
+    "Canal A, CKP: punta trasera (back-probe) en el cable de señal del sensor, en paralelo y sin desconectar nada. Masa del osciloscopio en la masa del motor o en el negativo de la batería, no en la carrocería. [Inferido]",
+    "Tipo de CKP: inductivo (2 hilos) genera su propia tensión y no necesita alimentación, rango ±20 V porque la amplitud sube con las RPM; Hall o magnetorresistivo (3 hilos) lo alimenta la UCE: se mide el cable de señal, rango ±10 V. [Inferido]",
+    "Canal B: pinza inductiva en la bobina 1. [Inferido]",
+    "Se puede sincronizar con otro inyector o bobina (el curso lo hace con el inyector 4, pág. 86), pero entonces la numeración de cilindros se desplaza según el orden de encendido: indícalo al analizar. [Fuente pág. 86]"
    ],
    "maniobra": [
     {
@@ -46,7 +48,8 @@
      "rpm": [
       800,
       800
-     ]
+     ],
+     "hacer": "Ralentí estable. [Inferido]"
     },
     {
      "fase": "Acel. suave",
@@ -55,7 +58,8 @@
      "rpm": [
       800,
       2500
-     ]
+     ],
+     "hacer": "Acelera suave hasta unas 2500 RPM. [Inferido]"
     },
     {
      "fase": "Ralentí",
@@ -64,7 +68,8 @@
      "rpm": [
       2500,
       800
-     ]
+     ],
+     "hacer": "Vuelta a ralentí. [Inferido]"
     },
     {
      "fase": "Acel. brusca",
@@ -73,7 +78,8 @@
      "rpm": [
       800,
       4500
-     ]
+     ],
+     "hacer": "Acelerón brusco a fondo y suelta: con carga es cuando se nota el fallo de encendido. [Fuente pág. 60]"
     },
     {
      "fase": "Ralentí",
@@ -82,7 +88,8 @@
      "rpm": [
       4500,
       800
-     ]
+     ],
+     "hacer": "Vuelta a ralentí. [Inferido]"
     }
    ],
    "requisitos": {
@@ -91,7 +98,25 @@
     "criterio": "diente"
    },
    "mirar": "Un cilindro que deja de aportar al acelerar o con carga, y no a ralentí, apunta a encendido.",
-   "fuente": "Curso de scripts, pág. 64 (fallo del sistema de encendido)."
+   "fuente": "Curso de scripts, script CSS, págs. 60 y 65.",
+   "antes": [
+    "Motor a temperatura de servicio (ventilador ya ha saltado una vez), salvo que el fallo sea en frío. [Inferido]",
+    "Todos los consumidores apagados: aire acondicionado, luces, luneta y ventilador del habitáculo. [Inferido]",
+    "Cambio en punto muerto (o P en automático) y freno de mano echado: vas a acelerar a fondo con el coche parado. [Inferido]",
+    "Nadie delante ni detrás del vehículo y el capó abierto con los cables de medida lejos de correas y ventilador. [Inferido]",
+    "Si el fallo aparece al arrancar, empieza a grabar antes de arrancar: en el caso D4CB así se vio que arrancaba con dos cilindros. [Fuente pág. 82]"
+   ],
+   "validar": [
+    "El CKP no satura en el acelerón y el hueco sale una vez por vuelta. [Inferido]",
+    "La bobina 1 da un pulso por ciclo. [Inferido]"
+   ],
+   "leer": [
+    "Un fallo de encendido baja la eficiencia de ese cilindro; puede ir bien al ralentí y fallar con carga, según lo que se le pida al encendido. [Fuente pág. 60]",
+    "Crúzalo con Inyección y con la caída de giro para descartar combustible y mecánica. [Fuente pág. 60]"
+   ],
+   "ojo": [
+    "Si el fallo solo sale circulando, esta prueba en parado puede no provocarlo. [Inferido]"
+   ]
   },
   {
    "id": "AVANCE",
@@ -115,8 +140,8 @@
     }
    ],
    "como": [
-    "Quitar la bujía del cilindro y roscar el transductor; la bobina sigue saltando fuera.",
-    "Grabar ralentí y acelerones a plena carga."
+    "Canal A: transductor de presión roscado en el hueco de la bujía. [Fuente pág. 2]",
+    "Canal B: pinza inductiva en la chispa de ese mismo cilindro. Con ella el script calcula el avance según RPM y carga. [Fuente págs. 2, 49]"
    ],
    "maniobra": [
     {
@@ -126,7 +151,8 @@
      "rpm": [
       800,
       800
-     ]
+     ],
+     "hacer": "Ralentí estable: avance a ralentí. [Fuente pág. 49]"
     },
     {
      "fase": "Acelerones",
@@ -135,7 +161,8 @@
      "rpm": [
       800,
       5000
-     ]
+     ],
+     "hacer": "Acelerones: suave hasta unas 2000 RPM, a fondo a varias RPM y soltar para ver el freno motor. [Fuente págs. 49–54]"
     }
    ],
    "requisitos": {
@@ -143,8 +170,24 @@
     "rpm_max": 5000,
     "criterio": "grados"
    },
-   "mirar": "Avance a ralentí 5–15° y estable (±1°); a plena carga según RPM.",
-   "fuente": "Curso de scripts, pág. 49."
+   "mirar": "Avance a ralentí y a plena carga; en freno motor se retrasa a propósito.",
+   "fuente": "Curso de scripts, script Px, págs. 49–56.",
+   "antes": [
+    "Motor a temperatura y apagado. [Inferido]",
+    "Desconecta el inyector de ese cilindro (gasolina). [Inferido]",
+    "Pon la bujía que quitas en su bobina y apóyala a masa (o usa un explosor) para que la chispa salte fuera: nunca al aire. [Inferido]",
+    "Cambio en punto muerto (o P) y freno de mano. [Inferido]"
+   ],
+   "validar": [
+    "Torres de presión simétricas y una chispa por ciclo en el canal B. [Inferido]"
+   ],
+   "leer": [
+    "La tabla da el avance en dos modos: ralentí y carga máxima. [Fuente pág. 49]",
+    "La carga se calcula con la presión absoluta en admisión durante la carrera de admisión. [Fuente pág. 51]",
+    "Ejemplo del curso a 2000 RPM: unos 40° con carga baja y 7° a plena carga (100 kPa). [Fuente págs. 51–54]",
+    "En freno motor (acelerador suelto) el encendido se retrasa a propósito, hasta pasado el PMS (ejemplo −6°): no es avería. [Fuente pág. 53]",
+    "Encendido retrasado anómalo: el caso Nissan KA20 daba −15° a ralentí con 50 kPa y −15,6° a 1500 RPM con 90 kPa. [Fuente págs. 55–56]"
+   ]
   }
  ]
 }

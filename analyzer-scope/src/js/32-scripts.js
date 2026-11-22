@@ -88,14 +88,19 @@ function skTab(){
   $('kPaso').innerHTML=SK.edit?skEditor(S):skPaso(S,SK.step);
   skWire(S);
 }
+/* texto con etiquetas de origen [Fuente…] [Inferido] [Teórico…] [Medido…] como chapas */
+const skTx=x=>skE(x).replace(/\[(Fuente|Inferido|Teórico|Medido|Taller)([^\]]*)\]/g,(m,a,b)=>'<span class="skTag skT'+a[0]+'">'+a+b+'</span>');
+const skLi=(t,l,cl)=>l&&l.length?'<b class="skH">'+t+'</b><ol class="skO'+(cl?' '+cl:'')+'">'+l.map(x=>'<li>'+skTx(x)+'</li>').join('')+'</ol>':'';
 function skPaso(S,i){
   const P=skPasos(S),n=P.length;
   if(i===0)return '<div class="skC"><b class="skH">Antes de empezar</b><p class="hint">Autoscope graba sin límite hasta llenar el disco. PicoScope guarda pantallas en un búfer y, si tardas, las nuevas sustituyen a las primeras. Por eso se configura antes de cada captura:</p><ol class="skO">'+
     '<li><b>Prueba de señal</b>: base de tiempos corta, ajustar escalas y comprobar que cada canal se ve bien.</li>'+
     '<li><b>Subir la base de tiempos</b> a 1–2 s/div para que una pantalla contenga la maniobra completa. Cada paso dice cuánto necesita y comprueba tu configuración.</li>'+
     '<li><b>Muestras</b> suficientes para el muestreo mínimo del paso.</li>'+
-    '<li><b>Disparo único</b> sobre la bobina: graba una pantalla y se para (por confirmar en taller).</li>'+
-    '<li><b>Exportar a CSV</b> solo la pantalla con la maniobra (forma de onda actual). Un CSV por paso.</li></ol>'+
+    '<li><b>Sin disparo</b>: grabación continua. Empieza la maniobra justo cuando arranca una pantalla nueva y pulsa <b>Stop</b> en cuanto termine.</li>'+
+    '<li><b>Busca en el búfer</b> la pantalla que tiene la maniobra entera (del primer ralentí a la parada) y <b>exporta a CSV</b> esa pantalla (forma de onda actual). Un CSV por paso.</li>'+
+    '<li><b>Nombra los canales</b> en PicoScope igual que en el paso (A = …, B = …): ayuda a revisar después.</li></ol>'+
+    '<p class="hint">Cada paso trae: preparación y seguridad, conexiones, la maniobra fase a fase, qué comprobar en la captura antes de desmontar y cómo leerla. Etiquetas: <span class="skTag skTF">Fuente</span> lo dice el curso de scripts (Autoscope) o el libro de Bradley, con su página · <span class="skTag skTI">Inferido</span> propuesta nuestra, validar en taller · <span class="skTag skTT">Taller</span> experiencia de taller del profesor.</p>'+
     '<div class="row"><span class="hint">'+n+(n>1?' pruebas':' prueba')+', una captura cada una.</span><span class="sp"></span><button class="p" data-go="1">Empezar: paso 1</button></div></div>';
   if(i>n){const L=P.map(p=>SK.csv[skKey(S,p)]);
     return '<div class="skC"><b class="skH">Resumen de las capturas</b><div class="skCk">'+P.map((p,k)=>{const c=L[k];
@@ -103,10 +108,13 @@ function skPaso(S,i){
       '<div class="row"><button class="p" id="kAll"'+(L.some(Boolean)?'':' disabled')+'>Abrir las capturas en el osciloscopio</button></div>'+
       '<p class="hint">Cada captura se abre como una página. El informe combinado (fases y cruce de pruebas por cilindro) llegará en una próxima versión.</p></div>';}
   const p=P[i-1],key=skKey(S,p),c=SK.cfg[key]||(SK.cfg[key]=skRec(p)),r=skChecks(p,c),cv=SK.csv[key];
-  return '<div class="skC"><b class="skH2">Paso '+i+' de '+n+' · '+skE(p.titulo)+'</b>'+(p.opcional?'<p class="skSi"><b>Opcional:</b> '+skE(p.condicion||'')+'</p>':'')+(p.mirar?'<p class="skSi"><b>Qué mirar:</b> '+skE(p.mirar)+'</p>':'')+'<div class="skG2"><div class="skMin"><b class="skH">Qué medir</b><div class="skTw"><table class="skTb"><thead><tr><th>Canal</th><th>Señal</th><th>Sonda</th><th>Rango</th></tr></thead><tbody>'+
+  return '<div class="skC"><b class="skH2">Paso '+i+' de '+n+' · '+skE(p.titulo)+'</b>'+(p.opcional?'<p class="skSi"><b>Opcional:</b> '+skE(p.condicion||'')+'</p>':'')+(p.mirar?'<p class="skSi"><b>Qué mirar:</b> '+skTx(p.mirar)+'</p>':'')+'<div class="skG2"><div class="skMin"><b class="skH">Qué medir</b><div class="skTw"><table class="skTb"><thead><tr><th>Canal</th><th>Señal</th><th>Sonda</th><th>Rango</th></tr></thead><tbody>'+
     p.canales.map(ch=>'<tr><td><span class="skCh" style="background:'+COL[SK_CH[ch.canal]]+'">'+ch.canal+'</span></td><td>'+skE(ch.senal)+'</td><td>'+skE(ch.sonda||'')+'</td><td class="nw">'+skE(ch.rango||'')+'</td></tr>').join('')+'</tbody></table></div>'+
-    (p.como&&p.como.length?'<b class="skH">Cómo</b><ol class="skO">'+p.como.map(x=>'<li>'+skE(x)+'</li>').join('')+'</ol>':'')+'</div>'+
-    '<div class="skMin"><b class="skH">Maniobra, en este orden</b>'+skPerfil(p,r.win)+(p.fuente?'<p class="hint">'+skE(p.fuente)+'</p>':'')+'</div></div></div>'+
+    skLi('Antes: preparación y seguridad',p.antes,'skAv')+skLi('Cómo conectar',p.como)+'</div>'+
+    '<div class="skMin"><b class="skH">Maniobra, en este orden</b>'+skPerfil(p,r.win)+
+    (p.maniobra.some(f=>f.hacer)?'<b class="skH">Qué hacer en cada fase</b><ol class="skO">'+p.maniobra.map(f=>'<li><b>'+skE(f.fase)+' · '+skT(+f.s)+'.</b> '+skTx(f.hacer||'')+'</li>').join('')+'</ol>':'')+
+    (p.fuente?'<p class="hint">'+skTx(p.fuente)+'</p>':'')+'</div></div>'+
+    (p.validar||p.leer||p.ojo?'<div class="skG2"><div class="skMin">'+skLi('Comprueba la captura antes de desmontar',p.validar)+'</div><div class="skMin">'+skLi('Cómo leerla',p.leer)+skLi('Ojo',p.ojo,'skAv')+'</div></div>':'')+'</div>'+
    '<div class="skC"><b class="skH">Tu configuración de PicoScope</b><div class="row"><label>Base de tiempos <select id="kTb">'+SK_TB.map(x=>'<option value="'+x[0]+'"'+(x[0]===c.tb?' selected':'')+'>'+x[1]+'/div</option>').join('')+'</select></label>'+
     '<label>Muestras <select id="kMs">'+SK_MS.map(x=>'<option value="'+x[0]+'"'+(x[0]===c.ms?' selected':'')+'>'+x[1]+'</option>').join('')+'</select></label><button id="kRec">Usar lo recomendado</button></div>'+
     '<div class="skKv"><div><small>Una pantalla dura</small><b>'+skT(r.win)+'</b></div><div><small>Maniobra</small><b>'+skT(skDur(p))+'</b></div><div><small>Muestreo</small><b>'+skF(r.fs)+'</b></div><div><small>Canales</small><b>'+p.canales.length+'</b></div></div>'+

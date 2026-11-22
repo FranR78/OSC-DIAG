@@ -34,7 +34,7 @@ sec:[
 'Cada canal tiene una <b>flecha de color</b> en el borde izquierdo del visor: arrástrala para subir o bajar su gráfica.',
 'El deslizador «Fondo» cambia el fondo del visor de negro a blanco pasando por los grises.']},
 {h:'3 · Medir tiempos y amplitudes',t:[
-'«Reglas T1/T2»: clic en la señal = T1 y Mayús+clic = T2 (o pulsa el botón). Muestra el intervalo, la frecuencia y los grados. «Reglas T3/T4» sirve para un segundo intervalo.',
+'«Reglas T1/T2»: actívalas con el botón; después, clic en la señal = T1 y Mayús+clic = T2. Muestra el intervalo, la frecuencia y los grados. «Reglas T3/T4» sirve para un segundo intervalo.',
 '«Amplitud»: dos reglas horizontales por canal (casilla «Reglas» de cada canal) con su diferencia.',
 'Bajo el visor aparecen las lecturas del canal seleccionado: mínimo, máximo, pico a pico, media, RMS, periodo, frecuencia y ciclo útil.',
 'Candado 🔓/🔒: con el candado cerrado, al arrastrar una regla se mueve todo el grupo conservando la distancia.']},
@@ -118,7 +118,7 @@ sec:[
 'Every channel has a <b>coloured arrow</b> on the left edge of the viewer: drag it to move its trace up or down.',
 'The “Background” slider changes the viewer background from black to white through the greys.']},
 {h:'3 · Measure times and amplitudes',t:[
-'“Rulers T1/T2”: click on the signal = T1 and Shift+click = T2 (or press the button). It shows the interval, the frequency and the degrees. “Rulers T3/T4” is for a second interval.',
+'“Rulers T1/T2”: turn them on with the button; then click on the signal = T1 and Shift+click = T2. It shows the interval, the frequency and the degrees. “Rulers T3/T4” is for a second interval.',
 '“Amplitude”: two horizontal rulers per channel (the channel’s “Rulers” checkbox) with their difference.',
 'The readings of the selected channel appear below the viewer: minimum, maximum, peak to peak, mean, RMS, period, frequency and duty cycle.',
 'Lock 🔓/🔒: with the lock closed, dragging one ruler moves the whole group while keeping the distance.']},

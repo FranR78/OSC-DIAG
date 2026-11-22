@@ -3,7 +3,7 @@
  "id": "FR-EQ-01",
  "nombre": "Equilibrio de cilindros",
  "autor": "Fran Rosales",
- "version": "2026.11.21",
+ "version": "2026.11.26",
  "estado": "borrador",
  "combustible": [
   "gasolina",
@@ -38,8 +38,10 @@
     }
    ],
    "como": [
-    "Pinchar la señal del CKP sin desconectar el sensor.",
-    "Motor a temperatura."
+    "Canal A, CKP: punta trasera (back-probe) en el cable de señal del sensor, en paralelo y sin desconectar nada. Masa del osciloscopio en la masa del motor o en el negativo de la batería, no en la carrocería. [Inferido]",
+    "Tipo de CKP: inductivo (2 hilos) genera su propia tensión y no necesita alimentación, rango ±20 V porque la amplitud sube con las RPM; Hall o magnetorresistivo (3 hilos) lo alimenta la UCE: se mide el cable de señal, rango ±10 V. [Inferido]",
+    "Canal B: pinza inductiva en el cable de la bobina 1 o sobre la bobina COP del cilindro 1. [Inferido]",
+    "Se puede sincronizar con otro inyector o bobina (el curso lo hace con el inyector 4, pág. 86), pero entonces la numeración de cilindros se desplaza según el orden de encendido: indícalo al analizar. [Fuente pág. 86]"
    ],
    "maniobra": [
     {
@@ -49,7 +51,8 @@
      "rpm": [
       800,
       800
-     ]
+     ],
+     "hacer": "Ralentí estable, sin tocar nada. [Inferido]"
     },
     {
      "fase": "Acel. suave",
@@ -58,7 +61,8 @@
      "rpm": [
       800,
       2500
-     ]
+     ],
+     "hacer": "Acelera suave hasta unas 2500 RPM. [Inferido]"
     },
     {
      "fase": "Ralentí",
@@ -67,7 +71,8 @@
      "rpm": [
       2500,
       800
-     ]
+     ],
+     "hacer": "Suelta y deja volver a ralentí. [Inferido]"
     },
     {
      "fase": "Acel. brusca",
@@ -76,7 +81,8 @@
      "rpm": [
       800,
       4000
-     ]
+     ],
+     "hacer": "Acelerón brusco a fondo y suelta: con carga es cuando falla el encendido. [Fuente pág. 60]"
     },
     {
      "fase": "Ralentí",
@@ -85,7 +91,8 @@
      "rpm": [
       4000,
       800
-     ]
+     ],
+     "hacer": "Deja volver a ralentí. [Inferido]"
     }
    ],
    "requisitos": {
@@ -94,7 +101,31 @@
     "criterio": "diente"
    },
    "mirar": "Todos los cilindros deben acelerar el cigüeñal por igual; el que cae es el que falla. Encendido, inyector o fuga se separan con su apartado.",
-   "fuente": "Curso de scripts, script CSS, pág. 56–67."
+   "fuente": "Curso de scripts, script CSS, págs. 57–68.",
+   "antes": [
+    "Motor a temperatura de servicio (ventilador ya ha saltado una vez), salvo que el fallo sea en frío. [Inferido]",
+    "Todos los consumidores apagados: aire acondicionado, luces, luneta y ventilador del habitáculo. [Inferido]",
+    "Cambio en punto muerto (o P en automático) y freno de mano echado: vas a acelerar a fondo con el coche parado. [Inferido]",
+    "Nadie delante ni detrás del vehículo y el capó abierto con los cables de medida lejos de correas y ventilador. [Inferido]",
+    "Si el fallo aparece al arrancar, empieza a grabar antes de arrancar: en el caso D4CB así se vio que arrancaba con dos cilindros. [Fuente pág. 82]"
+   ],
+   "validar": [
+    "El CKP se ve limpio en toda la captura, también en el acelerón (no satura). [Inferido]",
+    "El hueco de la rueda aparece una vez por vuelta. [Fuente pág. 61]",
+    "La bobina 1 da un pulso por ciclo (cada dos vueltas). [Inferido]"
+   ],
+   "leer": [
+    "Hoja de eficiencia: cuanto más alta la gráfica de un cilindro, más aporta; un cilindro que no trabaja frena el cigüeñal y queda por debajo de cero. [Fuente págs. 60, 81]",
+    "Al ralentí la UCE iguala los cilindros (compensación de inyección). Al acelerar la compensación se desactiva y sale cualquier diferencia. [Fuente pág. 72]",
+    "La contribución depende de la mezcla, la chispa y la compresión: compara cilindros y fases para saber si es encendido, combustible o mecánica. [Fuente pág. 60]",
+    "Hoja de compresión: solo vale al ralentí, y un cilindro flojo baja también al siguiente en el orden de encendido. Confírmalo con la compresión relativa. [Fuente págs. 71, 75]",
+    "Disco dentado: número de dientes, hueco respecto al PMS y desviación entre dientes; más del 2 % es un diente doblado o un volante deformado. [Fuente pág. 61]",
+    "Un cilindro que va bien al ralentí y cae con carga apunta a encendido. [Fuente pág. 60]"
+   ],
+   "ojo": [
+    "Para la parte mecánica sin combustión haz además «Caída de giro» (Integridad mecánica). [Fuente pág. 67]",
+    "Europa, acelerador electrónico (mariposa motorizada): al quitar la llave la mariposa vuelve a su posición de emergencia, casi cerrada, aunque pises a fondo. La caída sigue siendo solo mecánica y sirve para comparar cilindros entre sí (todos reciben el mismo aire), pero los empujes salen más pequeños. Empieza la caída desde más de 3000 RPM. [Inferido]"
+   ]
   },
   {
    "id": "EQ-D",
@@ -119,8 +150,10 @@
     }
    ],
    "como": [
-    "Pinchar la señal del CKP sin desconectar el sensor.",
-    "Acelerar suave y soltar de golpe calibra el dentado del CKP."
+    "Canal A, CKP: punta trasera (back-probe) en el cable de señal del sensor, en paralelo y sin desconectar nada. Masa del osciloscopio en la masa del motor o en el negativo de la batería, no en la carrocería. [Inferido]",
+    "Tipo de CKP: inductivo (2 hilos) genera su propia tensión y no necesita alimentación, rango ±20 V porque la amplitud sube con las RPM; Hall o magnetorresistivo (3 hilos) lo alimenta la UCE: se mide el cable de señal, rango ±10 V. [Inferido]",
+    "Canal B: punta en el cable de mando del inyector 1 o pinza de corriente en uno de sus cables. [Fuente pág. 76]",
+    "Se puede sincronizar con otro inyector o bobina (el curso lo hace con el inyector 4, pág. 86), pero entonces la numeración de cilindros se desplaza según el orden de encendido: indícalo al analizar. [Fuente pág. 86]"
    ],
    "maniobra": [
     {
@@ -130,7 +163,8 @@
      "rpm": [
       800,
       800
-     ]
+     ],
+     "hacer": "Ralentí estable: la contribución debe salir uniforme. [Fuente pág. 70]"
     },
     {
      "fase": "Suave y soltar",
@@ -139,7 +173,8 @@
      "rpm": [
       800,
       1600
-     ]
+     ],
+     "hacer": "Acelera suave y suelta de golpe: sirve para calibrar el dentado del CKP. [Fuente pág. 70]"
     },
     {
      "fase": "Ralentí",
@@ -148,7 +183,8 @@
      "rpm": [
       1600,
       800
-     ]
+     ],
+     "hacer": "Vuelta a ralentí. [Fuente pág. 70]"
     },
     {
      "fase": "Acelerón y soltar",
@@ -157,7 +193,8 @@
      "rpm": [
       800,
       2700
-     ]
+     ],
+     "hacer": "Acelerón brusco y suelta. [Fuente pág. 70]"
     },
     {
      "fase": "Acelerón y apagar",
@@ -166,7 +203,8 @@
      "rpm": [
       2700,
       0
-     ]
+     ],
+     "hacer": "Acelerón brusco y apaga el motor con la llave sin parar la grabación hasta que esté quieto. [Fuente pág. 70]"
     }
    ],
    "requisitos": {
@@ -175,7 +213,32 @@
     "criterio": "diente"
    },
    "mirar": "Aporte uniforme a ralentí, en aceleración suave y brusca; el cilindro que cae es el que falla.",
-   "fuente": "Curso de scripts, script CSS diésel, pág. 68–71."
+   "fuente": "Curso de scripts, script CSS diésel, págs. 69–86.",
+   "antes": [
+    "Motor a temperatura de servicio (ventilador ya ha saltado una vez), salvo que el fallo sea en frío. [Inferido]",
+    "Todos los consumidores apagados: aire acondicionado, luces, luneta y ventilador del habitáculo. [Inferido]",
+    "Cambio en punto muerto (o P en automático) y freno de mano echado: vas a acelerar a fondo con el coche parado. [Inferido]",
+    "Nadie delante ni detrás del vehículo y el capó abierto con los cables de medida lejos de correas y ventilador. [Inferido]",
+    "Si el fallo aparece al arrancar, empieza a grabar antes de arrancar: en el caso D4CB así se vio que arrancaba con dos cilindros. [Fuente pág. 82]"
+   ],
+   "validar": [
+    "El CKP se ve limpio en toda la captura y el hueco aparece una vez por vuelta. [Inferido]",
+    "El inyector 1 da su pulso en cada ciclo hasta que se apaga el motor. [Inferido]",
+    "Los dientes siguen hasta que el motor se para. [Inferido]"
+   ],
+   "leer": [
+    "Hoja de eficiencia: cuanto más alta la gráfica de un cilindro, más aporta; un cilindro que no trabaja frena el cigüeñal y queda por debajo de cero. [Fuente págs. 60, 81]",
+    "Al ralentí la UCE iguala los cilindros (compensación de inyección). Al acelerar la compensación se desactiva y sale cualquier diferencia. [Fuente pág. 72]",
+    "La contribución depende de la mezcla, la chispa y la compresión: compara cilindros y fases para saber si es encendido, combustible o mecánica. [Fuente pág. 60]",
+    "Hoja de compresión: solo vale al ralentí, y un cilindro flojo baja también al siguiente en el orden de encendido. Confírmalo con la compresión relativa. [Fuente págs. 71, 75]",
+    "Disco dentado: número de dientes, hueco respecto al PMS y desviación entre dientes; más del 2 % es un diente doblado o un volante deformado. [Fuente pág. 61]",
+    "Un cilindro que aporta más que los demás suele llevar un inyector que da más combustible; la UCE le recorta el pulso (se confirma midiendo el ancho de pulso). [Fuente pág. 72]",
+    "Si el fallo depende de la temperatura, repite en caliente: en el D4CB el inyector 3 volvió a trabajar al calentar. [Fuente pág. 84]"
+   ],
+   "ojo": [
+    "CKP Hall al quitar la llave: muchas UCE mantienen su relé principal unos segundos y el sensor sigue alimentado, pero no todas. Mira en la captura que los dientes siguen hasta que el motor se para; si se cortan antes, esa parte no vale y usa las deceleraciones al soltar el acelerador. [Inferido]",
+    "Diésel europeo con mariposa de admisión (anti-sacudidas): al quitar la llave se cierra para parar el motor suave, y la caída tras apagar sale con muy poco aire. Para la mecánica son más fiables las deceleraciones al soltar el acelerador de golpe: hay corte de inyección y la mariposa sigue abierta. [Inferido]"
+   ]
   }
  ]
 }
