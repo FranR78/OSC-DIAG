@@ -35,7 +35,9 @@ const GD=[['#bOpen','1 · Abre tu captura','Arrastra un CSV sobre la gráfica o 
   ['#gRu','3 · Mide, anota y exporta','«Reglas» y «Motor» miden; «Anotar» dibuja sobre la señal; «Exportar» crea el informe PDF. Pulsa ? para ver los atajos de teclado.']];
 let gdI=-1,GDL=GD;
 function gdShow(i){document.querySelectorAll('.gdT').forEach(e=>e.classList.remove('gdT'));gdI=i;
-  if(i<0||i>=GDL.length){$('gd').hidden=true;gdI=-1;if(GDL===GD)LS.set('as_guia','1');return}
+  if(i<0||i>=GDL.length){$('gd').hidden=true;gdI=-1;if(GDL===GD)LS.set('as_guia','1');
+    /* el caso real enciende T1/T2 para enseñarlas: al acabar se apagan (no quedan activas por defecto) */
+    if(typeof CASE!=='undefined'&&GDL===CASE&&(tr.on||tr2.on)){tr.on=false;tr2.on=false;sync();draw()}return}
   const[s,t,p,run]=GDL[i];if(run)run();document.querySelector(s).classList.add('gdT');$('gdT').textContent=t;$('gdP').textContent=p;$('gdN').textContent=(i+1)+' / '+GDL.length;
   $('gdG').textContent=i===GDL.length-1?'Entendido':'Siguiente';$('gd').hidden=false}
 $('gdG').onclick=()=>gdShow(gdI+1);$('gdS').onclick=()=>gdShow(-1);$('bGd').onclick=()=>{closePops();GDL=GD;gdShow(0)};

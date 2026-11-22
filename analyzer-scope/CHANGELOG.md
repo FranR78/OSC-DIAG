@@ -3,6 +3,9 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.27
+- **Reglas T1/T2 apagadas por defecto:** el «Caso real» de la portada las enciende para enseñarlas y ahora las apaga al terminar.
+
 ## 2026.11.26
 - **Compresión relativa en diésel:** métodos para que no arranque (desconectar inyectores; o sensor de presión del raíl o válvula reguladora; el CKP no suele servir) y comprobar que el sincronismo sigue saliendo.
 - **Adaptación a Europa:** canal C con el CKP y pedal a fondo en el arrastre (acelerador electrónico) para comparar compresiones con la mariposa abierta; avisos de mariposa en emergencia al quitar la llave, de no bloquearla a mano y de la mariposa anti-sacudidas del diésel.
