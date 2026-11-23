@@ -636,6 +636,11 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('catálogo de medidas: cada medida que usan las skills existe en el motor', await KE(() => { const ids = new Set(MEDIDAS.map(m => m.id)); return Object.values(CATALOGO.items).filter(P => P.reglas).every(P => P.reglas.every(r => r.si.every(c => ids.has(c.medida)))); }));
     await k.evaluate(() => { const d = canDemo(); d.chs[0].n = 'Canal A'; d.chs[1].n = 'Canal B'; addPages([d]); showTab('X'); }); await k.waitForTimeout(200); await k.click('#xGo'); await k.waitForTimeout(600);
     check('Diagnóstico: con la skill CAN instalada analiza la señal cargada y da el hallazgo (unidad en hex)', await KE(() => /500 kbit\/s/.test($('xAn').textContent) && /Unidad 0x2F1: su nivel se aparta/.test($('xRes').textContent) && /unidad 0x2F1/.test($('xRes').textContent) && !/cilindro 753/.test($('xRes').textContent)), await KE(() => $('xRes').textContent.slice(0, 300)));
+    const dco = await KE(() => { const fila = (b, id, v, mx) => b + ',' + id + ',' + v + ',' + mx + ',-0.07,' + (mx + 0.07); const L = ['Buffer Number,ID,Data,Max Voltage,Min Voltage,Voltage Delta'];
+      for (let i = 0; i < 20; i++) { L.push(fila(1, 280, '93 A1 00 00 A1 FF FF 00', 2.2), fila(1, 480, 'A4 28 00 00 D7 00 31 6A', 2.21), fila(1, '1A0', '00 11 22 33 44 55 66 77', i % 2 ? 1.5 : 1.52)); }
+      L.push(fila(1, '03FFF804', '', 2.2), fila(1, 280, '93 A1 00', 2.2));
+      const r = canDeco(L.join('\n')); return { tipo: r.tipo, tramas: r.tramas, inc: r.incompletas, H: mdSkills(canMedidas(r)).H.map(h => h.regla + ':' + h.sintoma) }; });
+    check('tabla de decodificación CAN: tipo diferencial, filas cortadas fuera y la unidad 0x1A0 señalada por la skill', dco.tipo === 'dif' && dco.tramas === 60 && dco.inc === 2 && dco.H.some(x => /^FR-CAN-15:Unidad 0x1A0/.test(x)) && !dco.H.some(x => /0x280|0x480/.test(x)), JSON.stringify(dco));
     check('procedimientos: sin errores JS', ke.length === 0, ke.join(' | '));
     await k.close();
   }

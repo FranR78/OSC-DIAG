@@ -126,7 +126,7 @@ function skPaso(S,i){
     '<div class="skKv"><div><small>Una pantalla dura</small><b>'+skT(r.win)+'</b></div><div><small>Maniobra</small><b>'+skT(skDur(p))+'</b></div><div><small>Muestreo</small><b>'+skF(r.fs)+'</b></div><div><small>Canales</small><b>'+p.canales.length+'</b></div></div>'+
     '<div class="skCk" id="kCk">'+r.o.map(o=>'<div class="skA '+o[0]+'"><b>'+(o[0]==='ok'?'✓':o[0]==='warn'?'!':'✗')+'</b><span><b>'+o[1]+'.</b> '+o[2]+'</span></div>').join('')+'</div></div>'+
    '<div class="skC"><b class="skH">Cargar la captura</b><div class="drop" id="kDrop">'+(cv?'<b>'+skE(cv.name)+'</b><div class="skCk">'+cv.chk.map(o=>'<div class="skA '+o[0]+'"><b>'+(o[0]==='ok'?'✓':'!')+'</b><span>'+o[1]+'</span></div>').join('')+'</div>':
-     'Suelta aquí el CSV exportado de PicoScope')+'<div class="row" style="justify-content:center;margin-top:8px"><button id="kLoad">'+(cv?'Cambiar CSV…':'Elegir CSV…')+'</button>'+(!cv&&(p.requisitos.criterio==='diente'||p.requisitos.criterio==='can')?'<button id="kDemo">Probar con una señal de ejemplo</button>':'')+(cv&&!cv.dm?'<button id="kVer">Ver en el osciloscopio</button><button id="kQuit">Quitar</button>':'')+'</div></div>'+
+     'Suelta aquí el CSV exportado de PicoScope')+'<div class="row" style="justify-content:center;margin-top:8px"><button id="kLoad">'+(cv?'Cambiar CSV…':'Elegir CSV…')+'</button>'+(!cv&&(p.requisitos.criterio==='diente'||p.requisitos.criterio==='can')?'<button id="kDemo">Probar con una señal de ejemplo</button>':'')+(cv&&!cv.dm&&!cv.deco?'<button id="kVer">Ver en el osciloscopio</button><button id="kQuit">Quitar</button>':'')+'</div></div>'+
     '<div class="row" style="margin-top:10px"><button data-go="'+(i-1)+'">← Anterior</button><span class="sp"></span><button class="p" data-go="'+(i+1)+'">'+(i<n?'Siguiente: paso '+(i+1):'Ir al resumen')+' →</button></div></div>'+(cv&&p.requisitos.criterio==='diente'?ckpCard(key,cv):'')+(cv&&p.requisitos.criterio==='can'?canCard(key,cv):'');
 }
 function skEditor(S){
@@ -139,6 +139,11 @@ async function skCargaCsv(S,i,f){
   const p=skPasos(S)[i-1];if(!p)return;const key=skKey(S,p);
   try{st('Leyendo '+f.name+'…');
     const hd=(await f.slice(0,3000).text()).split(/\r?\n/)[0];
+    if(canEsDeco(hd)){  // tabla de decodificación CAN de PicoScope
+      if(p.requisitos.criterio!=='can'){st(f.name+': es una tabla de decodificación CAN; cárgala en el procedimiento «Red CAN».');$('st').classList.add('err');skTab();return}
+      const dc=canDeco(await f.text());if(dc.err){st(f.name+': '+dc.err);$('st').classList.add('err');skTab();return}
+      const chk=[['ok','Tabla de decodificación: '+dc.tramas+' tramas de '+dc.U.length+' unidades (ID)'],...(dc.incompletas?[['warn',dc.incompletas+' filas cortadas (borde del búfer)']]:[]),['warn','Sin flancos ni CRC: para eso, la forma de onda.']];
+      SK.csv[key]={name:f.name,deco:dc,ds:[],chk,bad:false};[SK.ckp,SK.ckpO,SK.can,SK.canO].forEach(o=>delete o[key]);st(f.name+': tabla de decodificación cargada en el paso '+i+'.');skTab();return}
     if(/ciclo n\.?º|cycle (no|#)|^"?(m[aá]x|max)\.?"?[,;]/i.test(hd)&&!/^\s*(tiempo|time)\b/i.test(hd)){  // tabla de DeepMeasure, no forma de onda
       if(p.requisitos.criterio!=='diente'){st(f.name+': es una tabla de DeepMeasure. Para esta prueba hace falta la forma de onda: exporta la señal a CSV.');$('st').classList.add('err');skTab();return}
       const dm=ckpDeepMeasure(await f.text());if(dm.err){st(f.name+': '+dm.err);$('st').classList.add('err');skTab();return}

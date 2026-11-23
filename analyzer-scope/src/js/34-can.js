@@ -97,7 +97,7 @@ function canDemo(o={}){
   return{name:'ejemplo_can_500k.csv',chs:[{n:'CAN-H',x,y:h,u:'V'},{n:'CAN-L',x,y:l,u:'V'}],n:N,meta:{}};
 }
 /* ---- tarjeta en la prueba ---- */
-function canCard(key,cv){
+function canCard(key,cv){if(cv.deco)return canDecoCard(key,cv);
   const d=cv.ds[0],r=SK.can[key],o=SK.canO[key]||(SK.canO[key]={ih:Math.max(0,d.chs.findIndex(c=>/h\b|high|can.?h/i.test(c.n))),il:-1});
   if(o.il<0){const j=d.chs.findIndex((c,i)=>i!==o.ih&&/l\b|low|can.?l/i.test(c.n));o.il=j>=0?j:o.ih===0?1:0}
   const opt=sel=>d.chs.map((c,i)=>'<option value="'+i+'"'+(i===sel?' selected':'')+'>'+esc(c.n)+'</option>').join('');
@@ -121,3 +121,45 @@ function canWire(key){
     setTimeout(()=>{try{SK.can[key]=canAnaliza(SK.csv[key].ds[0],o)}catch(er){SK.can[key]={err:'No se pudo analizar: '+er.message}}
       st(SK.can[key].err||'Análisis de la red CAN hecho.');skTab()},20)};
 }
+/* ---------- Tabla de decodificación de PicoScope (Desc. serie → exportar CSV): una fila por trama ----------
+   Columnas: búfer · ID · datos · tensión máx. · mín. · delta (del canal decodificado). Pesa poco y trae lo que hace falta para
+   comparar unidades: niveles por ID. No trae flancos ni CRC. El canal decodificado se deduce de los niveles:
+   diferencial (H−L: recesivo ≈ 0 V), CAN-H (recesivo ≈ 2,5 V, dominante arriba) o CAN-L (dominante abajo). */
+function canEsDeco(cab){const H=cab.split(/[;,\t]/).map(h=>h.trim().replace(/^"|"$/g,'').toLowerCase());
+  return H.includes('id')&&H.some(h=>/^(data|datos)/.test(h))&&H.some(h=>/m[aá]x/.test(h))&&H.some(h=>/m[ií]n/.test(h))}
+function canDeco(txt){
+  const L=txt.replace(/^﻿/,'').split(/\r?\n/).filter(l=>l.trim()),D=L[0].includes(';')?';':L[0].includes('\t')?'\t':',';
+  const H=L[0].split(D).map(h=>h.trim().replace(/^"|"$/g,'').toLowerCase()),ci=re=>H.findIndex(h=>re.test(h));
+  const iI=H.indexOf('id'),iD=ci(/^(data|datos)/),iX=ci(/m[aá]x/),iN=ci(/m[ií]n/),iB=ci(/buffer|b[uú]fer/);
+  const num=v=>+String(v||'').trim().replace(/^"|"$/g,'').replace(D===';'?',':'\u0000','.');
+  const F=L.slice(1).map(l=>l.split(D)).map(c=>({b:iB>=0?c[iB]:'',id:String(c[iI]||'').trim(),nb:String(c[iD]||'').trim().split(/\s+/).filter(Boolean).length,mx:num(c[iX]),mn:num(c[iN])})).filter(f=>f.id&&isFinite(f.mx)&&isFinite(f.mn));
+  if(!F.length)return{err:'La tabla de decodificación no trae filas con ID y tensiones.'};
+  // longitud habitual de cada ID: las filas más cortas o sin datos son tramas cortadas (borde del búfer)
+  const lg={};F.forEach(f=>{(lg[f.id]=lg[f.id]||{})[f.nb]=(lg[f.id][f.nb]||0)+1});
+  const moda=id=>+Object.entries(lg[id]).sort((a,b)=>b[1]-a[1])[0][0];
+  const ok=F.filter(f=>f.nb>0&&f.nb===moda(f.id)),inc=F.length-ok.length;
+  if(!ok.length)return{err:'Ninguna trama completa en la tabla.'};
+  const mX=canMed(ok.map(f=>f.mx)),mN=canMed(ok.map(f=>f.mn));
+  const tipo=mN<1&&mX>1?'dif':mN>1.8&&mX>3?'h':mX<3.2&&mX>1.8&&mN<2?'l':'?';
+  const by=new Map();ok.forEach(f=>{const k=parseInt(f.id,16);if(!by.has(k))by.set(k,[]);by.get(k).push(f)});
+  const U=[...by.entries()].map(([id,A])=>{const mx=canMed(A.map(f=>f.mx)),mn=canMed(A.map(f=>f.mn));return{id,ext:id>0x7ff,n:A.length,mx,mn,amp:mx-mn}}).sort((a,b)=>a.id-b.id);
+  const amp=canMed(U.map(u=>u.amp));U.forEach(u=>u.desv=amp?Math.abs(u.amp-amp)/amp*100:null);
+  return{deco:true,tipo,tramas:ok.length,incompletas:inc,buffers:new Set(F.map(f=>f.b)).size,U,lv:{mx:mX,mn:mN,amp}}}
+function canDecoMedidas(r){const v=r.lv,M=[mdV('can_tramas',r.tramas)];
+  if(r.tipo==='dif')M.push(mdV('can_dif',v.amp),mdV('can_rec_dif',v.mn));
+  if(r.tipo==='h')M.push(mdV('can_dom_h',v.mx),mdV('can_rec_h',v.mn));
+  if(r.tipo==='l')M.push(mdV('can_dom_l',v.mn),mdV('can_rec_l',v.mx));
+  const U=r.U,by=f=>Object.fromEntries(U.map(u=>[u.id,f(u)]));
+  M.push(mdP('can_desv_unidad_pct',by(u=>u.desv)));if(r.tipo==='dif')M.push(mdP('can_dif_unidad',by(u=>u.amp)));
+  return M.filter(Boolean)}
+function canDecoCard(key,cv){const r=cv.deco,f=v=>v==null?'—':v.toFixed(2).replace('.',',');
+  const T={dif:'diferencial (H−L)',h:'CAN-H',l:'CAN-L','?':'no reconocido'};
+  let h='<div class="skC"><b class="skH">Analizar la tabla de decodificación</b><p class="hint">Niveles por trama del canal decodificado. La unidad (ID) cuya amplitud se aparta del resto es la sospechosa; varios ID pueden ser de la misma unidad. Sin flancos ni CRC: para eso, la forma de onda.</p>'+
+    '<div class="skKv"><div><small>Canal decodificado</small><b>'+T[r.tipo]+'</b></div><div><small>Tramas</small><b>'+r.tramas+'</b></div><div><small>Unidades (ID)</small><b>'+r.U.length+'</b></div><div><small>Tramas cortadas</small><b>'+r.incompletas+'</b></div></div>';
+  const sk=mdSkills(canDecoMedidas(r)),mal=new Set(['can_desv_unidad_pct','can_dif_unidad'].flatMap(m=>[...mdMarcados(sk,m)]));
+  h+='<div class="skCk"><div class="skA ok"><b>✓</b><span><b>[Medido]</b> '+r.tramas+' tramas de '+r.U.length+' unidades (ID) en '+r.buffers+' búferes · máx. '+f(r.lv.mx)+' V · mín. '+f(r.lv.mn)+' V · amplitud '+f(r.lv.amp)+' V.</span></div>'+
+    (r.incompletas?'<div class="skA warn"><b>!</b><span><b>[Medido]</b> '+r.incompletas+' filas cortadas o sin datos (borde del búfer): no se usan.</span></div>':'')+
+    (r.U.length<2?'<div class="skA warn"><b>!</b><span>Solo transmite una unidad: no hay con quién comparar.</span></div>':'')+'</div>'+mdHallazgosHTML(sk,'Las skills activas no encuentran nada anormal en la red.');
+  h+='<div class="skTw" style="margin-top:10px"><table class="skTb ckT"><thead><tr><th>ID</th><th>Tramas</th><th>Máx. / Mín. (V)</th><th>Amplitud</th><th>Desviación</th></tr></thead><tbody>'+
+    r.U.map(u=>'<tr'+(mal.has(String(u.id))?' class="canMal"':'')+'><td class="nw"><b>'+canId(u)+'</b></td><td>'+u.n+'</td><td class="nw">'+f(u.mx)+' / '+f(u.mn)+'</td><td><div class="ckB'+(mal.has(String(u.id))?' lo':'')+'"><i style="width:'+Math.min(100,u.amp/3*100)+'%"></i><span>'+f(u.amp)+' V</span></div></td><td>'+(u.desv==null?'—':u.desv.toFixed(1).replace('.',',')+' %')+'</td></tr>').join('')+'</tbody></table></div>';
+  return h+'</div>'}

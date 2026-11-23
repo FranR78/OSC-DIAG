@@ -3,7 +3,7 @@
  "paquete": "fran-can",
  "nombre": "Fran · Red CAN (ISO 11898-2)",
  "autor": "Fran Rosales",
- "version": "2026.11.28",
+ "version": "2026.11.31",
  "aviso": "CAN de alta velocidad. El CAN de baja velocidad tolerante a fallos tiene otros niveles. La terminación (60 Ω) se mide con polímetro.",
  "reglas": [
   {
@@ -547,6 +547,38 @@
     {
      "texto": "Revisar conector de la unidad {unidad}",
      "tipo": "prueba"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-18",
+   "tema": "red-can",
+   "sintoma": "Diferencial recesivo fuera de −0,5…0,05 V ({valor} V)",
+   "si": [
+    {
+     "medida": "can_rec_dif",
+     "op": "fuera",
+     "valor": [
+      -0.5,
+      0.05
+     ]
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Derivación entre CAN-H y CAN-L, o una línea a masa o a positivo",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Medir CAN-H y CAN-L por separado respecto a masa",
+     "tipo": "medida",
+     "esperado": "≈ 2,5 V los dos en reposo"
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",

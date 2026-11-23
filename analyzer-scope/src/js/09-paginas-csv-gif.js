@@ -52,6 +52,7 @@ async function loadFiles(files){
       const head=new Uint8Array(await f.slice(0,4).arrayBuffer());
       if(String.fromCharCode(...head)==='JWWD'){msg.push(f.name+': .psdata nativo (formato propietario cifrado/comprimido): no se puede leer aquí. Expórtalo a CSV desde el programa de tu osciloscopio y ábrelo aquí.');continue}
       const h2=await f.slice(0,80).text();if(h2.includes('ortu-psdata')){st('Leyendo sesión…');msg.push(await importSession(f));continue}
+      {const h3=(await f.slice(0,2000).text()).split(/\r?\n/)[0];if(typeof canEsDeco==='function'&&canEsDeco(h3)){msg.push(f.name+': '+i18('es una tabla de decodificación CAN (una fila por trama), no una forma de onda. Cárgala en «Procedimientos → Red CAN».'));continue}}
       st('Leyendo '+f.name+'…');await new Promise(q=>setTimeout(q,30));
       const ds=await readAny(f,u=>{busy(u);st('Leyendo '+f.name+'… '+Math.round(u*100)+' %')});ds.forEach(d=>pages.push(d));
       msg.push(f.name+': '+ds.map(d=>d.chs.length+' canal(es), '+d.n+' muestras').join(' | ')+(ds.length>1?' ('+ds.length+' páginas)':'')+(ds[0].cfg?' · ajustes recuperados':''));

@@ -3,6 +3,11 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.31
+- **Tabla de decodificación CAN de PicoScope** (Desc. serie → exportar CSV: ID, datos, tensión máx./mín.) en «Procedimientos → Red CAN»: pesa muy poco. Deduce el canal decodificado (diferencial, CAN-H o CAN-L), descarta las filas cortadas en el borde del búfer y compara la amplitud de cada ID con el resto; la skill señala la que se aparta. Sin flancos ni CRC (para eso, la forma de onda).
+- Skill **Fran · Red CAN** 2026.11.31: regla nueva del diferencial recesivo (−0,5…0,05 V). Sale «Actualizar» en el catálogo.
+- Abrir esa tabla en «Osciloscopio» ya no da error: dice dónde cargarla.
+
 ## 2026.11.30b
 - **Diagnóstico usa las skills instaladas sobre la señal cargada:** si una skill activa necesita un análisis (red CAN, cigüeñal), «Diagnóstico» lo ejecuta con los canales cargados (bloque «Análisis de las skills activas», con elección de canales) y sus medidas entran en la consulta. Antes solo ocurría en «Procedimientos».
 - La evidencia de una unidad CAN sale como «unidad 0x2F1» (antes «cilindro 753»), en pantalla y en el PDF.

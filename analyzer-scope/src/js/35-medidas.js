@@ -21,6 +21,7 @@ const MEDIDAS=[
   {id:'can_ov_pct',nombre:'Sobreoscilación de los flancos',unidad:'%',analisis:'can',que:'Pico tras el flanco sobre el nivel dominante'},
   {id:'can_crc_mal',nombre:'Tramas con CRC mal',unidad:'',analisis:'can',que:'Tramas cuyo CRC-15 no cuadra'},
   {id:'can_err_tramas',nombre:'Tramas de error',unidad:'',analisis:'can',que:'Dominantes de 6 bits o más'},
+  {id:'can_rec_dif',nombre:'Diferencial recesivo de la red',unidad:'V',analisis:'can',que:'H−L en recesivo (tabla de decodificación del canal diferencial)'},
   {id:'can_dif_unidad',nombre:'Diferencial dominante por unidad',unidad:'V',analisis:'can',por:'unidad',que:'Diferencial de las tramas de cada ID'},
   {id:'can_desv_unidad_pct',nombre:'Desviación de la unidad frente al resto',unidad:'%',analisis:'can',por:'unidad',que:'|diferencial de la unidad − mediana| / mediana'},
   {id:'can_ov_unidad_pct',nombre:'Sobreoscilación por unidad',unidad:'%',analisis:'can',por:'unidad',que:'Sobreoscilación de los flancos de cada ID'},
@@ -33,7 +34,7 @@ const mdP=(id,o)=>{const k=Object.keys(o||{}).filter(c=>o[c]!=null&&isFinite(o[c
 function ckpMedidas(r){if(!r||r.err)return[];const M=[];
   [['est','ckp_aporte_est_pct'],['acel','ckp_aporte_acel_pct'],['sin','ckp_aporte_sin_pct']].forEach(([g,id])=>{if(r.R[g])M.push(mdP(id,r.R[g].pct))});
   M.push(mdV('ckp_dientes',r.N),mdV('ckp_vueltas_mal',r.vueltasMal||0));return M.filter(Boolean)}
-function canMedidas(r){if(!r||r.err)return[];const M=[];
+function canMedidas(r){if(!r||r.err)return[];if(r.deco)return canDecoMedidas(r);const M=[];
   M.push(mdV('can_tramas',r.sin?0:r.tramas),mdV('can_h_med',r.g.hMed),mdV('can_l_med',r.g.lMed),mdV('can_hl_dif_med',r.g.hlMed));
   if(!r.sin){const v=r.lv;M.push(mdV('can_rec_h',v.rH),mdV('can_rec_l',v.rL),mdV('can_dom_h',v.dH),mdV('can_dom_l',v.dL),mdV('can_dif',v.dif),mdV('can_ov_pct',v.ov),
       mdV('can_crc_mal',r.crcMal),mdV('can_err_tramas',r.errFr));
