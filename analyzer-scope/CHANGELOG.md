@@ -3,6 +3,11 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.12.04
+- **Elegir la sonda** (Procedimientos → paso 0): punta 1:1, 10:1 y diferencial (impedancia, atenuación, masa), **CAT II / CAT III** (las puntas traseras bajan la medida a CAT II) y cómo quitar el ruido.
+- **Red CAN**: puntas 10:1 (8 MΩ) en vez de 1:1; aviso de que la sonda diferencial oculta los fallos de nivel recesivo.
+- **CKP inductivo flotante**: aviso de modo común (! amarilla) en los pasos con CKP. **Corriente de inyector**: por qué 10:1.
+
 ## 2026.12.03
 - **Logo nuevo Ortu & Rosales Automoción** en la app, la portada y los informes.
 - **Una sola letra, Open Sans**, incrustada (sin internet): interfaz, gráfica y PDF. En el PDF ya salen bien Ω, °, µ, Δ, ≈, ≤ y ≥ (antes «60 ©»).

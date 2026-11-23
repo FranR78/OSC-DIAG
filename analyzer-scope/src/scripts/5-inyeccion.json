@@ -3,7 +3,7 @@
  "id": "FR-INY-01",
  "nombre": "Inyección",
  "autor": "Fran Rosales",
- "version": "2026.11.25",
+ "version": "2026.12.04",
  "estado": "borrador",
  "combustible": [
   "gasolina",
@@ -111,7 +111,8 @@
     "Siguiente paso: hoja de compresión y, si hace falta, compresión relativa; si sale bien, prueba de retornos. [Fuente págs. 74, 78]"
    ],
    "ojo": [
-    "Si el fallo cambia con la temperatura, repite en caliente y mira en la hoja de fase cuántas inyecciones da la UCE a ese inyector (caso D4CB). [Fuente págs. 82–86]"
+    "Si el fallo cambia con la temperatura, repite en caliente y mira en la hoja de fase cuántas inyecciones da la UCE a ese inyector (caso D4CB). [Fuente págs. 82–86]",
+    "CKP inductivo flotante (dos hilos, ninguno a masa): no pongas la punta en un hilo y su masa en el otro. Al subir las RPM se sale del rango de modo común (unos ±30 V respecto a masa), PicoScope pone la ! amarilla y deja de dar datos. Mide cada hilo respecto a masa o usa la sonda diferencial. [Fuente Pico, vídeo «CAN bus vs Differential Probe»]"
    ]
   },
   {
@@ -168,7 +169,8 @@
     "En diésel, cuenta las inyecciones (piloto y principal) en la hoja de fase o en la captura. [Fuente págs. 83–85]"
    ],
    "ojo": [
-    "El curso no trae valores de la corriente del inyector: compara con un inyector bueno del mismo motor. [Inferido]"
+    "El curso no trae valores de la corriente del inyector: compara con un inyector bueno del mismo motor. [Inferido]",
+    "Punta 10:1: el pico de retorno (flyback) del inyector puede ser de cientos de voltios; la 10:1 protege el equipo. Solo va atenuada la punta, la masa no: ponla siempre en masa. [Fuente Pico, vídeo «CAN bus vs Differential Probe»]"
    ]
   }
  ]

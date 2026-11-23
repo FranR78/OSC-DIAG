@@ -3,7 +3,7 @@
  "id": "FR-MEC-01",
  "nombre": "Integridad mecánica",
  "autor": "Fran Rosales",
- "version": "2026.11.26",
+ "version": "2026.12.04",
  "estado": "borrador",
  "combustible": [
   "gasolina",
@@ -464,7 +464,8 @@
     "CKP Hall al quitar la llave: muchas UCE mantienen su relé principal unos segundos y el sensor sigue alimentado, pero no todas. Mira en la captura que los dientes siguen hasta que el motor se para; si se cortan antes, esa parte no vale y usa las deceleraciones al soltar el acelerador. [Inferido]",
     "No cortes la chispa quitando bobinas o fusibles con el motor en marcha: la gasolina sin quemar va al catalizador. La prueba se hace con la llave. [Inferido]",
     "Europa, acelerador electrónico (mariposa motorizada): al quitar la llave la mariposa vuelve a su posición de emergencia, casi cerrada, aunque pises a fondo. La caída sigue siendo solo mecánica y sirve para comparar cilindros entre sí (todos reciben el mismo aire), pero los empujes salen más pequeños. Empieza la caída desde más de 3000 RPM. [Inferido]",
-    "No bloquees la mariposa a mano ni con una cuña: puede romper los engranajes del cuerpo de mariposa o tragarse el objeto. Para medir la compresión con la mariposa abierta usa el arrastre con el acelerador a fondo (paso «Compresión relativa», canal C). [Inferido]"
+    "No bloquees la mariposa a mano ni con una cuña: puede romper los engranajes del cuerpo de mariposa o tragarse el objeto. Para medir la compresión con la mariposa abierta usa el arrastre con el acelerador a fondo (paso «Compresión relativa», canal C). [Inferido]",
+    "CKP inductivo flotante (dos hilos, ninguno a masa): no pongas la punta en un hilo y su masa en el otro. Al subir las RPM se sale del rango de modo común (unos ±30 V respecto a masa), PicoScope pone la ! amarilla y deja de dar datos. Mide cada hilo respecto a masa o usa la sonda diferencial. [Fuente Pico, vídeo «CAN bus vs Differential Probe»]"
    ]
   },
   {
@@ -550,7 +551,8 @@
    ],
    "ojo": [
     "CKP Hall al quitar la llave: muchas UCE mantienen su relé principal unos segundos y el sensor sigue alimentado, pero no todas. Mira en la captura que los dientes siguen hasta que el motor se para; si se cortan antes, esa parte no vale y usa las deceleraciones al soltar el acelerador. [Inferido]",
-    "Diésel europeo con mariposa de admisión (anti-sacudidas): al quitar la llave se cierra para parar el motor suave, y la caída tras apagar sale con muy poco aire. Para la mecánica son más fiables las deceleraciones al soltar el acelerador de golpe: hay corte de inyección y la mariposa sigue abierta. [Inferido]"
+    "Diésel europeo con mariposa de admisión (anti-sacudidas): al quitar la llave se cierra para parar el motor suave, y la caída tras apagar sale con muy poco aire. Para la mecánica son más fiables las deceleraciones al soltar el acelerador de golpe: hay corte de inyección y la mariposa sigue abierta. [Inferido]",
+    "CKP inductivo flotante (dos hilos, ninguno a masa): no pongas la punta en un hilo y su masa en el otro. Al subir las RPM se sale del rango de modo común (unos ±30 V respecto a masa), PicoScope pone la ! amarilla y deja de dar datos. Mide cada hilo respecto a masa o usa la sonda diferencial. [Fuente Pico, vídeo «CAN bus vs Differential Probe»]"
    ]
   },
   {

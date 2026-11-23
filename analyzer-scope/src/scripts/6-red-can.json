@@ -3,7 +3,7 @@
  "id": "FR-CAN-01",
  "nombre": "Red CAN",
  "autor": "Fran Rosales",
- "version": "2026.11.25",
+ "version": "2026.12.04",
  "estado": "borrador",
  "combustible": [
   "gasolina",
@@ -22,21 +22,21 @@
     {
      "canal": "A",
      "senal": "CAN-H",
-     "sonda": "Punta 1:1 respecto a masa",
+     "sonda": "Punta 10:1 respecto a masa",
      "rango": "±10 V",
      "entidad": "CAN"
     },
     {
      "canal": "B",
      "senal": "CAN-L",
-     "sonda": "Punta 1:1 respecto a masa",
+     "sonda": "Punta 10:1 respecto a masa",
      "rango": "±10 V",
      "entidad": "CAN"
     }
    ],
    "como": [
     "Canal A: CAN-H; canal B: CAN-L, en el conector de diagnosis (pines 6 y 14) o en el conector de la unidad sospechosa. [Teórico ISO 11898-2]",
-    "Masa de las dos puntas en la masa del vehículo; no uses sonda diferencial: la app necesita cada línea respecto a masa. [Inferido]",
+    "Masa de las dos puntas en la masa del vehículo. Mejor 10:1 (unos 8 MΩ) que 1:1 (1 MΩ del equipo): carga menos la red; en CAN FD y FlexRay, imprescindible. La app necesita cada línea respecto a masa. [Fuente Pico, vídeo «CAN bus vs Differential Probe»]",
     "La terminación (60 Ω entre H y L) se mide aparte, con el contacto quitado, con el polímetro. [Teórico ISO 11898-2]"
    ],
    "maniobra": [
@@ -70,7 +70,8 @@
     "La unidad cuyo nivel se aparta del resto es la sospechosa. [Inferido]"
    ],
    "ojo": [
-    "El CAN de baja velocidad tolerante a fallos tiene otros niveles. [Teórico ISO 11898-3]"
+    "El CAN de baja velocidad tolerante a fallos tiene otros niveles. [Teórico ISO 11898-3]",
+    "Sonda diferencial entre H y L: con un canal ves el diferencial (0 V recesivo, 2 V dominante), pero oculta los fallos de nivel: si el recesivo sube a 4 V en las dos líneas, el diferencial sigue dando 0–2 V. Úsala solo para registrar el CAN mientras mides otra cosa, no para diagnosticar la red. [Fuente Pico, vídeo «CAN bus vs Differential Probe»]"
    ]
   }
  ]

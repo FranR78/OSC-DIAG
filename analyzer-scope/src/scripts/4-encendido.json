@@ -3,7 +3,7 @@
  "id": "FR-ENC-01",
  "nombre": "Encendido",
  "autor": "Fran Rosales",
- "version": "2026.11.25",
+ "version": "2026.12.04",
  "estado": "borrador",
  "combustible": [
   "gasolina"
@@ -115,7 +115,8 @@
     "Crúzalo con Inyección y con la caída de giro para descartar combustible y mecánica. [Fuente pág. 60]"
    ],
    "ojo": [
-    "Si el fallo solo sale circulando, esta prueba en parado puede no provocarlo. [Inferido]"
+    "Si el fallo solo sale circulando, esta prueba en parado puede no provocarlo. [Inferido]",
+    "CKP inductivo flotante (dos hilos, ninguno a masa): no pongas la punta en un hilo y su masa en el otro. Al subir las RPM se sale del rango de modo común (unos ±30 V respecto a masa), PicoScope pone la ! amarilla y deja de dar datos. Mide cada hilo respecto a masa o usa la sonda diferencial. [Fuente Pico, vídeo «CAN bus vs Differential Probe»]"
    ]
   },
   {
