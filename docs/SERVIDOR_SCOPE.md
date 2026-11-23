@@ -21,7 +21,9 @@ implementaciones → Editar → Versión nueva» (misma URL `/exec`).
    Sin usar, caduca a los 14 días. Google renueva la clave de la cuenta cada ~30 días: si deja de entrar, enlace nuevo.
 3. En la Hoja, pestaña **Usuarios**: `activo` (sí/no), `caduca` (AAAA-MM-DD), `paquetes` (`*`, ids separados por comas o vacío)
    y `rol` (`cliente`; `autor` puede publicar paquetes; `admin`).
-4. **Quitar acceso:** `activo = no` (al siguiente clic). Para anular también su enlace, ejecuta `quitarAcceso('correo')`.
+4. **Todo un dominio (alumnado del centro):** propiedad `DOMINIOS_LIBRES` = el dominio (varios, separados por comas).
+   Entran sin fila ni enlace, como `cliente`; una fila en **Usuarios** con `activo = no` le cierra el paso a uno.
+5. **Quitar acceso:** `activo = no` (al siguiente clic). Para anular también su enlace, ejecuta `quitarAcceso('correo')`.
 
 ## Conocimiento
 * **Base Ortu** viene dentro de la app. **Plantilla Excel y editor** para que cada uno haga sus reglas («Mis reglas»,
