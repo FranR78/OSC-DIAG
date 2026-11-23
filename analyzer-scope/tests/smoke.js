@@ -158,10 +158,13 @@ const spanish = t => [...new Set((t.replace(/Ortu (&amp; |& )?(Rosales )?Automoc
   { const [dl] = await Promise.all([p.waitForEvent('download'), click('#dxWPdf')]);
     const buf = fs.readFileSync(await dl.path()); check('Informe PDF generado (%PDF)', buf.slice(0, 4).toString() === '%PDF', dl.suggestedFilename()); }
 
-  { const h0 = await E(() => document.getElementById('wrap').getBoundingClientRect().height);
-    const r = await p.locator('#wrapH').boundingBox();
-    await p.mouse.move(r.x + r.width / 2, r.y + 6); await p.mouse.down(); await p.mouse.move(r.x + r.width / 2, r.y + 126, { steps: 5 }); await p.mouse.up();
-    const h1 = await E(() => document.getElementById('wrap').getBoundingClientRect().height);
+  { // tras el PDF: esperar a que se cierre todo y el tirador esté a la vista (en GitHub, más lento, a veces aún no lo estaba)
+    await p.keyboard.press('Escape'); await p.locator('#wrapH').scrollIntoViewIfNeeded(); await p.waitForTimeout(300);
+    const h0 = await E(() => document.getElementById('wrap').getBoundingClientRect().height);
+    let h1 = h0;
+    for (let k = 0; k < 2 && h1 <= h0 + 80; k++) { const r = await p.locator('#wrapH').boundingBox();
+      await p.mouse.move(r.x + r.width / 2, r.y + r.height / 2); await p.mouse.down(); await p.mouse.move(r.x + r.width / 2, r.y + r.height / 2 + 120, { steps: 8 }); await p.mouse.up(); await p.waitForTimeout(150);
+      h1 = await E(() => document.getElementById('wrap').getBoundingClientRect().height); }
     check('tirador: la gráfica crece al arrastrar', h1 > h0 + 80, h0 + ' → ' + h1);
     await p.dblclick('#wrapH'); await p.waitForTimeout(100); }
   await E(() => { const r = document.getElementById('rhR'); r.value = 40; r.oninput(); });
