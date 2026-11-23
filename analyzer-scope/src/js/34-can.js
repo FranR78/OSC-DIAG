@@ -4,9 +4,8 @@
    2. Velocidad: el tramo más corto típico es un bit → la velocidad normalizada más cercana.
    3. Tramas: separadas por ≥ 7 bits recesivos; se quitan los bits de relleno, se lee el ID y se comprueba el CRC-15.
    4. Niveles por trama (centro de los bits, sin arbitraje ni ACK: solo transmite esa unidad) y flancos (subida 10–90 %, sobreoscilación).
-   5. Por ID: la unidad cuyo nivel se aparta del resto es la sospechosa → «dónde». Niveles de H y L → «qué» (a masa, a positivo, unidos…). */
+   5. Por ID: niveles, desviación frente al resto, flancos y CRC. Solo mide: qué es normal y qué avería indica lo dicen las skills (35-medidas.js, reglas/fran-can.json). */
 const CAN_RATES=[1e6,5e5,25e4,125e3,1e5,83333,5e4,33333];
-const CAN_REF={recMin:2,recMax:3,domHmin:2.75,domHmax:4.5,domLmin:.5,domLmax:2.25,difMin:1.5,difMax:3};  // ISO 11898-2 (valores típicos de transceptor)
 function canMed(a){if(!a.length)return null;const s=Float64Array.from(a).sort();return s[s.length>>1]}
 function canCrc(bits){let c=0;for(const b of bits){const nx=b^((c>>14)&1);c=(c<<1)&0x7fff;if(nx)c^=0x4599}return c}
 /* tramos dominante/recesivo del diferencial */
@@ -34,7 +33,7 @@ function canAnaliza(d,o){
   const x=H.x,n=x.length,yl=L.x===x?L.y:Float32Array.from(x,t=>{const i=Math.min(L.x.length-1,lb(L.x,t));return L.y[i]}),df=new Float32Array(n);
   for(let i=0;i<n;i++)df[i]=H.y[i]-yl[i];
   const st=Math.max(1,Math.floor(n/30000)),sH=[],sL=[];for(let i=0;i<n;i+=st){sH.push(H.y[i]);sL.push(yl[i])}
-  const g={hMed:canMed(sH),lMed:canMed(sL)};
+  const sD=[];for(let i=0;i<n;i+=st)sD.push(Math.abs(H.y[i]-yl[i]));const g={hMed:canMed(sH),lMed:canMed(sL),hlMed:canMed(sD)};
   const R=canTramos(x,df),dur=x[n-1]-x[0];
   if(R.length<20)return canSinTramas(g,dur);
   const lens=R.slice(1,-1).map(r=>r.t1-r.t0).sort((a,b)=>a-b),tmin=lens[Math.floor(lens.length*.1)];
@@ -69,41 +68,17 @@ function canAnaliza(d,o){
   const U=[...byId.entries()].map(([id,L])=>{const v=k=>canMed(L.map(f=>f[k]).filter(z=>z!=null));
     const u={id,ext:L[0].ext,n:L.length,crc:L.filter(f=>!f.ok).length,dH:v('dH'),dL:v('dL'),rH:v('rH'),rL:v('rL'),sube:v('sube'),ov:v('ov')};u.dif=u.dH!=null?u.dH-u.dL:null;return u});
   const dm=canMed(U.filter(u=>u.dif!=null).map(u=>u.dif));
-  U.forEach(u=>{u.mal=[];if(u.dif==null)return;
-    if(Math.abs(u.dif-dm)/dm>.12)u.mal.push('nivel '+(u.dif<dm?'bajo':'alto')+' frente al resto');
-    if(u.dif<CAN_REF.difMin||u.dif>CAN_REF.difMax)u.mal.push('diferencial fuera de 1,5–3 V');
-    if(u.ov!=null&&u.ov>25)u.mal.push('sobreoscilación '+Math.round(u.ov)+' %');
-    if(u.crc)u.mal.push(u.crc+' tramas con CRC mal')});
-  U.sort((a,b)=>b.mal.length-a.mal.length||(a.id==='?')-(b.id==='?')||a.id-b.id);
+  U.sort((a,b)=>(a.id==='?')-(b.id==='?')||a.id-b.id);
   const all=k=>canMed(F.map(f=>f[k]).filter(z=>z!=null));
   return{rate,tramas:F.length,errFr,crcMal:F.filter(f=>!f.ok).length,U,dur,lv:{dH:all('dH'),dL:all('dL'),rH:all('rH'),rL:all('rL'),dif:dm,sube:all('sube'),ov:all('ov')},g};
 }
 function canSinTramas(g,dur,msg){return{sin:true,msg:msg||'',g,dur}}
-/* conclusiones: [Medido] lo que sale de la captura, [Teórico] la referencia ISO 11898-2, [Inferido] la avería probable */
-function canDiag(r){
-  const L=[],f=v=>v==null?'—':v.toFixed(2).replace('.',',')+' V',G=r.g;
-  if(r.sin){
-    L.push(['bad','Medido','Sin tramas en '+skT(r.dur)+'. CAN-H ≈ '+f(G.hMed)+', CAN-L ≈ '+f(G.lMed)+'.'+(r.msg?' '+r.msg:'')]);
-    if(G.hMed>5)L.push(['bad','Inferido','CAN-H a positivo.']);else if(G.hMed<.5)L.push(['bad','Inferido','CAN-H a masa.']);
-    if(G.lMed>5)L.push(['bad','Inferido','CAN-L a positivo.']);else if(G.lMed<.5)L.push(['bad','Inferido','CAN-L a masa.']);
-    if(G.hMed>=.5&&G.hMed<=5&&G.lMed>=.5&&G.lMed<=5)L.push(['warn','Inferido',Math.abs(G.hMed-G.lMed)<.2?'H y L al mismo nivel: bus en reposo (contacto quitado o red dormida) o H y L unidos. Con contacto puesto debe haber tráfico.':'Niveles sin tráfico reconocible: revisa la conexión de las puntas.']);
-    L.push(['warn','Teórico','En reposo, H y L ≈ 2,5 V; con tráfico, dominante H ≈ 3,5 V y L ≈ 1,5 V (ISO 11898-2).']);return L}
-  const v=r.lv;
-  L.push(['ok','Medido',(r.rate/1e3)+' kbit/s · '+r.tramas+' tramas de '+r.U.length+' unidades (ID) en '+skT(r.dur)+'.']);
-  const okR=x=>x!=null&&x>=CAN_REF.recMin&&x<=CAN_REF.recMax;
-  L.push([okR(v.rH)&&okR(v.rL)?'ok':'bad','Medido','Recesivo: H '+f(v.rH)+' · L '+f(v.rL)+' (referencia ≈ 2,5 V).']);
-  L.push([v.dH>=CAN_REF.domHmin&&v.dH<=CAN_REF.domHmax&&v.dL>=CAN_REF.domLmin&&v.dL<=CAN_REF.domLmax?'ok':'bad','Medido','Dominante: H '+f(v.dH)+' · L '+f(v.dL)+' · diferencial '+f(v.dif)+' (referencia 3,5 / 1,5 / 2 V).']);
-  if(v.rL!=null&&v.rL<1)L.push(['bad','Inferido','CAN-L muy bajo en recesivo: CAN-L a masa o derivación a masa.']);
-  if(v.rH!=null&&v.rH>3.5)L.push(['bad','Inferido','CAN-H alto en recesivo: CAN-H a positivo o derivación a positivo.']);
-  if(v.dif!=null&&v.dif>CAN_REF.difMax)L.push(['warn','Inferido','Diferencial alto en toda la red: falta una resistencia de terminación (mide 60 Ω entre H y L con el contacto quitado).']);
-  if(v.dif!=null&&v.dif<CAN_REF.difMin)L.push(['warn','Inferido','Diferencial bajo en toda la red: terminación de más o derivación entre H y L.']);
-  if(v.ov!=null&&v.ov>25)L.push(['warn','Inferido','Sobreoscilación en los flancos ('+Math.round(v.ov)+' %): reflexiones por terminación o ramal en mal estado.']);
-  if(r.crcMal||r.errFr)L.push(['bad','Medido',(r.crcMal?r.crcMal+' tramas con CRC mal':'')+(r.crcMal&&r.errFr?' · ':'')+(r.errFr?r.errFr+' tramas de error':'')+'.']);
-  const sus=r.U.filter(u=>u.mal.length&&u.id!=='?');
-  if(sus.length)sus.forEach(u=>L.push(['bad','Inferido','Unidad con ID '+canId(u)+': '+u.mal.join(', ')+'. Revisa esa unidad, su conector y su ramal.']));
-  else if(L.every(l=>l[0]==='ok'))L.push(['ok','Inferido','Niveles, flancos y tramas correctos en todas las unidades.']);
-  return L;
-}
+/* lo medido, sin opinar (la interpretación la dan las skills) */
+function canMedido(r){const f=v=>v==null?'—':v.toFixed(2).replace('.',',')+' V',G=r.g,L=[];
+  if(r.sin){L.push('Sin tramas en '+skT(r.dur)+'. CAN-H ≈ '+f(G.hMed)+', CAN-L ≈ '+f(G.lMed)+'.'+(r.msg?' '+r.msg:''));return L}
+  const v=r.lv;L.push((r.rate/1e3)+' kbit/s · '+r.tramas+' tramas de '+r.U.length+' unidades (ID) en '+skT(r.dur)+'.');
+  L.push('Recesivo: H '+f(v.rH)+' · L '+f(v.rL)+'.');L.push('Dominante: H '+f(v.dH)+' · L '+f(v.dL)+' · diferencial '+f(v.dif)+'.');
+  return L}
 const canId=u=>u.id==='?'?'?':'0x'+u.id.toString(16).toUpperCase().padStart(u.ext?8:3,'0');
 /* señal de ejemplo: 500 kbit/s, 4 unidades; la del ID 0x2F1 con el nivel dominante bajo (ramal o conector con resistencia) */
 function canDemo(o={}){
@@ -131,10 +106,12 @@ function canCard(key,cv){
   if(r&&r.err)h+='<div class="skCk"><div class="skA bad"><b>✗</b><span>'+r.err+'</span></div></div>';
   else if(r){
     if(!r.sin)h+='<div class="skKv"><div><small>Velocidad</small><b>'+(r.rate/1e3)+' kbit/s</b></div><div><small>Tramas</small><b>'+r.tramas+'</b></div><div><small>Unidades (ID)</small><b>'+r.U.length+'</b></div><div><small>CRC mal / error</small><b>'+r.crcMal+' / '+r.errFr+'</b></div></div>';
-    h+='<div class="skCk">'+canDiag(r).map(l=>'<div class="skA '+l[0]+'"><b>'+(l[0]==='ok'?'✓':l[0]==='bad'?'✗':'!')+'</b><span><b>['+l[1]+']</b> '+l[2]+'</span></div>').join('')+'</div>';
+    const sk=mdSkills(canMedidas(r)),mal=new Set(['can_desv_unidad_pct','can_dif_unidad','can_ov_unidad_pct','can_crc_unidad'].flatMap(m=>[...mdMarcados(sk,m)]));
+    h+='<div class="skCk">'+canMedido(r).map(l=>'<div class="skA '+(r.sin?'warn':'ok')+'"><b>'+(r.sin?'!':'✓')+'</b><span><b>[Medido]</b> '+l+'</span></div>').join('')+'</div>'+
+      mdHallazgosHTML(sk,'Las skills activas no encuentran nada anormal en la red.');
     if(!r.sin){const f=v=>v==null?'—':v.toFixed(2).replace('.',','),ns=v=>v==null?'—':Math.round(v*1e9),dm=r.lv.dif||2;
       h+='<div class="skTw" style="margin-top:10px"><table class="skTb ckT"><thead><tr><th>ID</th><th>Tramas</th><th>Dominante H / L (V)</th><th>Diferencial</th><th>Subida (ns)</th><th>Sobreosc.</th><th>CRC mal</th></tr></thead><tbody>'+
-        r.U.map(u=>'<tr'+(u.mal.length?' class="canMal"':'')+'><td class="nw"><b>'+canId(u)+'</b></td><td>'+u.n+'</td><td class="nw">'+f(u.dH)+' / '+f(u.dL)+'</td><td><div class="ckB'+(u.mal.length?' lo':'')+'"><i style="width:'+Math.min(100,(u.dif||0)/3*100)+'%"></i><span>'+f(u.dif)+' V</span></div></td><td>'+ns(u.sube)+'</td><td>'+(u.ov==null?'—':Math.round(u.ov)+' %')+'</td><td>'+u.crc+'</td></tr>').join('')+'</tbody></table></div>';}
+        r.U.map(u=>'<tr'+(mal.has(String(u.id))?' class="canMal"':'')+'><td class="nw"><b>'+canId(u)+'</b></td><td>'+u.n+'</td><td class="nw">'+f(u.dH)+' / '+f(u.dL)+'</td><td><div class="ckB'+(mal.has(String(u.id))?' lo':'')+'"><i style="width:'+Math.min(100,(u.dif||0)/3*100)+'%"></i><span>'+f(u.dif)+' V</span></div></td><td>'+ns(u.sube)+'</td><td>'+(u.ov==null?'—':Math.round(u.ov)+' %')+'</td><td>'+u.crc+'</td></tr>').join('')+'</tbody></table></div>';}
   }
   return h+'</div>';
 }

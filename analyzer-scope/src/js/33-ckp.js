@@ -6,7 +6,6 @@
    4. Fase: el sincronismo (+ desfase) da el PMS del cilindro 1; con el orden de encendido, cada cilindro tiene su carrera de trabajo (720°/n desde su PMS).
    5. Aporte: en su propia carrera, cuánto sube la velocidad sobre la recta que une el PMS con el siguiente (quita la tendencia). Por eso el cilindro señalado es el responsable, sin restar uno.
    Regímenes por ciclo: estable, aceleración y sin combustión (sin sincronismo: corte o motor apagándose → solo mecánica). */
-const CKP_UMBRAL=85;  // % del mejor por debajo del cual se señala un cilindro (borrador, a validar con capturas reales)
 function ckpPct(a,q){const s=Array.from(a).sort((x,y)=>x-y);return s[Math.min(s.length-1,Math.max(0,Math.round(q*(s.length-1))))]}
 const ckpMed=a=>{if(!a.length)return NaN;const s=a.slice().sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
 function ckpSub(y){const st=Math.max(1,Math.floor(y.length/20000)),o=[];for(let i=0;i<y.length;i+=st)o.push(y[i]);return o}
@@ -59,21 +58,14 @@ function ckpAnaliza(d,o){
     const md={};o.order.forEach(c=>md[c]=ckpMed(L.map(q=>q.d[c])));const mx=Math.max(...Object.values(md));
     R[g]={n:L.length,rpm:Math.round(ckpMed(L.map(q=>q.rpm))),pct:Object.fromEntries(o.order.map(c=>[c,mx>0?Math.max(0,Math.round(md[c]/mx*100)):0]))}}
   const st=Math.max(1,Math.floor(rp.length/700)),serie=[];for(let i=0;i<rp.length;i+=st)serie.push([tm[i],rp[i]]);
-  return{N,T,m,vueltas:G.length-1,ciclos:cyc.length,R,cyc:cyc.map(c=>({t0:c.t0,t1:c.t1,reg:c.reg})),serie,warn,order:o.order,dur:E[E.length-1]-E[0]};
+  return{N,T,m,vueltasMal:bad,vueltas:G.length-1,ciclos:cyc.length,R,cyc:cyc.map(c=>({t0:c.t0,t1:c.t1,reg:c.reg})),serie,warn,order:o.order,dur:E[E.length-1]-E[0]};
 }
-/* conclusión: [Medido] lo que sale de la captura, [Inferido] lo que se deduce */
-function ckpDiag(r,fuel){
-  const L=[],cb=r.R.est||r.R.acel,sn=r.R.sin,lab=r.R.est?'estable':'en aceleración';
-  if(!cb){L.push(['warn','Inferido','No hay al menos 2 ciclos con combustión: no se puede comparar el aporte. Graba ralentí y aceleraciones con el sincronismo conectado.']);return L}
-  const lo=r.order.map(c=>[c,cb.pct[c]]).sort((a,b)=>a[1]-b[1]),w=lo.filter(x=>x[1]<CKP_UMBRAL);
-  if(!w.length){L.push(['ok','Medido','Aporte uniforme '+lab+': todos los cilindros por encima del '+CKP_UMBRAL+' % del mejor (el más bajo, el '+lo[0][0]+', con '+lo[0][1]+' %).'])}
-  else w.forEach(([c,v])=>{L.push(['bad','Medido','Cilindro '+c+': aporta el '+v+' % del mejor '+lab+'.']);
-    if(sn){const s=sn.pct[c];L.push(s<CKP_UMBRAL?['bad','Inferido','Sin combustión también queda bajo ('+s+' %): fuga de compresión en el cilindro '+c+'. Sigue en «Integridad mecánica».']:
-      ['warn','Inferido','Sin combustión está bien ('+s+' %): la mecánica del cilindro '+c+' responde; el fallo está en la combustión. Sigue en '+(fuel==='diesel'?'«Inyección»':'«Encendido» o «Inyección»')+'.'])}
-    else L.push(['warn','Inferido','No hay tramo sin combustión (apagar grabando o cortar encendido) para separar mecánica de combustión.'])});
-  if(r.R.acel&&r.R.est){const a=r.order.filter(c=>r.R.acel.pct[c]<CKP_UMBRAL&&r.R.est.pct[c]>=CKP_UMBRAL);if(a.length)L.push(['warn','Medido','Solo en aceleración baja el cilindro '+a.join(', ')+' ('+a.map(c=>r.R.acel.pct[c]+' %').join(', ')+').'])}
-  return L;
-}
+/* lo medido, sin opinar (la interpretación la dan las skills: 35-medidas.js) */
+function ckpMedido(r){const L=[],G=[['est','estable'],['acel','en aceleración'],['sin','sin combustión']].filter(g=>r.R[g[0]]);
+  if(!r.R.est&&!r.R.acel)L.push(['warn','No hay al menos 2 ciclos con combustión: no se puede comparar el aporte. Graba ralentí y aceleraciones con el sincronismo conectado.']);
+  G.forEach(([g,t])=>{const lo=r.order.map(c=>[c,r.R[g].pct[c]]).sort((a,b)=>a[1]-b[1])[0];L.push(['ok','Aporte '+t+': el más bajo, el cilindro '+lo[0]+', con el '+lo[1]+' % del mejor.'])});
+  if(!r.R.sin)L.push(['warn','No hay tramo sin combustión (apagar grabando o cortar encendido): no se puede separar mecánica de combustión.']);
+  return L}
 /* señal de ejemplo: rueda 60-2, Hall, sincronismo en el inyector 1; ralentí, aceleración y corte (sin combustión) */
 function ckpDemo(o={}){
   const order=o.order||[1,3,4,2],n=order.length,W=720/n,fs=o.fs||1e5,dur=3.6,N=60,m=2,TDC=100,flojo=o.flojo||0,fuga=o.fuga||0;
@@ -98,11 +90,13 @@ function ckpCard(key,cv){
   if(r&&r.err)h+='<div class="skCk"><div class="skA bad"><b>✗</b><span>'+r.err+'</span></div></div>';
   else if(r){
     h+='<div class="skKv"><div><small>Rueda fónica</small><b>'+r.N+'-'+r.m+'</b></div><div><small>Dientes por vuelta</small><b>'+r.T+'</b></div><div><small>Vueltas</small><b>'+r.vueltas+'</b></div><div><small>Ciclos (720°)</small><b>'+r.ciclos+'</b></div></div>';
-    h+='<div class="skCk">'+r.warn.map(w=>'<div class="skA warn"><b>!</b><span>'+w+'</span></div>').join('')+ckpDiag(r,SK.fuel).map(l=>'<div class="skA '+l[0]+'"><b>'+(l[0]==='ok'?'✓':l[0]==='bad'?'✗':'!')+'</b><span><b>['+l[1]+']</b> '+l[2]+'</span></div>').join('')+'</div>';
+    const sk=mdSkills(ckpMedidas(r),{cilindros:r.order.length}),mk={est:mdMarcados(sk,'ckp_aporte_est_pct'),acel:mdMarcados(sk,'ckp_aporte_acel_pct'),sin:mdMarcados(sk,'ckp_aporte_sin_pct')};
+    h+='<div class="skCk">'+r.warn.map(w=>'<div class="skA warn"><b>!</b><span>'+w+'</span></div>').join('')+ckpMedido(r).map(l=>'<div class="skA '+l[0]+'"><b>'+(l[0]==='ok'?'✓':'!')+'</b><span><b>[Medido]</b> '+l[1]+'</span></div>').join('')+'</div>'+
+      mdHallazgosHTML(sk,'Las skills activas no señalan ningún cilindro.');
     const G=[['est','Estable'],['acel','Aceleración'],['sin','Sin combustión']].filter(g=>r.R[g[0]]);
     h+='<div class="skTw" style="margin-top:10px"><table class="skTb ckT"><thead><tr><th>Cilindro</th>'+G.map(g=>'<th>'+g[1]+' <small>('+r.R[g[0]].n+' ciclos · '+r.R[g[0]].rpm+' RPM)</small></th>').join('')+'</tr></thead><tbody>'+
       r.order.slice().sort((a,b)=>a-b).map(c=>'<tr><td><span class="skCh" style="background:'+crCol(c)+'">'+c+'</span></td>'+G.map(g=>{const v=r.R[g[0]].pct[c];
-        return '<td><div class="ckB'+(v<CKP_UMBRAL?' lo':'')+'"><i style="width:'+v+'%"></i><span>'+v+' %</span></div></td>'}).join('')+'</tr>').join('')+'</tbody></table></div>';
+        return '<td><div class="ckB'+(mk[g[0]].has(String(c))?' lo':'')+'"><i style="width:'+v+'%"></i><span>'+v+' %</span></div></td>'}).join('')+'</tr>').join('')+'</tbody></table></div>';
     h+=ckpGraf(r);
   }
   return h+'</div>';

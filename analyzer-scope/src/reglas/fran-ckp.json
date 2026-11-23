@@ -1,0 +1,228 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-ckp",
+ "nombre": "Fran · Equilibrio de cilindros (CKP)",
+ "autor": "Fran Rosales",
+ "version": "2026.11.28",
+ "aviso": "Aporte de cada cilindro medido con el sensor de cigüeñal en su propia carrera de trabajo: el cilindro señalado es el responsable. Umbral del 85 % en borrador: validar con capturas reales.",
+ "reglas": [
+  {
+   "id": "FR-CKP-01",
+   "tema": "aporte-cilindro",
+   "sintoma": "Cilindro {cil}: aporta el {valor} % del mejor a régimen estable",
+   "si": [
+    {
+     "medida": "ckp_aporte_est_pct",
+     "op": "<",
+     "valor": 85,
+     "por_cilindro": true
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Fallo de combustión (encendido o inyección) o de compresión en el cilindro {cil}",
+     "etiqueta": "Inferido",
+     "separar": "El tramo sin combustión lo separa: si ahí está bien, es combustión"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Repetir la captura con tramo sin combustión (apagar grabando o corte de encendido)",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "Curso de scripts (Autoscope), script CSS, pág. 56–71",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CKP-02",
+   "tema": "aporte-cilindro",
+   "sintoma": "Cilindro {cil}: también bajo sin combustión ({valor} %): fuga de compresión",
+   "si": [
+    {
+     "medida": "ckp_aporte_sin_pct",
+     "op": "<",
+     "valor": 85,
+     "por_cilindro": true
+    },
+    {
+     "medida": "ckp_aporte_est_pct",
+     "op": "<",
+     "valor": 85,
+     "por_cilindro": true
+    }
+   ],
+   "confianza": "alta",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Pérdida de estanqueidad: segmentos, válvulas o junta de culata en el cilindro {cil}",
+     "etiqueta": "Inferido",
+     "separar": "Prueba de fugas: por dónde sale el aire (admisión, escape, cárter, refrigerante)"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Compresión relativa (procedimiento «Integridad mecánica»)",
+     "tipo": "prueba",
+     "esperado": "cilindro {cil} por debajo del 90 %"
+    },
+    {
+     "texto": "Prueba de fugas en el cilindro {cil}",
+     "tipo": "prueba",
+     "esperado": "< 20 %"
+    }
+   ],
+   "fuente": "Curso de scripts, pág. 67 (caída con encendido cortado)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CKP-03",
+   "tema": "aporte-cilindro",
+   "sintoma": "Cilindro {cil}: aporta el {valor} % a régimen estable y la mecánica responde sin combustión: el fallo está en la combustión",
+   "si": [
+    {
+     "medida": "ckp_aporte_est_pct",
+     "op": "<",
+     "valor": 85,
+     "por_cilindro": true
+    },
+    {
+     "medida": "ckp_aporte_sin_pct",
+     "op": ">=",
+     "valor": 90,
+     "por_cilindro": true
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Encendido del cilindro {cil}: bobina, bujía o cable",
+     "etiqueta": "Inferido",
+     "separar": "Cambiar la bobina de cilindro: si el fallo se mueve, es la bobina"
+    },
+    {
+     "texto": "Inyector del cilindro {cil}",
+     "etiqueta": "Inferido",
+     "separar": "Corriente de inyector (procedimiento «Inyección»)"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Procedimiento «Encendido» o «Inyección» en el cilindro {cil}",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "Curso de scripts (Autoscope), script CSS, pág. 56–71",
+   "estado": "borrador",
+   "contexto": {
+    "combustible": [
+     "gasolina"
+    ]
+   }
+  },
+  {
+   "id": "FR-CKP-04",
+   "tema": "aporte-cilindro",
+   "sintoma": "Cilindro {cil}: aporta el {valor} % a régimen estable y la mecánica responde sin combustión: el fallo está en la inyección",
+   "si": [
+    {
+     "medida": "ckp_aporte_est_pct",
+     "op": "<",
+     "valor": 85,
+     "por_cilindro": true
+    },
+    {
+     "medida": "ckp_aporte_sin_pct",
+     "op": ">=",
+     "valor": 90,
+     "por_cilindro": true
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Inyector del cilindro {cil}: caudal bajo, obstruido o retorno alto",
+     "etiqueta": "Inferido",
+     "separar": "Prueba de retorno de inyectores y corriente de inyector"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Procedimiento «Inyección» en el cilindro {cil}",
+     "tipo": "prueba"
+    },
+    {
+     "texto": "Prueba de retorno de los inyectores",
+     "tipo": "medida",
+     "esperado": "retorno del cilindro {cil} similar al resto"
+    }
+   ],
+   "fuente": "Curso de scripts, casos diésel, pág. 72–86",
+   "estado": "borrador",
+   "contexto": {
+    "combustible": [
+     "diesel"
+    ]
+   }
+  },
+  {
+   "id": "FR-CKP-05",
+   "tema": "aporte-cilindro",
+   "sintoma": "Cilindro {cil}: solo baja en aceleración ({valor} %)",
+   "si": [
+    {
+     "medida": "ckp_aporte_acel_pct",
+     "op": "<",
+     "valor": 85,
+     "por_cilindro": true
+    },
+    {
+     "medida": "ckp_aporte_est_pct",
+     "op": ">=",
+     "valor": 85,
+     "por_cilindro": true
+    }
+   ],
+   "confianza": "baja",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Fallo que aparece con carga: encendido (bobina o bujía) o inyector con caudal insuficiente",
+     "etiqueta": "Inferido",
+     "separar": "Repetir con carga y comparar con el tramo estable"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Procedimiento «Encendido» con acelerones",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "Curso de scripts, pág. 64",
+   "estado": "borrador"
+  }
+ ],
+ "notas": [
+  {
+   "id": "N-CKP-01",
+   "titulo": "Cómo se mide el aporte de cada cilindro",
+   "tema": "aporte-cilindro",
+   "texto": "# Método\n- Cada combustión acelera el cigüeñal; el sensor de cigüeñal ve esa aceleración diente a diente.\n- Cada cilindro se mide en su propia carrera de trabajo (desde su PMS): el señalado es el responsable, sin restar uno.\n- Sin combustión (apagar grabando o cortar el encendido) solo queda la mecánica: separa fuga de compresión de fallo de combustión.\n# Sincronismo\n- Gasolina: bobina 1 (el inyector secuencial inyecta en admisión, unos 360° antes).\n- Diésel: inyector 1.\n# Aviso\n- Un cilindro flojo baja también al siguiente en orden de encendido: confirmar con compresión relativa (pág. 71).",
+   "valores": [
+    {
+     "magnitud": "Aporte de un cilindro respecto al mejor",
+     "min": 85,
+     "max": 100,
+     "unidad": "%",
+     "condicion": "criterio en borrador"
+    }
+   ],
+   "fuente": "Curso de scripts (Autoscope), script CSS, pág. 56–71"
+  }
+ ]
+}

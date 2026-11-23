@@ -3,6 +3,13 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.28
+- **Scripts → Procedimientos.** Cada procedimiento declara las skills (temas) que necesita; si falta alguna lo avisa y, si está desactivada, ofrece **Activar**. Las medidas salen igual.
+- **Medidas con nombre** (`35-medidas.js`): el análisis del cigüeñal y el de CAN publican medidas (`ckp_aporte_est_pct`, `can_dif_unidad`…) con su catálogo (qué es, unidad, de qué análisis sale).
+- **El código ya no opina:** los umbrales del CKP (85 %) y de CAN (ISO 11898-2) salen del código a dos skills base, **Fran · Equilibrio de cilindros (CKP)** y **Fran · Red CAN (ISO 11898-2)**, con reglas, notas, fuente y estado borrador. Se ven, se activan y se copian en «Diagnóstico → Fuente de conocimiento».
+- Los hallazgos de los procedimientos salen de las skills activas: [Medido] síntoma, [Inferido] causas, qué comprobar y de qué skill viene.
+- **Qué probar:** Procedimientos → Equilibrio de cilindros o Red CAN → señal de ejemplo → Analizar; desactivar la skill en Diagnóstico y ver el aviso.
+
 ## 2026.11.27
 - **Reglas T1/T2 apagadas por defecto:** el «Caso real» de la portada las enciende para enseñarlas y ahora las apaga al terminar.
 

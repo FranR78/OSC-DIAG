@@ -38,7 +38,7 @@ function rgCondTxt(c){const u=c.unidad?' '+c.unidad:'';
   if(c.op==='entre')return i18('entre')+' '+c.valor[0]+' '+i18('y')+' '+c.valor[1]+u;
   if(c.op==='fuera')return i18('fuera de')+' '+c.valor[0]+'–'+c.valor[1]+u;
   return c.op+' '+c.valor+u}
-const rgSub=(t,v)=>String(t==null?'':t).replace(/\{(cil|valor|pct|canal)\}/g,(m,k)=>v[k]!=null?v[k]:m);
+const rgSub=(t,v)=>String(t==null?'':t).replace(/\{(cil|valor|pct|canal|unidad)\}/g,(m,k)=>v[k]!=null?v[k]:m);
 /* evalúa una regla con la petición del diagnóstico → hallazgos (uno por cilindro o canal que cumple) */
 function rgEval(r,P,p){const H=[],motor=(p.contexto&&p.contexto.motor)||{},S=(p.contexto&&p.contexto.senales)||[],cx=r.contexto||{};
   if(motor.combustible&&rgL(cx.combustible).length&&!rgL(cx.combustible).includes(motor.combustible))return H;
@@ -60,7 +60,7 @@ function rgEval(r,P,p){const H=[],motor=(p.contexto&&p.contexto.motor)||{},S=(p.
       const ev=U.map(({c,m,rk})=>{const v=cyl!=null&&m.por_cilindro?m.por_cilindro[cyl]:m.valor;if(val==null)val=v;
         const e={medida:m.id,canal:m.canal,cilindro:cyl,valor:v,condicion:rgCondTxt(c),etiqueta:'Medido'};
         if(rk){e.comparacion=rk;const q=rk.find(x=>x.cilindro===cyl);if(q&&pct==null)pct=q.pct_mejor}return e});
-      const V={cil:cyl,valor:val,pct,canal:ch};
+      const V={cil:cyl,valor:val,pct,canal:ch,unidad:cyl!=null?'0x'+Number(cyl).toString(16).toUpperCase().padStart(3,'0'):null};  // {unidad}: ID de una unidad CAN
       const NS=(P.notas||[]).filter(n=>rgL(r.notas).includes(n.id)||(r.tema&&n.tema===r.tema));
       H.push({notas_paquete:NS,regla:r.id,tema:r.tema||'',paquete:P.paquete,paquete_nombre:P.nombre||P.paquete,base:!!P.base,fuente:r.fuente||'',estado:r.estado||'',
         local:true,comparativa:r.si.some(c=>c.op==='peor'),confianza:r.confianza||'media',etiqueta:r.etiqueta||'',

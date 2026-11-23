@@ -58,3 +58,14 @@ Es el mismo esquema que las reglas del portal (`API_DIAGNOSTICO.md` §5), en JSO
 Crea, edita, duplica y borra reglas de los paquetes propios, y crea o exporta paquetes. «Copiar una regla de la base» la trae en borrador con el mismo `tema`: cambias el umbral y la fuente, y el diagnóstico enseña los dos criterios. «Probar con la señal actual» evalúa la regla con lo que hay cargado.
 
 Una regla mal escrita no se evalúa. Un paquete importado mal escrito se rechaza y la app dice por qué.
+
+## Medidas de los procedimientos (catálogo `MEDIDAS`, `src/js/35-medidas.js`)
+| id | qué es | unidad | por |
+|---|---|---|---|
+| `ckp_aporte_est_pct` / `_acel_pct` / `_sin_pct` | Aporte de cada cilindro en % del mejor (estable / aceleración / sin combustión) | % | cilindro |
+| `ckp_dientes`, `ckp_vueltas_mal` | Posiciones de la rueda fónica; vueltas mal contadas | — | — |
+| `can_tramas`, `can_h_med`, `can_l_med`, `can_hl_dif_med` | Tramas leídas; niveles típicos de H, L y |H−L| | V | — |
+| `can_rec_h`, `can_rec_l`, `can_dom_h`, `can_dom_l`, `can_dif` | Niveles recesivo y dominante; diferencial de la red | V | — |
+| `can_ov_pct`, `can_crc_mal`, `can_err_tramas` | Sobreoscilación; CRC mal; tramas de error | %, — | — |
+| `can_dif_unidad`, `can_desv_unidad_pct`, `can_ov_unidad_pct`, `can_crc_unidad` | Lo mismo por unidad (ID) | V, % | unidad (`{unidad}` = ID en hex) |
+Skills base que las usan: `fran-ckp.json`, `fran-can.json`.

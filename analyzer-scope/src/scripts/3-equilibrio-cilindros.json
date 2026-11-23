@@ -12,7 +12,7 @@
  "sintomas": "No va fino, tirones, ralentí inestable, vibración, falla un cilindro.",
  "descripcion": "Cuánto aporta cada cilindro; dice cuál falla. El origen (encendido, inyección o mecánica) se confirma en su apartado.",
  "skills": [
-  "contribucion-cilindros"
+  "aporte-cilindro"
  ],
  "pasos": [
   {

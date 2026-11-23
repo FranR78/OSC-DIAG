@@ -11,8 +11,8 @@
  "sintomas": "Falla al acelerar o con carga, pierde fuerza, testigo de avería parpadea.",
  "descripcion": "Fallos de encendido por cilindro y avance.",
  "skills": [
-  "encendido",
-  "avance"
+  "aporte-cilindro",
+  "avance-encendido"
  ],
  "pasos": [
   {

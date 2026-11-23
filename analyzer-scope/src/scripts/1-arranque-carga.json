@@ -12,9 +12,7 @@
  "sintomas": "Arranca con dificultad, no arranca, se descarga la batería, testigo de carga encendido.",
  "descripcion": "Batería, motor de arranque, bujías de incandescencia, compresión durante el arranque y alternador, en una sola captura.",
  "skills": [
-  "bateria",
-  "arranque",
-  "carga",
+  "arranque-carga",
   "compresion-relativa"
  ],
  "pasos": [

@@ -58,10 +58,16 @@ un **simulador didáctico** de irregularidad (δ, RPM en 720°, órdenes de ence
 
 | Fase | Entrega |
 |---|---|
-| S1 | **Medidas con nombre** en el motor (CKP, CAN, compresión, arranque) + catálogo de medidas (id, qué es, unidad, análisis). |
-| S2 | **Sacar criterios del código** a paquetes de skills (CKP 85 %, CAN ISO 11898-2, El Power 9 V / 13,8–15 V…), con autor y fuente. |
-| S3 | **Catálogo e instalación**: app base vacía, instalar/actualizar desde el servidor, `skills_necesarias` en procedimientos. Renombrar Scripts → Procedimientos. |
+| S1 ✅ (CKP, CAN) | **Medidas con nombre** en el motor (CKP, CAN, compresión, arranque) + catálogo de medidas (id, qué es, unidad, análisis). |
+| S2 ✅ (CKP, CAN) · pendiente: canal matemático CAN y El Power (sin análisis aún) | **Sacar criterios del código** a paquetes de skills (CKP 85 %, CAN ISO 11898-2, El Power 9 V / 13,8–15 V…), con autor y fuente. |
+| S3 ✅ renombrar + skills necesarias + activar · pendiente: catálogo en el servidor (instalar/actualizar) | **Catálogo e instalación**: app base vacía, instalar/actualizar desde el servidor, `skills_necesarias` en procedimientos. Renombrar Scripts → Procedimientos. |
 | S4 | **Mis skills privadas + enviar para verificar** (cola en Drive) + publicar. |
 | S5 | Plantillas Excel (skills y procedimientos) + editor con formulario. |
 | S6 | **Informe combinado** (pantalla y PDF): medidas [Medido], hallazgos por skill [Inferido] con fuente y estado, pasos que faltan. |
 | S7 | Modelo de Ortu en JS (curva esperada + demo), validado con sus 34 casos. |
+
+## 7. Estado (2026-11-28)
+* `src/js/35-medidas.js`: catálogo `MEDIDAS`, `ckpMedidas`, `canMedidas`, `mdSkills` (evalúa las skills activas con el mismo motor que «Diagnóstico»), `mdFaltan`.
+* Skills base nuevas: `src/reglas/fran-ckp.json` (5 reglas, 1 nota) y `src/reglas/fran-can.json` (17 reglas, 1 nota). Borrador.
+* Procedimientos: campo `skills` = temas que necesitan (`aporte-cilindro`, `red-can`, `compresion-relativa`, `pulso-cilindro-*`; sin skill aún: `arranque-carga`, `avance-encendido`, `corriente-inyector`).
+* Pendiente: catálogo central en `apps-script-scope` (hoy las skills base siguen incrustadas al construir; pesan KB), criterios del canal matemático CAN, El Power.

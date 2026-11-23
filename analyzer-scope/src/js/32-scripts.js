@@ -1,4 +1,4 @@
-/* ---------- Scripts de captura: pruebas guiadas paso a paso (docs/SCRIPTS.md) ----------
+/* ---------- Procedimientos (antes «scripts»): pruebas guiadas paso a paso (docs/SCRIPTS.md) ----------
    Originales: SCRIPTS_BASE (src/scripts/*.json, solo lectura). Del usuario: localStorage «as_scripts» (duplicar, editar, importar, exportar).
    Cada paso: qué medir, cómo, maniobra en orden, comprobación de la configuración de PicoScope y carga del CSV. */
 const SK_TB=[[.001,'1 ms'],[.002,'2 ms'],[.005,'5 ms'],[.01,'10 ms'],[.02,'20 ms'],[.05,'50 ms'],[.1,'100 ms'],[.2,'200 ms'],[.5,'500 ms'],[1,'1 s'],[2,'2 s'],[5,'5 s'],[10,'10 s']];
@@ -68,16 +68,21 @@ function skPerfil(p,win){
   s+='<text x="4" y="11" font-size="10" fill="var(--mu)">RPM</text></svg>';
   return s+'<div class="skLg">'+p.maniobra.map((f,i)=>'<span><i style="background:'+(SK_FC[f.tipo]||'#8a9bb0')+'"></i>'+(i+1)+'. '+skE(f.fase)+' · '+skT(+f.s)+'</span>').join('')+'</div>';
 }
+/* skills que pide el procedimiento y no están activas: las medidas salen igual, la interpretación no */
+function skFaltaHTML(S){const F=mdFaltan(S);if(!F.length)return(S.skills||[]).length?'<p class="hint skOkS">✓ Skills necesarias activas: '+S.skills.map(skE).join(' · ')+'</p>':'';
+  return '<div class="skA warn skFalta"><b>!</b><span>Este procedimiento necesita skills que no tienes activas: '+F.map(f=>'<b>'+skE(f.tema)+'</b>'+(f.paquete?' <button class="skAct" data-pq="'+esc(f.paquete.paquete)+'">Activar «'+skE(f.paquete.nombre||f.paquete.paquete)+'»</button>':' <small>(aún no hay ninguna)</small>')).join(' · ')+
+    '. Las medidas salen igual; esas partes quedan sin interpretar.</span></div>'}
 /* ---- pintado ---- */
 function skTab(){
   const S=skCur();if(!S)return;SK.sel=S.id;const U=skUser();
   const it=s=>'<button class="skI'+(s.id===S.id?' on':'')+'" data-k="'+esc(s.id)+'"><b>'+skE(s.nombre)+'</b><small>'+(s.sintomas?skE(s.sintomas):skE(s.autor||''))+'</small></button>';
   $('kL').innerHTML='<b class="skH">Qué quieres comprobar</b>'+SCRIPTS_BASE.map(s=>it(Object.assign({},s,{_o:true}))).join('')+
-    '<b class="skH">Mis scripts</b>'+(U.length?U.map(it).join(''):'<p class="hint">Duplica un original para hacer el tuyo.</p>')+
-    '<div class="row"><button id="kImpB">Importar script (.json)…</button></div>';
+    '<b class="skH">Mis procedimientos</b>'+(U.length?U.map(it).join(''):'<p class="hint">Duplica un original para hacer el tuyo.</p>')+
+    '<div class="row"><button id="kImpB">Importar procedimiento (.json)…</button></div>';
   const ori=S._o?null:SCRIPTS_BASE.find(b=>S.origen&&b.id===S.origen.id),nuevo=ori&&S.origen.version&&ori.version!==S.origen.version;
   $('kCab').innerHTML='<div class="skCab"><div class="skTt"><h2>'+skE(S.nombre)+(S.estado==='borrador'?' <span class="skB">BORRADOR</span>':'')+'</h2>'+(S.sintomas?'<p class="skSi"><b>Cuándo entrar:</b> '+skE(S.sintomas)+'</p>':'')+'<p class="hint">'+skE(S.descripcion||'')+'</p>'+
     ((S.combustible||[]).length>1&&S.pasos.some(p=>p.combustible)?'<div class="row skFu"><span class="hint">Motor:</span><button id="kFg" class="'+(SK.fuel==='gasolina'?'on':'')+'">Gasolina</button><button id="kFd" class="'+(SK.fuel==='diesel'?'on':'')+'">Diésel</button></div>':'')+
+    skFaltaHTML(S)+
     (S.origen?'<p class="hint">Copia de «'+skE(S.origen.nombre||S.origen.id)+'»'+(nuevo?' · <b>hay una versión nueva del original</b> ('+skE(ori.version)+')':'')+'</p>':'')+'</div><div class="row">'+
     (S._o?'<span class="hint">Original de '+skE(S.autor||'')+': solo lectura</span><button class="p" id="kDup">Duplicar y editar</button>':
       '<button id="kEd">Editar</button><button id="kDup">Duplicar</button><button id="kExp">Exportar (.json)</button><button id="kDel">'+(SK.del?'¿Borrar? Pulsa otra vez':'Borrar')+'</button>')+'</div></div>';
@@ -146,16 +151,17 @@ function skWire(S){
   $('kSteps').querySelectorAll('.skS').forEach(b=>b.onclick=()=>{SK.step=+b.dataset.s;SK.edit=false;skTab()});
   $('kPaso').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{SK.step=+b.dataset.go;skTab()});
   $('kImpB').onclick=()=>$('kImp').click();
+  document.querySelectorAll('#kCab .skAct').forEach(bt=>bt.onclick=()=>{rgSetActivo(bt.dataset.pq,true);if(typeof rgPanel==='function')rgPanel();skTab();st('Skill activada.')});
   const on=(id,f)=>{const e=$(id);if(e)e.onclick=f};
   on('kDup',()=>{const U=skUser(),c=JSON.parse(JSON.stringify(Object.assign({},S,{_o:undefined})));
     c.id='MIO-'+Date.now().toString(36).toUpperCase();c.nombre=S.nombre+' (copia)';c.autor='';c.origen={id:S.origen?S.origen.id:S.id,nombre:S.origen?S.origen.nombre:S.nombre,version:S.origen?S.origen.version:S.version||''};
-    U.push(c);skSave(U);SK.sel=c.id;SK.step=0;SK.edit=true;skTab();st('Copia creada en «Mis scripts». El original no cambia.')});
+    U.push(c);skSave(U);SK.sel=c.id;SK.step=0;SK.edit=true;skTab();st('Copia creada en «Mis procedimientos». El original no cambia.')});
   on('kEd',()=>{SK.edit=true;skTab()});
   on('kCa',()=>{SK.edit=false;skTab()});
   on('kGu',()=>{let o;try{o=JSON.parse($('kTx').value)}catch(e){$('kESt').textContent='JSON mal escrito: '+e.message;return}
     o.id=S.id;if(S.origen&&!o.origen)o.origen=S.origen;const er=skValida(o);if(er){$('kESt').textContent='No se guarda: '+er+'.';return}
     const U=skUser().map(x=>x.id===S.id?o:x);skSave(U);SK.edit=false;skTab();st('Script guardado.')});
-  on('kExp',()=>saveFile((S.nombre||'script')+'.json',new Blob([JSON.stringify(Object.assign({},S,{_o:undefined}),null,2)],{type:'application/json'})));
+  on('kExp',()=>saveFile((S.nombre||'procedimiento')+'.json',new Blob([JSON.stringify(Object.assign({},S,{_o:undefined}),null,2)],{type:'application/json'})));
   on('kDel',()=>{if(!SK.del){SK.del=true;skTab();return}SK.del=false;skSave(skUser().filter(x=>x.id!==S.id));SK.sel=null;SK.step=0;skTab();st('Script borrado.')});
   const P=skPasos(S),key=P[SK.step-1]?skKey(S,P[SK.step-1]):'';
   on('kFg',()=>{SK.fuel='gasolina';SK.step=0;skTab()});on('kFd',()=>{SK.fuel='diesel';SK.step=0;skTab()});
@@ -176,6 +182,6 @@ $('tabK').onclick=()=>showTab('K');
 $('kIn').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)skCargaCsv(skCur(),SK.step,f)};
 $('kImp').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;let o;
   try{o=JSON.parse(await f.text())}catch(er){st(f.name+': JSON mal escrito.');$('st').classList.add('err');return}
-  const er=skValida(o);if(er){st(f.name+': no es un script válido ('+er+').');$('st').classList.add('err');return}
+  const er=skValida(o);if(er){st(f.name+': no es un procedimiento válido ('+er+').');$('st').classList.add('err');return}
   const U=skUser();if(SCRIPTS_BASE.some(b=>b.id===o.id)||U.some(x=>x.id===o.id))o.id='MIO-'+Date.now().toString(36).toUpperCase();
-  delete o._o;U.push(o);skSave(U);SK.sel=o.id;SK.step=0;skTab();st(f.name+': script importado en «Mis scripts».')};
+  delete o._o;U.push(o);skSave(U);SK.sel=o.id;SK.step=0;skTab();st(f.name+': procedimiento importado en «Mis procedimientos».')};

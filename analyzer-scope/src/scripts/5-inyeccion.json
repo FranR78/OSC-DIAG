@@ -12,7 +12,8 @@
  "sintomas": "Humo negro, golpeteo, consumo alto, falla un inyector, arranque en frío difícil.",
  "descripcion": "Aporte por cilindro en diésel y forma de la corriente del inyector.",
  "skills": [
-  "inyeccion"
+  "aporte-cilindro",
+  "corriente-inyector"
  ],
  "pasos": [
   {

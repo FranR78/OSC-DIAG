@@ -1,4 +1,4 @@
-# Scripts de captura (pestaña «Scripts»)
+# Procedimientos (pestaña «Procedimientos», antes «Scripts»)
 
 Los scripts se agrupan por **sistema**, para que quien tiene una avería entre por lo que le pasa al coche y no haga pruebas a ciegas:
 **Arranque y carga · Integridad mecánica · Equilibrio de cilindros · Encendido · Inyección · Red CAN**. Cada apartado es un script y sus pasos son las pruebas (una captura cada una).
@@ -62,3 +62,7 @@ Sale en las pruebas con `requisitos.criterio: "can"` (`requisitos.bitrate` para 
 4. **Por unidad (ID)**: diferencial que se aparta > 12 % de la mediana, fuera de 1,5–3 V, sobreoscilación > 25 % o CRC mal → sospechosa.
 5. **Sin tramas**: por niveles, H/L a masa (< 0,5 V), a positivo (> 5 V), o H = L (reposo o unidos).
 * Referencia [Teórico]: ISO 11898-2, CAN de alta velocidad. El CAN de baja velocidad tolerante a fallos no está cubierto.
+
+## Skills que necesita cada procedimiento
+`"skills": ["aporte-cilindro", …]` son **temas** de reglas. Vale cualquier skill activa con reglas de ese tema (de Ortu, de Fran o propia).
+Si falta, la cabecera avisa; si está desactivada, ofrece «Activar». Los hallazgos de CKP y CAN salen de las skills activas (`35-medidas.js`), no del código.

@@ -1,0 +1,598 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-can",
+ "nombre": "Fran · Red CAN (ISO 11898-2)",
+ "autor": "Fran Rosales",
+ "version": "2026.11.28",
+ "aviso": "CAN de alta velocidad. El CAN de baja velocidad tolerante a fallos tiene otros niveles. La terminación (60 Ω) se mide con polímetro.",
+ "reglas": [
+  {
+   "id": "FR-CAN-01",
+   "tema": "red-can",
+   "sintoma": "CAN-H a positivo: {valor} V sin tramas",
+   "si": [
+    {
+     "medida": "can_h_med",
+     "op": ">",
+     "valor": 5
+    },
+    {
+     "medida": "can_tramas",
+     "op": "<",
+     "valor": 1
+    }
+   ],
+   "confianza": "alta",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Cortocircuito de CAN-H a positivo en el cableado o en una unidad",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Desconectar unidades una a una hasta que CAN-H vuelva a ≈ 2,5 V",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-02",
+   "tema": "red-can",
+   "sintoma": "CAN-H a masa: {valor} V sin tramas",
+   "si": [
+    {
+     "medida": "can_h_med",
+     "op": "<",
+     "valor": 0.5
+    },
+    {
+     "medida": "can_tramas",
+     "op": "<",
+     "valor": 1
+    }
+   ],
+   "confianza": "alta",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Cortocircuito de CAN-H a masa en el cableado o en una unidad",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Medir resistencia de CAN-H a masa con el contacto quitado",
+     "tipo": "medida",
+     "esperado": "sin continuidad"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-03",
+   "tema": "red-can",
+   "sintoma": "CAN-L a positivo: {valor} V sin tramas",
+   "si": [
+    {
+     "medida": "can_l_med",
+     "op": ">",
+     "valor": 5
+    },
+    {
+     "medida": "can_tramas",
+     "op": "<",
+     "valor": 1
+    }
+   ],
+   "confianza": "alta",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Cortocircuito de CAN-L a positivo",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Desconectar unidades una a una hasta que CAN-L vuelva a ≈ 2,5 V",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-04",
+   "tema": "red-can",
+   "sintoma": "CAN-L a masa: {valor} V sin tramas",
+   "si": [
+    {
+     "medida": "can_l_med",
+     "op": "<",
+     "valor": 0.5
+    },
+    {
+     "medida": "can_tramas",
+     "op": "<",
+     "valor": 1
+    }
+   ],
+   "confianza": "alta",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Cortocircuito de CAN-L a masa",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Medir resistencia de CAN-L a masa con el contacto quitado",
+     "tipo": "medida",
+     "esperado": "sin continuidad"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-05",
+   "tema": "red-can",
+   "sintoma": "Sin tramas y H y L al mismo nivel (diferencia {valor} V)",
+   "si": [
+    {
+     "medida": "can_hl_dif_med",
+     "op": "<",
+     "valor": 0.2
+    },
+    {
+     "medida": "can_h_med",
+     "op": "entre",
+     "valor": [
+      0.5,
+      5
+     ]
+    },
+    {
+     "medida": "can_tramas",
+     "op": "<",
+     "valor": 1
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Bus en reposo (contacto quitado o red dormida)",
+     "etiqueta": "Inferido"
+    },
+    {
+     "texto": "CAN-H y CAN-L unidos",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Repetir con contacto puesto: tiene que haber tráfico",
+     "tipo": "prueba"
+    },
+    {
+     "texto": "Medir resistencia entre CAN-H y CAN-L",
+     "tipo": "medida",
+     "esperado": "≈ 60 Ω"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-06",
+   "tema": "red-can",
+   "sintoma": "Recesivo de CAN-H fuera de 2–3 V ({valor} V)",
+   "si": [
+    {
+     "medida": "can_rec_h",
+     "op": "fuera",
+     "valor": [
+      2,
+      3
+     ]
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "CAN-H con derivación a positivo o a masa",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Medir CAN-H en reposo con el contacto puesto",
+     "tipo": "medida",
+     "esperado": "≈ 2,5 V"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-07",
+   "tema": "red-can",
+   "sintoma": "Recesivo de CAN-L fuera de 2–3 V ({valor} V)",
+   "si": [
+    {
+     "medida": "can_rec_l",
+     "op": "fuera",
+     "valor": [
+      2,
+      3
+     ]
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "CAN-L con derivación a positivo o a masa",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Medir CAN-L en reposo con el contacto puesto",
+     "tipo": "medida",
+     "esperado": "≈ 2,5 V"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-08",
+   "tema": "red-can",
+   "sintoma": "Dominante de CAN-H fuera de 2,75–4,5 V ({valor} V)",
+   "si": [
+    {
+     "medida": "can_dom_h",
+     "op": "fuera",
+     "valor": [
+      2.75,
+      4.5
+     ]
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Transceptor débil o derivación en CAN-H",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Comparar el nivel por unidad en la tabla",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-09",
+   "tema": "red-can",
+   "sintoma": "Dominante de CAN-L fuera de 0,5–2,25 V ({valor} V)",
+   "si": [
+    {
+     "medida": "can_dom_l",
+     "op": "fuera",
+     "valor": [
+      0.5,
+      2.25
+     ]
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Transceptor débil o derivación en CAN-L",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Comparar el nivel por unidad en la tabla",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-10",
+   "tema": "red-can",
+   "sintoma": "Diferencial alto en toda la red ({valor} V)",
+   "si": [
+    {
+     "medida": "can_dif",
+     "op": ">",
+     "valor": 3
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Falta una resistencia de terminación",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Medir entre CAN-H y CAN-L con el contacto quitado",
+     "tipo": "medida",
+     "esperado": "≈ 60 Ω (120 Ω = falta una)"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-11",
+   "tema": "red-can",
+   "sintoma": "Diferencial bajo en toda la red ({valor} V)",
+   "si": [
+    {
+     "medida": "can_dif",
+     "op": "<",
+     "valor": 1.5
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Terminación de más o derivación entre CAN-H y CAN-L",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Medir entre CAN-H y CAN-L con el contacto quitado",
+     "tipo": "medida",
+     "esperado": "≈ 60 Ω (< 50 Ω = sobra carga)"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-12",
+   "tema": "red-can",
+   "sintoma": "Sobreoscilación en los flancos ({valor} %)",
+   "si": [
+    {
+     "medida": "can_ov_pct",
+     "op": ">",
+     "valor": 25
+    }
+   ],
+   "confianza": "baja",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Reflexiones: terminación o ramal en mal estado",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Revisar terminaciones y empalmes del ramal",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-13",
+   "tema": "red-can",
+   "sintoma": "{valor} tramas con CRC mal",
+   "si": [
+    {
+     "medida": "can_crc_mal",
+     "op": ">",
+     "valor": 0
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Interferencias o niveles al límite",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Revisar masas y trenzado del cableado",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-14",
+   "tema": "red-can",
+   "sintoma": "{valor} tramas de error",
+   "si": [
+    {
+     "medida": "can_err_tramas",
+     "op": ">",
+     "valor": 0
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Una unidad detecta errores en la red",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Leer memoria de averías de las unidades",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-15",
+   "tema": "red-can",
+   "sintoma": "Unidad {unidad}: su nivel se aparta un {valor} % del resto",
+   "si": [
+    {
+     "medida": "can_desv_unidad_pct",
+     "op": ">",
+     "valor": 12,
+     "por_cilindro": true
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Unidad {unidad}, su conector o su ramal (resistencia de contacto, transceptor)",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Medir en el conector de la unidad {unidad} y comparar con el de diagnosis",
+     "tipo": "prueba"
+    },
+    {
+     "texto": "Revisar conector y empalmes del ramal de {unidad}",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-16",
+   "tema": "red-can",
+   "sintoma": "Unidad {unidad}: diferencial fuera de 1,5–3 V ({valor} V)",
+   "si": [
+    {
+     "medida": "can_dif_unidad",
+     "op": "fuera",
+     "valor": [
+      1.5,
+      3
+     ],
+     "por_cilindro": true
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Transceptor o ramal de la unidad {unidad}",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Medir en el conector de la unidad {unidad}",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-17",
+   "tema": "red-can",
+   "sintoma": "Unidad {unidad}: {valor} tramas con CRC mal",
+   "si": [
+    {
+     "medida": "can_crc_unidad",
+     "op": ">",
+     "valor": 0,
+     "por_cilindro": true
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Unidad {unidad} o su ramal",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Revisar conector de la unidad {unidad}",
+     "tipo": "prueba"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  }
+ ],
+ "notas": [
+  {
+   "id": "N-CAN-01",
+   "titulo": "Niveles del CAN de alta velocidad",
+   "tema": "red-can",
+   "texto": "# Niveles\n- Recesivo: CAN-H ≈ CAN-L ≈ 2,5 V.\n- Dominante: CAN-H ≈ 3,5 V, CAN-L ≈ 1,5 V, 2 V de diferencia.\n# Dónde\n- Cada unidad transmite con un nivel algo distinto: la que se aparta del resto es la sospechosa.\n# Terminación\n- 60 Ω entre CAN-H y CAN-L con el contacto quitado (dos resistencias de 120 Ω).",
+   "valores": [
+    {
+     "magnitud": "Recesivo CAN-H y CAN-L",
+     "valor": 2.5,
+     "unidad": "V",
+     "condicion": "ISO 11898-2"
+    },
+    {
+     "magnitud": "Dominante CAN-H",
+     "valor": 3.5,
+     "unidad": "V",
+     "condicion": "ISO 11898-2"
+    },
+    {
+     "magnitud": "Dominante CAN-L",
+     "valor": 1.5,
+     "unidad": "V",
+     "condicion": "ISO 11898-2"
+    },
+    {
+     "magnitud": "Diferencial dominante",
+     "min": 1.5,
+     "max": 3,
+     "unidad": "V",
+     "condicion": "ISO 11898-2"
+    },
+    {
+     "magnitud": "Terminación",
+     "valor": 60,
+     "unidad": "Ω",
+     "condicion": "contacto quitado"
+    }
+   ],
+   "fuente": "ISO 11898-2 (CAN de alta velocidad)"
+  }
+ ]
+}

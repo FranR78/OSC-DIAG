@@ -30,7 +30,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
 
   console.log('\n1 · Arranque');
   check('título con los créditos', (await p.title()).includes('J.A.Ortúñez') && (await p.title()).includes('Fran Rosales'));
-  check('nueve pestañas', (await p.$$eval('#tabs .tab', e => e.map(x => x.textContent))).join('|') === 'Osciloscopio|Diagrama de distribución|Compresión relativa|Scripts|Diagnóstico|Unir y convertir CSV|GIF|Instrucciones|Objetivo');
+  check('nueve pestañas', (await p.$$eval('#tabs .tab', e => e.map(x => x.textContent))).join('|') === 'Osciloscopio|Diagrama de distribución|Compresión relativa|Procedimientos|Diagnóstico|Unir y convertir CSV|GIF|Instrucciones|Objetivo');
   check('ajustes de canales visibles por defecto', await E(() => !document.getElementById('leftp').classList.contains('nos')));
   check('sección «Sincronización» plegada por defecto', await E(() => document.getElementById('sBox').hidden));
   check('«Regla de fase» e «Identificación de cilindros» desplegadas al iniciar', await E(() => !$('bPh').hidden && !$('bCy').hidden && $('oPh').checked && $('oCy').checked));
@@ -567,7 +567,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await c7.close();
   }
 
-  console.log('\nF8 · Scripts de captura (pasos guiados para PicoScope)');
+  console.log('\nF8 · Procedimientos (pasos guiados para PicoScope) y skills');
   {
     const k = await ctx.newPage(); const ke = []; k.on('pageerror', e => ke.push(String(e))); k.setDefaultTimeout(6000);
     await k.goto(APP); await k.waitForTimeout(400); await k.click('#tabK'); await k.waitForTimeout(150);
@@ -590,27 +590,34 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await k.click('#kVer'); await k.waitForTimeout(200);
     check('«Ver en el osciloscopio» abre la captura', await KE(() => curTab === 'S' && PG.length >= 1 && CH[0].x));
     await k.click('#tabK'); await k.click('#kDup'); await k.waitForTimeout(150);
-    check('duplicar: copia en «Mis scripts», con editor y sin tocar el original', await KE(() => { const u = JSON.parse(localStorage.getItem('as_scripts')); return u.length === 1 && u[0].origen.id === 'FR-MEC-01' && !!$('kTx') && SCRIPTS_BASE.find(s => s.id === 'FR-MEC-01').nombre === 'Integridad mecánica'; }));
+    check('duplicar: copia en «Mis procedimientos», con editor y sin tocar el original', await KE(() => { const u = JSON.parse(localStorage.getItem('as_scripts')); return u.length === 1 && u[0].origen.id === 'FR-MEC-01' && !!$('kTx') && SCRIPTS_BASE.find(s => s.id === 'FR-MEC-01').nombre === 'Integridad mecánica'; }));
     await k.evaluate(() => { $('kTx').value = $('kTx').value.replace('"pasos": [', '"pasos": [], "x": ['); }); await k.click('#kGu');
     check('editor: un script mal escrito no se guarda y dice por qué', /No se guarda: no tiene pasos/.test(await k.textContent('#kESt')), await k.textContent('#kESt'));
     await k.evaluate(() => { const o = JSON.parse(JSON.stringify(SCRIPTS_BASE[0])); o.nombre = 'Mi mecánica'; $('kTx').value = JSON.stringify(o); }); await k.click('#kGu');
     check('editor: guarda los cambios en la copia', await KE(() => JSON.parse(localStorage.getItem('as_scripts'))[0].nombre === 'Mi mecánica' && /Mi mecánica/.test($('kL').textContent)));
     const ck = await KE(() => { const o = { ick: 0, isy: 1, order: [1, 3, 4, 2], off: 0 }, r = {};
-      for (const [k, q] of [['flojo', { flojo: 3 }], ['fuga', { flojo: 3, fuga: 3 }], ['bien', {}], ['flojo2', { flojo: 2 }]]) { const a = ckpAnaliza(ckpDemo(q), o); r[k] = { a, d: a.err ? [] : ckpDiag(a, 'diesel').map(x => x[0] + ':' + x[2]) }; } return r; });
+      for (const [k, q, f] of [['flojo', { flojo: 3 }, 'gasolina'], ['flojoD', { flojo: 3 }, 'diesel'], ['fuga', { flojo: 3, fuga: 3 }, 'gasolina'], ['bien', {}, 'gasolina'], ['flojo2', { flojo: 2 }, 'gasolina']]) {
+        SK.fuel = f; const a = ckpAnaliza(ckpDemo(q), o); r[k] = { a, d: a.err ? [] : mdSkills(ckpMedidas(a), { cilindros: 4 }).H.map(h => h.regla + ':' + h.sintoma) }; } SK.fuel = 'gasolina'; return r; });
     check('CKP: detecta la rueda 60-2 (58 dientes, hueco de 2)', ck.flojo.a.N === 60 && ck.flojo.a.T === 58 && ck.flojo.a.m === 2, JSON.stringify([ck.flojo.a.err, ck.flojo.a.N, ck.flojo.a.T]));
-    check('CKP: señala al responsable (cil. 3 flojo, cil. 2 flojo) y no a otro', /^bad:Cilindro 3:/.test(ck.flojo.d[0]) && /^bad:Cilindro 2:/.test(ck.flojo2.d[0]) && ck.flojo.d.filter(x => /^bad:Cilindro/.test(x)).length === 1, JSON.stringify([ck.flojo.d, ck.flojo2.d]));
-    check('CKP: separa combustión (mecánica bien) de fuga (también sin combustión)', /combustión/.test(ck.flojo.d[1]) && /fuga de compresión en el cilindro 3/.test(ck.fuga.d[1]), JSON.stringify([ck.flojo.d, ck.fuga.d]));
-    check('CKP: motor sano → aporte uniforme', /^ok:Aporte uniforme/.test(ck.bien.d[0]), JSON.stringify(ck.bien.d));
+    check('skill CKP: señala al responsable (cil. 3 flojo, cil. 2 flojo) y no a otro', /^FR-CKP-01:Cilindro 3:/.test(ck.flojo.d[0]) && /^FR-CKP-01:Cilindro 2:/.test(ck.flojo2.d[0]) && ck.flojo.d.filter(x => /^FR-CKP-01/.test(x)).length === 1, JSON.stringify([ck.flojo.d, ck.flojo2.d]));
+    check('skill CKP: combustión (gasolina/diésel) frente a fuga de compresión', ck.flojo.d.some(x => /^FR-CKP-03:Cilindro 3/.test(x)) && ck.flojoD.d.some(x => /^FR-CKP-04:Cilindro 3.*inyección/.test(x)) && ck.fuga.d.some(x => /^FR-CKP-02:Cilindro 3.*fuga de compresión/.test(x)), JSON.stringify([ck.flojo.d, ck.flojoD.d, ck.fuga.d]));
+    check('skill CKP: motor sano → ningún hallazgo', ck.bien.d.length === 0, JSON.stringify(ck.bien.d));
+    check('el código no lleva umbrales de diagnóstico (CKP_UMBRAL, CAN_REF, ckpDiag, canDiag fuera)', await KE(() => typeof CKP_UMBRAL === 'undefined' && typeof CAN_REF === 'undefined' && typeof ckpDiag === 'undefined' && typeof canDiag === 'undefined'));
     await k.click('#kL .skI[data-k="FR-EQ-01"]'); await k.click('#kSteps .skS[data-s="1"]'); await k.click('#kDemo'); await k.click('#kCkGo'); await k.waitForTimeout(500);
-    check('CKP en la app: señal de ejemplo → tabla por cilindro, gráfica y conclusión', await KE(() => /60-2/.test($('kPaso').textContent) && /\[Medido\] Cilindro 3/.test($('kPaso').textContent) && document.querySelectorAll('.ckT tbody tr').length === 4));
-    const cn = await KE(() => { const a = canAnaliza(canDemo(), { ih: 0, il: 1 }), b = canAnaliza(canDemo({ bajo: false }), { ih: 0, il: 1 }), z = canDemo(); z.chs[1].y = z.chs[1].y.map(() => 0.02); const c = canAnaliza(z, { ih: 0, il: 1 });
-      return { rate: a.rate, tramas: a.tramas, crc: a.crcMal, ids: a.U.map(u => canId(u)).sort().join(), mal: a.U.filter(u => u.mal.length).map(u => canId(u)).join(), da: canDiag(a).map(x => x[2]).join(' | '), db: canDiag(b).map(x => x[2]).join(' | '), dc: canDiag(c).map(x => x[2]).join(' | ') }; });
+    check('CKP en la app: señal de ejemplo → tabla por cilindro, gráfica y conclusión', await KE(() => /60-2/.test($('kPaso').textContent) && /\[Medido\] Cilindro 3: aporta/.test($('kPaso').textContent) && /Fran · Equilibrio de cilindros/.test($('kPaso').textContent) && document.querySelectorAll('.ckT tbody tr').length === 4));
+    const cn = await KE(() => { const H = d => mdSkills(canMedidas(d)).H.map(h => h.regla + ':' + h.sintoma), a = canAnaliza(canDemo(), { ih: 0, il: 1 }), b = canAnaliza(canDemo({ bajo: false }), { ih: 0, il: 1 }), z = canDemo(); z.chs[1].y = z.chs[1].y.map(() => 0.02); const c = canAnaliza(z, { ih: 0, il: 1 });
+      return { rate: a.rate, tramas: a.tramas, crc: a.crcMal, ids: a.U.map(u => canId(u)).sort().join(), da: H(a), db: H(b), dc: H(c) }; });
     check('CAN: 500 kbit/s, tramas decodificadas con CRC correcto y los 4 ID', cn.rate === 5e5 && cn.tramas > 50 && cn.crc === 0 && cn.ids === '0x0C9,0x1A0,0x2F1,0x3E0', JSON.stringify(cn));
-    check('CAN: señala la unidad con el nivel dominante bajo (0x2F1) y solo esa', cn.mal === '0x2F1' && /Unidad con ID 0x2F1: nivel bajo/.test(cn.da), cn.da);
-    check('CAN: red sana → todo correcto; CAN-L a masa → lo dice', /correctos en todas las unidades/.test(cn.db) && /CAN-L a masa/.test(cn.dc), cn.db + ' // ' + cn.dc);
+    check('skill CAN: señala la unidad con el nivel bajo (0x2F1) y solo esa', cn.da.length && cn.da.every(x => /Unidad 0x2F1/.test(x)) && cn.da.some(x => /^FR-CAN-15/.test(x)), JSON.stringify(cn.da));
+    check('skill CAN: red sana → ningún hallazgo; CAN-L a masa → lo dice', cn.db.length === 0 && cn.dc.some(x => /^FR-CAN-04:CAN-L a masa/.test(x)), JSON.stringify([cn.db, cn.dc]));
     await k.click('#kL .skI[data-k="FR-CAN-01"]'); await k.click('#kSteps .skS[data-s="1"]'); await k.click('#kDemo'); await k.click('#kCnGo'); await k.waitForTimeout(600);
-    check('CAN en la app: señal de ejemplo → tabla por unidad y conclusión', await KE(() => /500 kbit\/s/.test($('kPaso').textContent) && /Unidad con ID 0x2F1/.test($('kPaso').textContent) && document.querySelectorAll('.ckT tbody tr').length === 4));
-    check('scripts: sin errores JS', ke.length === 0, ke.join(' | '));
+    check('CAN en la app: señal de ejemplo → tabla por unidad y conclusión', await KE(() => /500 kbit\/s/.test($('kPaso').textContent) && /Unidad 0x2F1: su nivel se aparta/.test($('kPaso').textContent) && document.querySelectorAll('.ckT tr.canMal').length === 1 && document.querySelectorAll('.ckT tbody tr').length === 4));
+    await k.click('#kL .skI[data-k="FR-ARR-01"]'); await k.waitForTimeout(100);
+    check('procedimiento con skills que faltan: lo avisa (arranque-carga) sin bloquear', /necesita skills que no tienes activas: arranque-carga/.test(await k.textContent('#kCab')));
+    await k.evaluate(() => rgSetActivo('fran-can', false)); await k.click('#kL .skI[data-k="FR-CAN-01"]'); await k.waitForTimeout(100);
+    check('skill desactivada: ofrece activarla y al pulsar queda activa', /Activar «Fran · Red CAN/.test(await k.textContent('#kCab')) && await (async () => { await k.click('#kCab .skAct'); await k.waitForTimeout(100); return await KE(() => rgActivo({ paquete: 'fran-can' }) && !/necesita skills/.test($('kCab').textContent)); })());
+    check('catálogo de medidas: cada medida que usan las skills existe en el motor', await KE(() => { const ids = new Set(MEDIDAS.map(m => m.id)); return REGLAS_BASE.filter(P => /^fran-/.test(P.paquete)).every(P => P.reglas.every(r => r.si.every(c => ids.has(c.medida)))); }));
+    check('procedimientos: sin errores JS', ke.length === 0, ke.join(' | '));
     await k.close();
   }
 

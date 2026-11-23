@@ -12,7 +12,7 @@
  "sintomas": "Varios testigos encendidos a la vez, la diagnosis no comunica, averías intermitentes de red, unidades que no responden.",
  "descripcion": "CAN de alta velocidad: niveles de CAN-H y CAN-L, flancos y tramas por unidad. Dice qué falla (a masa, a positivo, terminación) y qué unidad se aparta del resto.",
  "skills": [
-  "can"
+  "red-can"
  ],
  "pasos": [
   {

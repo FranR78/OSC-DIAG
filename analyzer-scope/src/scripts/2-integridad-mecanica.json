@@ -13,10 +13,10 @@
  "descripcion": "Compresión, válvulas, segmentos, distribución y escape por cilindro.",
  "skills": [
   "compresion-relativa",
-  "admision",
-  "escape",
-  "carter",
-  "distribucion"
+  "pulso-cilindro-adm",
+  "pulso-cilindro-car",
+  "pulso-cilindro-esc",
+  "aporte-cilindro"
  ],
  "pasos": [
   {
