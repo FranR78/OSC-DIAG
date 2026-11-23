@@ -2143,7 +2143,7 @@ function pdfDatos(){const an={can:null,ckp:null},act=PG[pgI];
 async function report(){
   if(!window.jspdf)return st('No se pudo cargar el generador de PDF.');
   if(!CH.some(c=>c.x))return st('No hay señales cargadas.');
-  const K=$('pdfBg').value==='k',{jsPDF}=window.jspdf,doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'}),lg=$('logo').src,
+  const K=$('pdfBg').value==='k',{jsPDF}=window.jspdf,doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4',compress:true}),lg=$('logo').src,
     cl=s=>String(s).replace(/∞/g,'inf').replace(/●/g,'-'),
     tc=K?[235,240,248]:[25,25,25],hc=K?[255,255,255]:[20,85,143],mc=K?[160,172,190]:[95,105,120],ok=[34,163,90],bad=[200,45,45],warn=[194,120,0];
   // Open Sans en el PDF (la misma letra que la app y la gráfica); los signos que no tiene se cambian por texto
@@ -2161,15 +2161,15 @@ async function report(){
   let yy=32;
   const line=(t,sz,colr,ind,neg)=>{doc.setFontSize(sz);const L=doc.splitTextToSize(cl(t),275-(ind||0));if(yy+L.length*sz*.42>198){nueva();yy=32}doc.setTextColor(...colr);B(neg);doc.text(L,10+(ind||0),yy);B(0);yy+=L.length*sz*.42+1.4};
   const zoom=ev=>{const v0={t0:view.t0,span:view.span},m0=typeof MARCA!=='undefined'?MARCA:null,w=Math.max(ev.t1-ev.t0,1e-6),pad=Math.max(w*.6,2e-5);
-    view.t0=ev.t0-pad;view.span=w+2*pad;MARCA={t0:ev.t0,t1:ev.t1,txt:ev.txt};draw(K?'dark':'light');const im=cv.toDataURL('image/png');view.t0=v0.t0;view.span=v0.span;MARCA=m0;draw();return im};
+    view.t0=ev.t0-pad;view.span=w+2*pad;MARCA={t0:ev.t0,t1:ev.t1,txt:ev.txt};draw(K?'dark':'light');const im=cv.toDataURL('image/jpeg',.88);view.t0=v0.t0;view.span=v0.span;MARCA=m0;draw();return im};
   const imgH=(w,maxH)=>{let h=w*cv.height/cv.width;if(h>maxH){h=maxH;w=h*cv.width/cv.height}return[w,h]};
   const evLab=e=>{const m=typeof MEDIDAS!=='undefined'&&MEDIDAS.find(x=>x.id===e.medida);return(typeof mlb==='function'?mlb(e.medida):e.medida)+(e.canal?' · '+e.canal:'')+
     (e.cilindro!=null?(m&&m.por==='unidad'?' · '+i18('unidad')+' 0x'+Number(e.cilindro).toString(16).toUpperCase().padStart(3,'0'):' · '+i18('cilindro')+' '+e.cilindro):'')+': '+(typeof rgNumTxt==='function'?rgNumTxt(e.valor):e.valor)+(m&&m.unidad?' '+m.unidad:'')+' ('+e.condicion+') · '+(e.etiqueta||'Medido')};
   /* 1 · portada: resultado. Se escribe al final, cuando ya se sabe en qué página está cada hallazgo */
   head();const pagHall=[];
   /* 2 · la señal */
-  doc.addPage();page++;head();const R=draw(K?'dark':'light'),img=cv.toDataURL('image/png');draw();
-  let[w,h]=imgH(277,100);doc.addImage(img,'PNG',10,30,w,h);
+  doc.addPage();page++;head();const R=draw(K?'dark':'light'),img=cv.toDataURL('image/jpeg',.9);draw();
+  let[w,h]=imgH(277,100);doc.addImage(img,'JPEG',10,30,w,h);
   const fd={usuario:'usuario',bajo:'paso bajo',alto:'paso alto',banda:'ancho de banda'};
   const items=[...CH.filter(c=>c.x&&c.on).map(c=>c.n+(c.p?' ('+c.p+')':'')+' ['+c.u+'] escala '+fmtV(c.vd,c.u)+'/div'+(c.fl!=='off'?' · filtro '+fd[c.fl]+' '+c.f1+(c.fl==='banda'?'-'+c.f2:'')+' Hz':'')+(c.sen?' · sensor ×'+c.sen.k+(c.sen.o?' +'+c.sen.o:''):'')+(c.inv?' · invertido':'')),
     'Vista: '+fmt(view.span,'s')+' desde '+fmt(view.t0,'s')].concat(PG.length>1?['Página '+(pgI+1)+' de '+PG.length+': '+PG[pgI].name]:[])
@@ -2196,7 +2196,7 @@ async function report(){
     let L=[];if(typeof mdDonde==='function'){for(const r of[D.an.can,D.an.ckp])if(r&&!L.length)L=mdDonde(r,x)}
     const Lt=L.filter(e=>isFinite(e.t0)&&isFinite(e.t1));
     if(L.length)line('Dónde: '+L.map(e=>(isFinite(e.t0)?mdMs(e.t0)+' · ':e.b!=null&&e.b!==''?'búfer '+e.b+' · fila '+e.fila+' · ':'')+e.txt).join('  |  '),8.5,tc,0);
-    if(Lt.length){try{const im=zoom(Lt[0]);let[w2,h2]=imgH(180,62);if(yy+h2>196){nueva();yy=32}doc.addImage(im,'PNG',10,yy,w2,h2);
+    if(Lt.length){try{const im=zoom(Lt[0]);let[w2,h2]=imgH(180,62);if(yy+h2>196){nueva();yy=32}doc.addImage(im,'JPEG',10,yy,w2,h2);
       doc.setFontSize(7.5);doc.setTextColor(...mc);doc.text(i18('En rojo, el tramo')+': '+Lt[0].txt+' ('+mdMs(Lt[0].t0)+')',10+w2+4,yy+5);yy+=h2+4}catch(e){}}
     if((x.causas||[]).length){line('Posibles causas',9.5,hc,0,1);x.causas.forEach(c=>line('• '+c.texto+' ['+(c.etiqueta||'Inferido')+']'+(c.como_separar?' — '+c.como_separar:''),8.5,tc,3))}
     if((x.comprobaciones||[]).length){line('Comprobaciones (marca y anota el resultado)',9.5,hc,0,1);

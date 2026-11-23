@@ -10,6 +10,7 @@ Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<v
   - **Una página por hallazgo:** qué es, de qué skill sale, la evidencia con su nombre (no el identificador interno), **dónde** está y la **imagen ampliada del tramo marcado en rojo**, las causas y las **comprobaciones para rellenar en el taller** (casilla, dónde, herramienta, pasos, valor correcto, si sale bien / mal y una línea de «Resultado»).
   - **Tabla por unidad (ID) o por cilindro**, con en rojo lo que señala la skill.
 - El informe sirve tanto para «Diagnóstico» como para los análisis de «Procedimientos» de la captura abierta.
+- Imágenes en JPEG y PDF comprimido: de ~12 MB a ~0,7 MB.
 - Skill **Fran · Red CAN** 2026.12.04: los síntomas se leen mejor («Tramas con CRC mal: 1»).
 
 ## 2026.12.03
