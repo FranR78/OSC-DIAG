@@ -67,8 +67,10 @@ Una regla mal escrita no se evalúa. Un paquete importado mal escrito se rechaza
 | `can_tramas`, `can_h_med`, `can_l_med`, `can_hl_dif_med` | Tramas leídas; niveles típicos de H, L y |H−L| | V | — |
 | `can_rec_h`, `can_rec_l`, `can_dom_h`, `can_dom_l`, `can_dif` | Niveles recesivo y dominante; diferencial de la red | V | — |
 | `can_ov_pct`, `can_crc_mal`, `can_err_tramas` | Sobreoscilación; CRC mal; tramas de error | %, — | — |
+| `can_crc_pct`, `can_suma_dom` | % de tramas con CRC mal; CAN-H + CAN-L en dominante (≈ 5 V) | %, V | — |
+| `can_rec_dif`, `can_sin_ack` | H−L en recesivo; tramas sin ACK (decodificación) | V, — | — |
 | `can_dif_unidad`, `can_desv_unidad_pct`, `can_ov_unidad_pct`, `can_crc_unidad` | Lo mismo por unidad (ID) | V, % | unidad (`{unidad}` = ID en hex) |
-Skills base que las usan: `fran-ckp.json`, `fran-can.json`.
+Skills que las usan: `catalogo/skills/fran-ckp.json`, `catalogo/skills/fran-can.json`. Crear una skill desde documentos: `CREAR_SKILL.md`.
 
 ## Comprobaciones detalladas (2026.12.02)
 Cada elemento de `comprobaciones` admite, además de `texto`, `tipo` y `esperado`:
