@@ -98,6 +98,11 @@
      "medida": "minimo",
      "op": ">",
      "valor": 0.7
+    },
+    {
+     "medida": "maximo",
+     "op": "<",
+     "valor": 1.2
     }
    ],
    "confianza": "baja",

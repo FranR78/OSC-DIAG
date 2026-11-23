@@ -1,0 +1,143 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-carga-arranque",
+ "nombre": "Fran · Batería, arranque y carga",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Método para batería, motor de arranque, cableado y alternador (12 V y mild hybrid de 48 V). Sin reglas: el motor de reglas no tiene entidad de batería ni alternador ni medida de mínima en arranque, rizado o corriente. Todas las cifras son orientativas y varias salen de casos concretos: manda la documentación del modelo.",
+ "acceso": "libre",
+ "reglas": [],
+ "notas": [
+  {
+   "id": "N-CAR-01",
+   "titulo": "Valores de referencia",
+   "tema": "arranque-carga",
+   "texto": "# Arranque\n- Vbat mínima en arranque: no baja de 8 V en el taller. [Criterio]\n- Según autor, mínimas de 9,6, 9,4 y 8,8 V; 8,5-10 V esperado. [Criterio]\n- El multímetro no ve la caída real: 9,1 V con el polímetro frente a 8,4 V con el osciloscopio. [Medido]\n# Batería\n- En reposo y fría: 12,69 V medidos (mínimo 12,6 V) con la batería cargada. [Medido]\n- ⚠ El taller usa 12,4 V aprox. con el coche parado; la fuente da 12,69 V. Manda el criterio del taller; con carga superficial, cargar y repetir. [Criterio]\n- SOH de más de 80 %: buena; de menos de 60 %: cambiar. [Criterio]\n# Alternador\n- Caso medido: 13,65 V y 62 mV de rizado; dato de un caso, no de fabricante. [Medido]\n- Con un diodo cortado, pierde un 33 % de corriente aunque el polímetro marque de 13,8 a 14,4 V. [Inferido]\n# Escritura\n- Tensiones siempre con el componente conectado y en Vbat, no «12 V». [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Vbat mínima en arranque",
+     "min": 8,
+     "unidad": "V",
+     "condicion": "criterio de taller"
+    },
+    {
+     "magnitud": "Mínima en arranque esperada, según autor",
+     "min": 8.5,
+     "max": 10,
+     "unidad": "V",
+     "condicion": "orientativo"
+    },
+    {
+     "magnitud": "Batería en reposo, fría y cargada",
+     "valor": 12.69,
+     "unidad": "V",
+     "condicion": "dato de un caso, no de fabricante (mínimo 12,6 V)"
+    },
+    {
+     "magnitud": "Tensión del alternador en un caso",
+     "valor": 13.65,
+     "unidad": "V",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Rizado del alternador en un caso",
+     "valor": 62,
+     "unidad": "mV",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "SOH de batería buena",
+     "min": 80,
+     "unidad": "%",
+     "condicion": "criterio de una fuente; por debajo de 60 % cambiar"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: arranque y carga"
+  },
+  {
+   "id": "N-CAR-02",
+   "titulo": "Batería y caída en arranque",
+   "tema": "arranque-carga",
+   "texto": "# Batería primero\n- Test de batería, arranque y carga: puntas a bornes, pinza en el cable de batería, CCA y temperatura bien puestos, y el software de otras aplicaciones cerrado. [Teórico OEM]\n- Si no concluye: cargar, contacto y faros 5-10 min y repetir. [Inferido]\n- Tras semanas parado, sospechar sulfatación o consumo parásito. [Inferido]\n# Caída en arranque\n- Con la pinza, medir Vbat y corriente a la vez. [Criterio]\n- Poca corriente y Vbat hundida: batería. Mucha corriente: carga mecánica o motor de arranque. [Criterio]\n- Comparar siempre con una referencia buena: 750 A frente a 400 A delataba una carga externa, no el arranque; dato de un caso, no de fabricante. [Medido]",
+   "valores": [
+    {
+     "magnitud": "Corriente de arranque con carga externa frente a la referencia",
+     "valor": 750,
+     "unidad": "A",
+     "condicion": "dato de un caso, no de fabricante; referencia buena de 400 A"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: arranque y carga"
+  },
+  {
+   "id": "N-CAR-03",
+   "titulo": "Cableado, motor de arranque y mando",
+   "tema": "arranque-carga",
+   "texto": "# Cableado\n- Con 4 canales, medir la caída entre batería y motor de arranque, y la masa, durante el pico de arranque. [Criterio]\n- Una masa de UCE con 785 mV delató el retorno; dato de un caso, no de fabricante. [Medido]\n- Un 0 Ω estático no valida: probar con carga y moviendo el mazo. [Criterio]\n# Motor de arranque\n- Puentear el relé (30-87) con pinza: si pide 50 A sin girar, es el motor. [Medido]\n- Antes, medir en 87 y el fusible: 0 V = circuito abierto, no motor. [Criterio]\n# Mando\n- Motor sano y relé que chasquea: mirar la masa de mando (pin 85) y las alimentaciones de la UCE. [Medido]\n- Una UCE que se reinicia tira el bus CAN. [Medido]\n- Piezas de desguace: pueden traer la misma avería. [Criterio]\n# Síntoma → causa\n- Vbat hundida con poca corriente: batería. [Criterio]\n- Mucha corriente y gira poco: carga mecánica o motor de arranque. [Criterio]\n- Caída alta en cables con corriente normal: cableado. [Inferido]\n- Relé que chasquea y no gira, 87 con 0 V: circuito abierto o mando. [Inferido]",
+   "valores": [
+    {
+     "magnitud": "Tensión en la masa de la UCE durante el arranque",
+     "valor": 785,
+     "unidad": "mV",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Corriente del motor de arranque puenteado que no gira",
+     "valor": 50,
+     "unidad": "A",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: arranque y carga"
+  },
+  {
+   "id": "N-CAR-04",
+   "titulo": "Alternador: canales y rizado",
+   "tema": "arranque-carga",
+   "texto": "# Canales\n- A: rizado en AC. B: señal de mando. C: pinza en el cable de carga. D: tensión DC. [Criterio]\n- Rizado con una fase ausente: diodo cortado. [Inferido]\n# Cuidado\n- A ralentí puede no cargar: añadir cargas (luces, luneta). [Medido]\n- No juzgar solo con el polímetro: con un diodo cortado marca de 13,8 a 14,4 V y pierde un 33 % de corriente. [Inferido]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: arranque y carga"
+  },
+  {
+   "id": "N-CAR-05",
+   "titulo": "Alternador pilotado y sobretensión",
+   "tema": "arranque-carga",
+   "texto": "# Alternador pilotado\n- El regulador sigue la consigna de la UCE: no cambiar el alternador sin mirarla. [Criterio]\n- LIN: decodificar la trama y leer la consigna y las banderas de fallo. [Medido]\n- BSS/BSD (BMW): bus monohilo. [Teórico OEM]\n# Aislar el mando\n- Desconectar la línea de mando: el regulador queda autónomo. [Medido]\n- Si la tensión sigue subiendo (más de 17 V), es el alternador. [Medido]\n- Si se normaliza, UCE o sensor de batería. [Medido]\n# Sobretensión o subtensión mezcladas\n- No siempre es el alternador: un cable puente de baterías de 24 V con la soldadura rota dio picos de más de 50 V; dato de un caso, no de fabricante. [Medido]\n- Probar con el mazo en movimiento y base de tiempos corta. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Tensión con el regulador autónomo que indica alternador defectuoso",
+     "min": 17,
+     "unidad": "V",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: arranque y carga"
+  },
+  {
+   "id": "N-CAR-06",
+   "titulo": "Mild hybrid: dos redes, dos tensiones",
+   "tema": "arranque-carga",
+   "texto": "# Qué cambia\n- Cuatro cosas: quién arranca, qué batería, qué red cae y cómo se mide. [Criterio]\n- Arranca el alternador reversible: 277 ms de arrastre frente a 460 ms con el de 12 V. [Medido]\n- Con el reversible cae la red de 48 V (más de 200 A) y no la de Vbat. [Medido]\n- La batería de 48 V marca 46 V parada, nunca 48. [Medido]\n- Con mucho frío o avería del 48 V arranca el de 12 V. [Criterio]\n# Híbrido\n- El rearranque en marcha puede ser del motor de 12 V y no del eléctrico de alta tensión. [Inferido]\n- Cableado naranja: usar equipo de protección individual (EPI). [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Arrastre con alternador reversible de 48 V",
+     "valor": 277,
+     "unidad": "ms",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Arrastre con motor de arranque de 12 V",
+     "valor": 460,
+     "unidad": "ms",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Batería de 48 V en reposo",
+     "valor": 46,
+     "unidad": "V",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: arranque y carga"
+  }
+ ]
+}

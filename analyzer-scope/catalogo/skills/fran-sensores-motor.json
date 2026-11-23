@@ -284,7 +284,7 @@
    "id": "N-SEN-07",
    "titulo": "Margen útil y qué hacer con un 0 V o un 5 V",
    "tema": "sensores-motor",
-   "texto": "# Lectura\n- Señal en 0 V: cortocircuito a masa o falta de alimentación. [Criterio]\n- Señal en 5 V: circuito abierto o masa perdida. [Criterio]\n- Con 5 V y masa correctos y señal fija: sensor. [Inferido]\n# Antes de cambiar\n- Medir con carga y moviendo el mazo. [Criterio]\n- Medir en los dos extremos del cable. [Criterio]",
+   "texto": "# Lectura\n- Señal en 0 V: cortocircuito a masa o falta de alimentación (el margen útil dice que 0 V es fallo). [Inferido]\n- Señal en 5 V: corte o masa perdida (el margen útil dice que 5 V es fallo). [Inferido]\n- Con 5 V y masa correctos y señal fija: sensor. [Inferido]\n# Antes de cambiar\n- Medir con carga y moviendo el mazo. [Criterio]\n- Medir en los dos extremos del cable. [Criterio]",
    "fuente": "Biblioteca Pico y notas técnicas del portal: sensores de gestión del motor"
   }
  ]

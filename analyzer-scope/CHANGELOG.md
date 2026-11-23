@@ -5,6 +5,7 @@ Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<v
 
 ## 2026.12.06
 - **Skill Transductor de presión 2026.12.06** (biblioteca Pico, WPS500X): 3 reglas en borrador sobre `desv_pico_cil` / `desv_pulso_cil` (escape: empuje más bajo; admisión: jalón más débil; cárter: pico por encima del resto) y 9 notas (dónde medir según síntoma, leer la traza y desfase, adquisición y rangos, escape, restricción de escape, vacío, cárter/PCV, presión en cilindro, junta de culata).
+- **Catálogo completo (15 skills nuevas, borrador):** compresión, distribución, encendido, common rail, PWM, lambda, sensores de motor, carga y arranque, consumo parásito, caída de tensión, ABS, FlexRay, NVH, trifásicos y manejo de PicoScope. 7 reglas (compresión, encendido, lambda ×2, MAP ×2) y ~100 notas.
 - Las skills pueden usar también las medidas del Diagnóstico (API_DIAGNOSTICO §4.2).
 
 ## 2026.12.05

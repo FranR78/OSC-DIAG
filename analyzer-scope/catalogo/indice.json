@@ -14,6 +14,17 @@
   },
   {
    "tipo": "skill",
+   "id": "fran-caida-tension",
+   "nombre": "Fran · Caída de tensión y conexiones",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-caida-tension.json",
+   "temas": [],
+   "reglas": 0
+  },
+  {
+   "tipo": "skill",
    "id": "fran-can",
    "nombre": "Fran · Red CAN (ISO 11898-2)",
    "autor": "Fran Rosales",
@@ -24,6 +35,17 @@
     "red-can"
    ],
    "reglas": 22
+  },
+  {
+   "tipo": "skill",
+   "id": "fran-carga-arranque",
+   "nombre": "Fran · Batería, arranque y carga",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-carga-arranque.json",
+   "temas": [],
+   "reglas": 0
   },
   {
    "tipo": "skill",
@@ -61,6 +83,17 @@
     "compresion-relativa"
    ],
    "reglas": 1
+  },
+  {
+   "tipo": "skill",
+   "id": "fran-consumo-parasito",
+   "nombre": "Fran · Consumo parásito",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-consumo-parasito.json",
+   "temas": [],
+   "reglas": 0
   },
   {
    "tipo": "skill",

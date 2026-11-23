@@ -1,0 +1,104 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-consumo-parasito",
+ "nombre": "Fran · Consumo parásito",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Método para medir y localizar una batería que se descarga en reposo sin abrir circuitos ni despertar el bus. Sin reglas: el consumo en reposo se mide con pinza o con mV en fusibles, no con una medida de canal del analizador. Las cifras (50 mA, 660 mA) salen de un caso o de una tabla concreta: manda la documentación del modelo.",
+ "acceso": "libre",
+ "reglas": [],
+ "notas": [
+  {
+   "id": "N-CP-01",
+   "titulo": "Medir sin abrir el circuito",
+   "tema": "consumo-parasito",
+   "texto": "# Cómo\n- Pinza amperimétrica de CC en la escala de 20 A, puesta a cero antes de pinzarla. [Criterio]\n- Pinzar el positivo que va a la caja de fusibles. [Criterio]\n- La lámpara de pruebas solo dice que hay consumo, no cuánto. [Criterio]\n# Esperar a que se duerma\n- Antes de leer hay que esperar a que los módulos se duerman. [Criterio]\n- En un caso, a los 10 min marcaba 1,11 A y a los 20 min aprox. se estabilizó en 660-700 mA; dato de un caso, no de fabricante. [Medido]\n- El tiempo depende del modelo. [Inferido]",
+   "valores": [
+    {
+     "magnitud": "Consumo a los 10 min de cerrar el coche",
+     "valor": 1.11,
+     "unidad": "A",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Consumo estabilizado tras 20 min aprox.",
+     "min": 660,
+     "max": 700,
+     "unidad": "mA",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: consumo parásito"
+  },
+  {
+   "id": "N-CP-02",
+   "titulo": "Límite aceptable de consumo en reposo",
+   "tema": "consumo-parasito",
+   "texto": "# Límite\n- 50 mA aprox. según la tabla de cargas del fabricante. [Criterio]\n- El autor ha visto coches con 100 mA que aguantan 15 días. [Criterio]\n- ⚠ Otra fuente da 80 mA o menos. Manda la documentación del modelo. [Criterio]\n# Interpretación\n- Por encima del límite tras dormirse el vehículo: hay un consumidor que no se duerme. [Inferido]\n- Un consumo que baja despacio es normal: no es parásito hasta que se estabiliza. [Inferido]",
+   "valores": [
+    {
+     "magnitud": "Límite de consumo en reposo, tabla de fabricante",
+     "max": 50,
+     "unidad": "mA",
+     "condicion": "orientativo"
+    },
+    {
+     "magnitud": "Consumo en reposo que aguanta 15 días en un caso",
+     "valor": 100,
+     "unidad": "mA",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Límite en otra fuente",
+     "max": 80,
+     "unidad": "mA",
+     "condicion": "⚠ discrepa de los 50 mA"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: consumo parásito"
+  },
+  {
+   "id": "N-CP-03",
+   "titulo": "Localizar el circuito con mV sobre los fusibles",
+   "tema": "consumo-parasito",
+   "texto": "# Procedimiento\n- Polímetro en mV sobre los dos contactos de cada fusible, con el fusible puesto. [Criterio]\n- 0,0 mV: no pasa corriente por ese fusible. [Criterio]\n- Convertir mV a corriente con la tabla del tipo y amperaje del fusible. [Criterio]\n- Ejemplo: mini de 15 A con 2,9 mV son 633 mA aprox., que cuadra con los 660 mA de la pinza. [Medido]\n# Del fusible al consumidor\n- Esquema eléctrico: ver qué cuelga de ese fusible. [Criterio]\n- Confirmar actuando sobre el consumidor: en el caso, al cerrar el maletero cayeron el consumo y la caída de tensión del fusible. [Medido]\n# Síntoma → causa\n- Consumo alto y estable tras dormirse: un consumidor activo; mirar el fusible con más mV. [Inferido]\n- Consumo que cae al actuar sobre un elemento: ese elemento es el que no se apaga (por ejemplo, un interruptor del maletero). [Medido]",
+   "valores": [
+    {
+     "magnitud": "Caída en un fusible mini de 15 A",
+     "valor": 2.9,
+     "unidad": "mV",
+     "condicion": "equivale a 633 mA aprox.; dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: consumo parásito"
+  },
+  {
+   "id": "N-CP-04",
+   "titulo": "Por qué no sacar fusibles ni el borne",
+   "tema": "consumo-parasito",
+   "texto": "# Regla\n- Quitar o reponer un fusible, o el borne, despierta el bus y todos los módulos. [Medido]\n- El consumo se dispara y hay que esperar otra vez a que se duerman. [Medido]\n# Excepción\n- Retirar fusibles uno a uno valía en coches sin red de módulos (carburación, primeras inyecciones). [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: consumo parásito"
+  },
+  {
+   "id": "N-CP-05",
+   "titulo": "Consumos intermitentes o prolongados",
+   "tema": "consumo-parasito",
+   "texto": "# Cuando la pinza no basta\n- Si el consumo aparece y desaparece, usar osciloscopio con pinza o shunt y base de tiempos larga. [Criterio]\n- Posible captura de más de 13 h; el software admite más de 2 días. [Teórico OEM]\n- En un caso se vio un módulo que se despierta cada 15 min. [Medido]\n# Conexión\n- Conectar sin soltar el borne (despierta el bus). [Criterio]\n- Con despertares de más de 30 A, no usar un shunt de 100 W. [Inferido]",
+   "valores": [
+    {
+     "magnitud": "Periodo de despertar de un módulo en un caso",
+     "valor": 15,
+     "unidad": "min",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Despertar a partir del cual no usar un shunt de 100 W",
+     "min": 30,
+     "unidad": "A",
+     "condicion": "orientativo"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: consumo parásito"
+  }
+ ]
+}

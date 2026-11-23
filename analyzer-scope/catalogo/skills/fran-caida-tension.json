@@ -1,0 +1,99 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-caida-tension",
+ "nombre": "Fran · Caída de tensión y conexiones",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Método de caída de tensión con osciloscopio para localizar resistencias parásitas (masas, positivos, conectores, relés) con el circuito en carga. Sin reglas: la caída admisible depende del circuito y no hay entidad ni medida que la acote. Los 8 V y los 4,3 V son casos concretos, no umbrales.",
+ "acceso": "libre",
+ "reglas": [],
+ "notas": [
+  {
+   "id": "N-CT-01",
+   "titulo": "Idea: la caída solo se ve con corriente",
+   "tema": "caida-tension",
+   "texto": "# Principio\n- Una resistencia parásita (masa corroída, terminal sulfatado, soldadura agrietada) solo se ve con corriente: sin consumo no hay caída. [Medido]\n- La tensión de alimentación y de masa se mide con el componente conectado y funcionando. Desconectado, solo resistencia y continuidad. [Criterio]\n- Un 0 Ω no valida una masa: un solo hilo de cobre da 0 Ω y no aguanta la corriente. [Medido]\n- Tras reparar, volver a medir con carga, no con óhmetro. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: caída de tensión"
+  },
+  {
+   "id": "N-CT-02",
+   "titulo": "Cómo medir la caída: flotante o masa común",
+   "tema": "caida-tension",
+   "texto": "# Identificar el equipo\n- Entradas flotantes (series 4225, 4425 y «A») o masa común (series antiguas). [Teórico OEM]\n# Flotante\n- Punta en un extremo del tramo y pinza de masa del mismo canal en el otro: la caída sale directa en un canal. [Teórico OEM]\n# Masa común\n- Canal A en un extremo y canal B en el otro, ambas masas al chasis, y canal matemático A − B. [Teórico OEM]\n- También vale medir cada extremo contra la masa de batería: la caída es la diferencia. [Inferido]\n# Límites\n- Flotación de ±30 V del negativo respecto al chasis. [Teórico OEM]\n- Cuidado con los picos de autoinducción (encendido, inyectores, CKP). [Teórico OEM]\n- El negativo flotante carga más que el positivo: no usarlo en CAN o FlexRay ni en señales sensibles. [Teórico OEM]\n# Qué leer\n- El tramo positivo (borne a consumidor) y el de masa (consumidor a borne −) por separado; la suma explica la tensión que falta al componente. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Límite de flotación del negativo respecto al chasis",
+     "min": -30,
+     "max": 30,
+     "unidad": "V",
+     "condicion": "entradas flotantes"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: caída de tensión"
+  },
+  {
+   "id": "N-CT-03",
+   "titulo": "Puntos de conexión, de menos a más invasivo",
+   "tema": "caida-tension",
+   "texto": "# Orden\n- 1.º Terminales expuestos: bornes, B+ del alternador, motor de arranque, tomas de masa. [Criterio]\n- 2.º Cable de derivación o caja de desconexión (breakout). [Criterio]\n- 3.º Back-probe: pinchar por detrás del conector enchufado con sonda fina, sin abrir terminales ni dañar gomas. [Criterio]\n- 4.º Perforar el aislante: último recurso; sellar después o entra humedad y aparecen caídas. [Criterio]\n- 5.º Caja de fusibles: pinza en un cable de derivación en lugar del fusible, solo para actuadores de consumo relevante. [Criterio]\n# Avisos\n- Para consumos parásitos no se sacan fusibles (despierta el bus): ver el paquete de consumo parásito. [Criterio]\n- No mover mazos ni conectores antes de capturar: se corrige la avería intermitente sin querer. [Criterio]\n- Sensor: medir en la UCE; actuador: en el propio componente. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: caída de tensión"
+  },
+  {
+   "id": "N-CT-04",
+   "titulo": "Localizar el tramo con la caída",
+   "tema": "caida-tension",
+   "texto": "# Pasos\n- Poner el componente en carga y capturar a base lenta (1 s/div). [Medido]\n- ¿Cae en el positivo o en la masa? Una tensión residual en el hilo de masa indica masa mala. [Criterio]\n- Manipular la zona sospechosa con la captura en marcha: si la tensión se mueve, es esa unión. [Criterio]\n- Puentear con masa o positivo provisional: si desaparece el síntoma, confirmado. [Medido]\n- Si el fusible está sano, seguir el cable punto a punto hasta el pin: llega sin tensión si está cortado. [Medido]\n# Síntoma → causa (casos, no umbrales)\n- Electroventilador sin girar con 8 V aprox. en el hilo de masa: pintura en el punto de masa. [Medido]\n- Relé con soldadura fatigada: alimentación del sensor a 4,3 V con 11 A. [Medido]\n- Velocímetro desajustado: caídas de tensión en los arranques. [Medido]\n- Mala masa en una dirección con FlexRay: ver el paquete de FlexRay. [Criterio]\n- Los valores son de casos concretos, no de fabricante: no son umbrales. [Inferido]",
+   "valores": [
+    {
+     "magnitud": "Tensión residual en el hilo de masa del electroventilador",
+     "valor": 8,
+     "unidad": "V",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Alimentación del sensor con relé de soldadura fatigada",
+     "valor": 4.3,
+     "unidad": "V",
+     "condicion": "dato de un caso con 11 A, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: caída de tensión"
+  },
+  {
+   "id": "N-CT-05",
+   "titulo": "Medir resistencia con divisor",
+   "tema": "caida-tension",
+   "texto": "# Montaje\n- Resistencia fija de 10 kΩ en serie con la resistencia R (componente aislado). [Medido]\n- Canal A = tensión total; canal B = tensión en R. [Medido]\n- Canal matemático B / ((A − B) / 10000). [Medido]\n# Límites\n- Alcance de 50 kΩ aprox. por la impedancia del canal. [Inferido]\n- Vigilar la potencia de la resistencia patrón. [Criterio]\n- Con el módulo PicoBNC+ no hace falta. [Teórico OEM]\n- Es resistencia, no caída en carga: no sustituye a la medida con corriente. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Resistencia patrón del divisor",
+     "valor": 10,
+     "unidad": "kohm",
+     "condicion": "en serie con la resistencia medida"
+    },
+    {
+     "magnitud": "Alcance máximo de la resistencia a medir",
+     "max": 50,
+     "unidad": "kohm",
+     "condicion": "por la impedancia del canal"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: caída de tensión"
+  },
+  {
+   "id": "N-CT-06",
+   "titulo": "ConnectDetect y sus límites",
+   "tema": "caida-tension",
+   "texto": "# Qué es\n- Solo en las series 4x25 y 4x25A con sondas x1. [Teórico OEM]\n- Verde o rojo según contacto bueno o malo de la punta; ve conexión si el circuito es de menos de 100 kΩ. [Teórico OEM]\n# Qué no hace\n- No distingue abierto de masa. [Teórico OEM]\n- No sirve de continuidad. [Teórico OEM]\n- No vale con sensores de alta impedancia (picado, lambda) ni con bases de tiempo muy lentas. [Teórico OEM]\n- ⚠ Una fuente lo describe como «continuidad»; manda la que lo limita a contacto de la punta. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Circuito máximo en el que ConnectDetect ve conexión",
+     "max": 100,
+     "unidad": "kohm",
+     "condicion": "series 4x25 y 4x25A, sondas x1"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: caída de tensión"
+  }
+ ]
+}
