@@ -28,3 +28,7 @@ function dxAnPanel(){const el=$('xAn');if(!el)return;const K=dxAnNecesarios(),L=
 {const f=dxPeticion;dxPeticion=function(){const p=f();if(DXA.can&&!DXA.can.err)p.medidas.push(...canMedidas(DXA.can));if(DXA.ckp&&!DXA.ckp.err)p.medidas.push(...ckpMedidas(DXA.ckp));return p}}
 {const f=dxMedidas;dxMedidas=function(){const p=f();dxAnPanel();return p}}
 {const f=dxGo;dxGo=function(){dxAnNecesarios().forEach(dxAnRun);return f()};$('xGo').onclick=dxGo}  // siempre con la señal y los canales de ahora
+{const f=dxShow;dxShow=function(res){f(res);const box=$('xRes');if(!box)return;let h='';
+  for(const[k,fn] of [['can',canMedidas],['ckp',ckpMedidas]]){const r=DXA[k];if(!r||r.err)continue;
+    mdSkills(fn(r)).H.forEach(x=>{const d=mdDondeHTML(r,x,null);if(d)h+='<div class="s"><b>'+esc(x.sintoma)+'</b>'+d+'</div>'})}
+  if(h){const el=document.createElement('div');el.className='mdBox';el.innerHTML='<b>'+i18('Dónde está en la señal')+'</b>'+h;box.appendChild(el)}}}

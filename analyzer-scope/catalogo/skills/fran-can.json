@@ -3,7 +3,7 @@
  "paquete": "fran-can",
  "nombre": "Fran · Red CAN (ISO 11898-2)",
  "autor": "Fran Rosales",
- "version": "2026.11.31",
+ "version": "2026.12.01",
  "aviso": "CAN de alta velocidad. El CAN de baja velocidad tolerante a fallos tiene otros niveles. La terminación (60 Ω) se mide con polímetro.",
  "reglas": [
   {
@@ -582,6 +582,39 @@
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-19",
+   "tema": "red-can",
+   "sintoma": "{valor} tramas sin confirmar (ACK): nadie las recibe",
+   "si": [
+    {
+     "medida": "can_sin_ack",
+     "op": ">",
+     "valor": 0
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "La unidad que transmite está sola en la red (resto desconectado o sin alimentación)",
+     "etiqueta": "Inferido"
+    },
+    {
+     "texto": "Línea abierta entre esa unidad y las demás",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Comprobar alimentación y masa de las demás unidades de la red",
+     "tipo": "medida",
+     "esperado": "batería en su alimentación"
+    }
+   ],
+   "fuente": "ISO 11898-1 (acuse de recibo)",
    "estado": "borrador"
   }
  ],

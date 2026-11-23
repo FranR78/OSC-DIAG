@@ -3,6 +3,11 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.12.01
+- **Dónde está cada hallazgo:** cada hallazgo de CAN y del cigüeñal lista los tramos que lo muestran: trama con CRC mal (instante e ID leído, «dudoso»), tramas de la unidad que se aparta, carrera del cilindro flojo en cada ciclo.
+- **«Ver en la señal»:** abre la captura en el osciloscopio, amplía ese tramo y lo marca en rojo con su nombre. En «Procedimientos» y en «Diagnóstico» («Dónde está en la señal»).
+- **Tabla de decodificación completa:** exporta todas las columnas desde PicoScope; la app usa Start/End Time, DLC, CRC Valid, Bit Stuffing Valid, Valid y ACK (tramas malas con su instante, tramas sin confirmar) y descarta el resto. Skill **Fran · Red CAN** 2026.12.01: regla nueva «tramas sin ACK».
+
 ## 2026.11.31
 - **Tabla de decodificación CAN de PicoScope** (Desc. serie → exportar CSV: ID, datos, tensión máx./mín.) en «Procedimientos → Red CAN»: pesa muy poco. Deduce el canal decodificado (diferencial, CAN-H o CAN-L), descarta las filas cortadas en el borde del búfer y compara la amplitud de cada ID con el resto; la skill señala la que se aparta. Sin flancos ni CRC (para eso, la forma de onda).
 - Skill **Fran · Red CAN** 2026.11.31: regla nueva del diferencial recesivo (−0,5…0,05 V). Sale «Actualizar» en el catálogo.

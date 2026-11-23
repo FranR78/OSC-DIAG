@@ -55,10 +55,10 @@ function ckpCore(E,Y,o){
   // ciclos y ventanas de cada cilindro
   const W=720/n,cyc=[];let k=0,a0=th0;while(a0>am[0])a0-=720;
   for(;a0+720<=am[am.length-1];a0+=720){
-    const c={t0:null,t1:null,d:{},ok:true};
+    const c={t0:null,t1:null,d:{},w:{},ok:true};
     for(let j=0;j<n;j++){const s=a0+j*W,i0=lb(am,s),i1=lb(am,s+W);if(i1-i0<3){c.ok=false;break}
       const e=Math.min(i1,rs.length-1),v0=rs[i0],v1=rs[e],sp=(am[e]-am[i0])||1;let mx=-Infinity;  // pico sobre la cuerda inicio→fin: quita la tendencia (acelera o se para)
-      for(let i=i0;i<i1;i++){const q=rs[i]-(v0+(v1-v0)*(am[i]-am[i0])/sp);if(q>mx)mx=q}c.d[o.order[j]]=mx;
+      for(let i=i0;i<i1;i++){const q=rs[i]-(v0+(v1-v0)*(am[i]-am[i0])/sp);if(q>mx)mx=q}c.d[o.order[j]]=mx;c.w[o.order[j]]=[tm[i0],tm[i1-1]];
       if(j===0)c.t0=tm[i0];if(j===n-1)c.t1=tm[i1-1]}
     if(!c.ok)continue;let s=0,q=0;for(let i=lb(am,a0);i<lb(am,a0+720);i++){s+=rp[i];q++}c.rpm=s/q;
     c.comb=Y?Y.some(t=>t>=c.t0-.002&&t<=c.t1):true;cyc.push(c)}
@@ -68,7 +68,7 @@ function ckpCore(E,Y,o){
     const md={};o.order.forEach(c=>md[c]=ckpMed(L.map(q=>q.d[c])));const mx=Math.max(...Object.values(md));
     R[g]={n:L.length,rpm:Math.round(ckpMed(L.map(q=>q.rpm))),pct:Object.fromEntries(o.order.map(c=>[c,mx>0?Math.max(0,Math.round(md[c]/mx*100)):0]))}}
   const st=Math.max(1,Math.floor(rp.length/700)),serie=[];for(let i=0;i<rp.length;i+=st)serie.push([tm[i],rp[i]]);
-  return{N,T,m,sinFase,pares:Object.fromEntries(o.order.map((c,j)=>[c,o.order[(j+n/2)%n]])),vueltasMal:bad,vueltas:G.length-1,ciclos:cyc.length,R,cyc:cyc.map(c=>({t0:c.t0,t1:c.t1,reg:c.reg})),serie,warn,order:o.order,dur:E[E.length-1]-E[0]};
+  return{N,T,m,sinFase,pares:Object.fromEntries(o.order.map((c,j)=>[c,o.order[(j+n/2)%n]])),vueltasMal:bad,vueltas:G.length-1,ciclos:cyc.length,R,cyc:cyc.map(c=>({t0:c.t0,t1:c.t1,reg:c.reg,w:c.w})),serie,warn,order:o.order,dur:E[E.length-1]-E[0]};
 }
 /* tabla de DeepMeasure (PicoScope 7) exportada a CSV: instantes de cada diente desde «Tiempo de inicio» / «Tiempo final» */
 function ckpDeepMeasure(txt){
@@ -119,7 +119,7 @@ function ckpCard(key,cv){
     h+='<div class="skKv"><div><small>Rueda fónica</small><b>'+r.N+'-'+r.m+'</b></div><div><small>Dientes por vuelta</small><b>'+r.T+'</b></div><div><small>Vueltas</small><b>'+r.vueltas+'</b></div><div><small>Ciclos (720°)</small><b>'+r.ciclos+'</b></div></div>';
     const sk=mdSkills(ckpMedidas(r),{cilindros:r.order.length}),mk={est:mdMarcados(sk,'ckp_aporte_est_pct'),acel:mdMarcados(sk,'ckp_aporte_acel_pct'),sin:mdMarcados(sk,'ckp_aporte_sin_pct')};
     h+='<div class="skCk">'+r.warn.map(w=>'<div class="skA warn"><b>!</b><span>'+w+'</span></div>').join('')+ckpMedido(r).map(l=>'<div class="skA '+l[0]+'"><b>'+(l[0]==='ok'?'✓':'!')+'</b><span><b>[Medido]</b> '+l[1]+'</span></div>').join('')+'</div>'+
-      mdHallazgosHTML(sk,'Las skills activas no señalan ningún cilindro.');
+      mdHallazgosHTML(sk,'Las skills activas no señalan ningún cilindro.',{r,ds:cv.ds&&cv.ds[0]||null});
     const G=[['est','Estable'],['acel','Aceleración'],['sin','Sin combustión']].filter(g=>r.R[g[0]]);
     h+='<div class="skTw" style="margin-top:10px"><table class="skTb ckT"><thead><tr><th>Cilindro</th>'+G.map(g=>'<th>'+g[1]+' <small>('+r.R[g[0]].n+' ciclos · '+r.R[g[0]].rpm+' RPM)</small></th>').join('')+'</tr></thead><tbody>'+
       r.order.slice().sort((a,b)=>a-b).map(c=>'<tr><td><span class="skCh" style="background:'+crCol(c)+'">'+c+'</span></td>'+G.map(g=>{const v=r.R[g[0]].pct[c];

@@ -22,6 +22,7 @@ const MEDIDAS=[
   {id:'can_crc_mal',nombre:'Tramas con CRC mal',unidad:'',analisis:'can',que:'Tramas cuyo CRC-15 no cuadra'},
   {id:'can_err_tramas',nombre:'Tramas de error',unidad:'',analisis:'can',que:'Dominantes de 6 bits o más'},
   {id:'can_rec_dif',nombre:'Diferencial recesivo de la red',unidad:'V',analisis:'can',que:'H−L en recesivo (tabla de decodificación del canal diferencial)'},
+  {id:'can_sin_ack',nombre:'Tramas sin confirmar (ACK)',unidad:'',analisis:'can',que:'Tramas que ninguna otra unidad confirmó (columna ACK de la decodificación)'},
   {id:'can_dif_unidad',nombre:'Diferencial dominante por unidad',unidad:'V',analisis:'can',por:'unidad',que:'Diferencial de las tramas de cada ID'},
   {id:'can_desv_unidad_pct',nombre:'Desviación de la unidad frente al resto',unidad:'%',analisis:'can',por:'unidad',que:'|diferencial de la unidad − mediana| / mediana'},
   {id:'can_ov_unidad_pct',nombre:'Sobreoscilación por unidad',unidad:'%',analisis:'can',por:'unidad',que:'Sobreoscilación de los flancos de cada ID'},
@@ -49,13 +50,14 @@ function mdSkills(medidas,ctx){const p={medidas,contexto:{motor:Object.assign({c
     if(rgValida({paquete:'xx',reglas:[r]}).length)return;H.push(...rgEval(r,P,p))}));
   return{H,usadas:[...usadas]}}
 const mdSev=h=>h.confianza==='alta'?'bad':h.confianza==='baja'?'warn':'bad';
-function mdHallazgosHTML(res,vacio){
+function mdHallazgosHTML(res,vacio,ctx){
   if(!res.usadas.length)return '<div class="skCk"><div class="skA warn"><b>!</b><span>Ninguna skill activa interpreta estas medidas. Actívala o instálala en «Diagnóstico → Fuente de conocimiento».</span></div></div>';
   let h='<div class="skCk">';
   if(!res.H.length)h+='<div class="skA ok"><b>✓</b><span>'+vacio+'</span></div>';
   res.H.forEach(x=>{h+='<div class="skA '+mdSev(x)+' mdH"><b>'+(mdSev(x)==='bad'?'✗':'!')+'</b><span><b>[Medido]</b> '+esc(x.sintoma)+(x.estado==='borrador'?' <span class="skB">BORRADOR</span>':'')+
     (x.causas.length?'<br><b>[Inferido]</b> '+x.causas.map(c=>esc(c.texto)+(c.como_separar?' <i>('+esc(c.como_separar)+')</i>':'')).join(' · '):'')+
     (x.comprobaciones.length?'<br><b>Comprobar:</b> '+x.comprobaciones.map(c=>esc(c.texto)+(c.esperado?' → '+esc(c.esperado):'')).join(' · '):'')+
+    (ctx&&typeof mdDondeHTML==='function'?mdDondeHTML(ctx.r,x,ctx.ds):'')+
     '<br><small class="hint">'+esc(x.paquete_nombre)+(x.fuente?' · '+esc(x.fuente):'')+'</small></span></div>'});
   return h+'</div><p class="hint">Skills usadas: '+res.usadas.map(esc).join(' · ')+'</p>'}
 /* qué (cilindro/unidad) señala alguna skill, para marcar la tabla */

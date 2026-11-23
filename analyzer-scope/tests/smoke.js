@@ -641,6 +641,17 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
       L.push(fila(1, '03FFF804', '', 2.2), fila(1, 280, '93 A1 00', 2.2));
       const r = canDeco(L.join('\n')); return { tipo: r.tipo, tramas: r.tramas, inc: r.incompletas, H: mdSkills(canMedidas(r)).H.map(h => h.regla + ':' + h.sintoma) }; });
     check('tabla de decodificación CAN: tipo diferencial, filas cortadas fuera y la unidad 0x1A0 señalada por la skill', dco.tipo === 'dif' && dco.tramas === 60 && dco.inc === 2 && dco.H.some(x => /^FR-CAN-15:Unidad 0x1A0/.test(x)) && !dco.H.some(x => /0x280|0x480/.test(x)), JSON.stringify(dco));
+    const loc = await KE(() => { const a = canAnaliza(canDemo({ crcMal: true }), { ih: 0, il: 1 }), H = mdSkills(canMedidas(a)).H, h = H.find(x => x.regla === 'FR-CAN-13');
+      const L = ['Packet,Start Time,End Time,ID,DLC,Data,CRC Valid,Bit Stuffing Valid,Valid,ACK,Max Voltage,Min Voltage,Voltage Delta'];
+      for (let i = 0; i < 12; i++) L.push((i + 1) + ',' + (i * 1.2) + ' ms,' + (i * 1.2 + 0.23) + ' ms,280,8,93 A1 00 00 A1 FF FF 00,' + (i === 7 ? 'False' : 'True') + ',True,' + (i === 7 ? 'False' : 'True') + ',' + (i === 3 ? 'No' : 'Yes') + ',2.2,-0.07,2.27');
+      const d = canDeco(L.join('\n')), Hd = mdSkills(canMedidas(d)).H, hd = Hd.find(x => x.regla === 'FR-CAN-13');
+      return { donde: h ? mdDonde(a, h).map(x => x.txt) : [], crc: d.crcMal, ack: d.sinAck, ev: d.EV.map(e => +(e.t0 * 1e3).toFixed(2)), dd: hd ? mdDonde(d, hd).map(x => (x.t0 * 1e3).toFixed(1) + ' ' + x.txt) : [], r19: Hd.some(x => x.regla === 'FR-CAN-19') }; });
+    check('localizar: la trama con CRC mal sale con su instante e ID leído (dudoso)', loc.donde.length === 1 && /CRC mal · ID 0x[0-9A-F]{3} \(dudoso\)/.test(loc.donde[0]), JSON.stringify(loc));
+    check('decodificación con todas las columnas: usa CRC Valid, ACK y Start Time (trama mala a 8,4 ms)', loc.crc === 1 && loc.ack === 1 && loc.ev[0] === 8.4 && /^8\.4 CRC mal/.test(loc.dd[0]) && loc.r19, JSON.stringify(loc));
+    await k.evaluate(() => showTab('K')); await k.click('#kL .skI[data-k="FR-EQ-01"]'); await k.click('#kSteps .skS[data-s="1"]'); await k.waitForTimeout(150);
+    if (!(await k.$('#kCkGo'))) { await k.click('#kDemo'); }
+    await k.click('#kCkGo'); await k.waitForTimeout(500); await k.click('#kPaso .mdV'); await k.waitForTimeout(300);
+    check('«Ver en la señal»: abre la captura en el osciloscopio, amplía la carrera del cilindro y la marca', await KE(() => curTab === 'S' && MARCA && /Cilindro 3/.test(MARCA.txt) && view.t0 < MARCA.t0 && view.t0 + view.span > MARCA.t1 && view.span < 0.2));
     check('procedimientos: sin errores JS', ke.length === 0, ke.join(' | '));
     await k.close();
   }
