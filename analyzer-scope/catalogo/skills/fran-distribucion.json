@@ -1,0 +1,90 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-distribucion",
+ "nombre": "Fran · Sincronismo de la distribución",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Calado de la distribución con CKP y CMP: método, tabla síntoma-causa y confirmación con presión en cilindro. Sin reglas: el desfase correcto depende del motor y de la rueda fónica, y aaa, rce, aae, rca y cruce se comparan con un patrón del mismo motor. Cifras de los ejemplos son de casos, no de fabricante.",
+ "acceso": "libre",
+ "reglas": [],
+ "notas": [
+  {
+   "id": "N-DIST-01",
+   "titulo": "Principio: sensores frente a calado estático",
+   "tema": "sincronismo-distribucion",
+   "texto": "# Principio\n- CKP y CMP dan la posición real de cada árbol respecto al cigüeñal. El útil de calado estático no la da en marcha: con holgura, encaja y engaña. [Criterio]\n- El código de correlación llega tarde o no llega: la UCE solo salta con un desfase grande (unos 3° de árbol). [Inferido]\n- Sin patrón de comparación, una cifra suelta no vale. [Criterio]\n# Alcance\n- El paquete no tiene reglas: el desfase correcto depende del motor y de la rueda fónica. Las medidas de distribución (aaa, rce, aae, rca, cruce) se leen con cursores y se comparan con un patrón.",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sincronismo-distribucion"
+  },
+  {
+   "id": "N-DIST-02",
+   "titulo": "Método paso a paso",
+   "tema": "sincronismo-distribucion",
+   "texto": "# Pasos\n- 1. Señales sanas antes de medir el desfase: cada sensor con su amplitud y su forma. [Criterio]\n- 2. Capturar CKP y CMP a la vez (más canales si hay varios árboles; etiquetar cada sonda). [Medido]\n- 3. Con VVT, desconectar sus electroválvulas para dejar los árboles en reposo. Se graban DTC: hay que borrarlos. [Medido]\n- 4. Medir el desfase en grados: reglas de rotación 0-720° sobre el hueco de la rueda fónica y regla de tiempo hasta el primer flanco del CMP. [Medido]\n- 5. Comparar con un patrón: biblioteca de Pico, otro cilindro o banco, o un coche donante del mismo motor. [Criterio]\n- 6. Pasar grados a dientes: 360° ÷ nº de dientes de la rueda. [Teórico OEM]\n# Escalas\n- Inductivo a régimen alto: escala suficiente (±100 V en moto a 6000 rpm). [Inferido]",
+   "valores": [
+    {
+     "magnitud": "Desfase CKP-CMP de un ejemplo",
+     "valor": 41.34,
+     "unidad": "°",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Hueco del CKP al flanco del CMP, referencia buena (CKP Hall)",
+     "valor": 8.97,
+     "unidad": "ms",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sincronismo-distribucion"
+  },
+  {
+   "id": "N-DIST-03",
+   "titulo": "Señales sanas de CKP y CMP",
+   "tema": "sincronismo-distribucion",
+   "texto": "# CKP inductivo\n- Sin señal o solo ruido: revisar cableado y sensor antes de sustituir. [Medido]\n- Referencia de 15-20 VAC en ralentí frente a 65 VAC medidos en un caso. ⚠ Manda lo medido y la documentación del modelo. [Inferido]\n# CMP Hall\n- Con contacto puesto debe conmutar entre 0 y 5 V (referencia de la UCE). [Medido]\n- Hall plano a 0 V al arrancar y sincroniza tarde: sensor mal montado (engranaje macizo en su cara activa). [Medido]\n# Moto sin CMP\n- Algunas motos sincronizan con la depresión del MAP; el cigüeñal a 270° es normal. [Medido]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sincronismo-distribucion"
+  },
+  {
+   "id": "N-DIST-04",
+   "titulo": "Pasar grados a dientes",
+   "tema": "sincronismo-distribucion",
+   "texto": "# Cuenta\n- Grados por diente = 360° ÷ nº de dientes de la rueda. [Teórico OEM]\n- Un diente entero se ve claro. 3-4° señalan holgura o tensión de cadena, no un diente saltado. [Inferido]\n# Ejemplos de rueda\n- 60-2 dientes: 6° por diente. [Teórico OEM]\n- 36-2 dientes: 10° por diente. [Teórico OEM]\n# Aviso\n- ⚠ Un caso da 59,88° como «2 dientes», que no cuadra con 10° por diente. Manda el ángulo medido y la rueda de ese motor.",
+   "valores": [
+    {
+     "magnitud": "Ángulo por diente rueda 60-2",
+     "valor": 6,
+     "unidad": "°",
+     "condicion": "Teórico OEM"
+    },
+    {
+     "magnitud": "Ángulo por diente rueda 36-2",
+     "valor": 10,
+     "unidad": "°",
+     "condicion": "Teórico OEM"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sincronismo-distribucion"
+  },
+  {
+   "id": "N-DIST-05",
+   "titulo": "Tabla: lo que se ve → causa a descartar",
+   "tema": "sincronismo-distribucion",
+   "texto": "# Síntoma → causa\n- Desfase constante de un diente exacto, señales buenas, código CMP: calado mal hecho (flanco un diente después del hueco). [Medido]\n- Desfase pequeño que crece o cambia en marcha: cadena estirada, tensor, guía o piñón loco excéntrico. [Medido]\n- Hueco mayor o dientes de menos o más entre referencias: rueda fónica o volante dañados (suele no dar código). [Inferido]\n- Hall plano a 0 V al arrancar: sensor mal montado. [Medido]\n- Un solo banco o árbol fuera: VVT atascado o cadena de ese banco. [Inferido]\n- Desfase de pocos grados en inyector-bomba: ajuste fino en los colisos del piñón, no diente saltado. [Inferido]\n# Seguridad\n- Cadena estirada: no prolongar el motor en marcha, puede saltar y chocar las válvulas. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sincronismo-distribucion"
+  },
+  {
+   "id": "N-DIST-06",
+   "titulo": "Confirmar con presión en cilindro",
+   "tema": "sincronismo-distribucion",
+   "texto": "# Lectura\n- Transductor en el cilindro: se leen EVO, IVO e IVC contra un cilindro sano o patrón, con ciclo de 720° y tabla de pistones. [Medido]\n- Árbol retrasado: IVC tardío y compresión baja. [Medido]\n- Escape avanzado: EVO y EVC tempranos. [Medido]\n- Duración corta con eventos bien definidos: holgura de taqués, no leva girada. [Inferido]\n# Límite\n- Un compresímetro de aguja da el pico y oculta la contrapresión en el escape. [Medido]\n- ⚠ En un VTC de Accord hay 30° en el texto frente a 25° en un pie de captura: sin resolver, no usar como umbral. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Ciclo completo de 4 tiempos",
+     "valor": 720,
+     "unidad": "°",
+     "condicion": "Teórico OEM"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sincronismo-distribucion"
+  }
+ ]
+}

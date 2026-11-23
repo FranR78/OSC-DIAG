@@ -1,0 +1,179 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-encendido",
+ "nombre": "Fran · Fallo de cilindro y encendido",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Localización de un fallo de combustión con el secundario: confirma el cilindro, separa chispa, mezcla, compresión e inyector. La regla señala un cilindro con tensión de pico mucho menor que la media, no la causa. Umbral en borrador (-30 % de la media, no de fabricante): validar con capturas reales, porque en chispa perdida los dos cilindros de la pareja difieren de forma normal. Sin medida aún para tiempo de quemado ni línea de chispa: van como notas.",
+ "acceso": "libre",
+ "reglas": [
+  {
+   "id": "FR-ENC-01",
+   "tema": "avance-encendido",
+   "sintoma": "Cilindro {cil}: tensión de pico del secundario más baja que el resto ({valor} % respecto a la media)",
+   "contexto": {
+    "entidad": [
+     "encendido"
+    ]
+   },
+   "si": [
+    {
+     "medida": "desv_pico_cil",
+     "op": "<",
+     "valor": -30,
+     "por_cilindro": true
+    }
+   ],
+   "confianza": "baja",
+   "etiqueta": "Medido",
+   "notas": [
+    "N-ENC-01",
+    "N-ENC-02",
+    "N-ENC-03",
+    "N-ENC-04",
+    "N-ENC-05"
+   ],
+   "causas": [
+    {
+     "texto": "Bujía del cilindro {cil} contaminada (aceite, carbonilla): línea de chispa que cae y quemado largo",
+     "etiqueta": "Medido",
+     "separar": "Quemado largo (en un caso 2,2 ms frente a 1,2-1,7 ms normales) y pico bajo"
+    },
+    {
+     "texto": "Bobina del cilindro {cil} con poca energía o bota dañada (la chispa salta por fuera)",
+     "etiqueta": "Inferido",
+     "separar": "Cambiar la bobina de cilindro: si el fallo la sigue, es la bobina; si no, bujía o cilindro"
+    },
+    {
+     "texto": "Mezcla o compresión del cilindro {cil} que cambian la tensión necesaria (no es el sistema de encendido)",
+     "etiqueta": "Inferido",
+     "separar": "Compresión relativa y, si hay segunda espiga alta al final de la línea, inyector del cilindro"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Confirmar el cilindro y que el fallo se repite",
+     "tipo": "medida",
+     "donde": "Cable de bujía o bobina del cilindro {cil}",
+     "estado": "Motor en marcha; si el fallo es intermitente, estresar con acelerón con carga",
+     "herramienta": "Osciloscopio + pinza capacitiva de secundario + señal de cigüeñal como referencia",
+     "pasos": [
+      "No fiarse del código: la UCE puede asignar el fallo al cilindro siguiente en el orden de encendido.",
+      "Comparar el secundario del cilindro {cil} con el de otro cilindro.",
+      "Capturar con el fallo presente."
+     ],
+     "esperado": "Picos parecidos entre cilindros y quemado de 1,2-1,7 ms",
+     "si_bien": "Si el pico es igual al de los demás, el fallo está en mezcla o compresión.",
+     "si_mal": "El cilindro {cil} sigue con pico bajo: pasar a la bujía y la bobina."
+    },
+    {
+     "texto": "Separar bobina, bujía y bota",
+     "tipo": "prueba",
+     "donde": "Bobina y bujía del cilindro {cil}",
+     "estado": "Motor parado",
+     "herramienta": "Boroscopio, llave de bujías",
+     "pasos": [
+      "Mirar la bota de la bobina y la bujía: señales de chispa por fuera.",
+      "Cambiar la bobina con la de otro cilindro y repetir.",
+      "Cambiar la bujía por una nueva."
+     ],
+     "esperado": "Bujía y bota limpias; el fallo no cambia de cilindro",
+     "si_bien": "Si no cambia, buscar mezcla o compresión.",
+     "si_mal": "Si sigue la bobina: sustituir. Bota dañada: sustituirla también y la bujía."
+    },
+    {
+     "texto": "Comprobar compresión del cilindro {cil}",
+     "tipo": "medida",
+     "donde": "Cable de batería",
+     "estado": "Arranque sin que llegue a arrancar",
+     "herramienta": "Osciloscopio + pinza de corriente",
+     "esperado": "Pico de corriente igual al de los demás cilindros",
+     "si_bien": "Compresión correcta: seguir con inyector.",
+     "si_mal": "Pico menor: ver el paquete de compresión."
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: avance-encendido",
+   "estado": "borrador"
+  }
+ ],
+ "notas": [
+  {
+   "id": "N-ENC-01",
+   "titulo": "Método: de lo general a lo particular",
+   "tema": "avance-encendido",
+   "texto": "# Pasos\n- 1. Confirmar el cilindro real; no fiarse del código. La UCE puede asignar el fallo al cilindro siguiente en el orden de encendido. [Medido]\n- Formas: sensor de pulsos en el escape con la bobina de un cilindro como referencia, power balance desde el escáner o prueba de misfire del osciloscopio. [Medido]\n- 2. ¿Uno o varios cilindros? Si falla uno, se descarta lo común: presión de gasolina, regulador, bomba. [Criterio]\n- 3. Compresión relativa primero: no desmonta nada. [Medido]\n- 4. ¿Llega la orden de disparo? Si la UCE manda el pulso al cilindro que falla, se descarta la UCE y se sigue por cable, bujía y bobina. [Criterio]\n- 5. Secundario del cilindro sospechoso: pinza capacitiva, con el cigüeñal como referencia. Capturar con el fallo presente y estresar el motor (acelerón con carga). [Medido]\n- 6. Si el secundario apunta a mezcla pobre: inyector del cilindro. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: avance-encendido"
+  },
+  {
+   "id": "N-ENC-02",
+   "titulo": "Lectura del secundario",
+   "tema": "avance-encendido",
+   "texto": "# Tabla de lectura\n- Pico de 10-12 kV en ralentí, 25-35 kV de capacidad, hasta unos 43 kV estresado: bobina sana. [Medido]\n- Tiempo de quemado de 1,2-1,7 ms: normal. [Medido]\n- Quemado largo (2,2 ms), pico bajo y línea de chispa que cae: bujía contaminada. [Medido]\n- Línea de chispa alta y quemado corto: bujía gastada o muy abierta. [Criterio]\n- Segunda espiga alta al final de la línea: mezcla pobre en ese cilindro. [Criterio]\n# Regla\n- Cuanto mayor la tensión de quemado, más corto el tiempo de quemado. [Criterio]\n- En chispa perdida, la chispa alta es la de compresión. [Criterio]\n# Cifras\n- Son de casos, no de fabricante: manda la documentación del modelo.",
+   "valores": [
+    {
+     "magnitud": "Pico de secundario en ralentí (bobina sana)",
+     "min": 10,
+     "max": 12,
+     "unidad": "kV",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Capacidad de la bobina",
+     "min": 25,
+     "max": 35,
+     "unidad": "kV",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Pico estresado",
+     "valor": 43,
+     "unidad": "kV",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Tiempo de quemado normal",
+     "min": 1.2,
+     "max": 1.7,
+     "unidad": "ms",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Tiempo de quemado con bujía contaminada",
+     "valor": 2.2,
+     "unidad": "ms",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: avance-encendido"
+  },
+  {
+   "id": "N-ENC-03",
+   "titulo": "Chispa perdida y bobina",
+   "tema": "avance-encendido",
+   "texto": "# Chispa perdida\n- Si falla un solo cilindro de la pareja, la bobina queda casi descartada: fallarían los dos. [Criterio]\n- Con chispa perdida el primario recoge interferencia del cilindro gemelo: mejor el secundario con pinza capacitiva. [Medido]\n# Bota dañada\n- La chispa salta por fuera y quema también la bujía nueva. [Medido]\n# Por qué una sola regla\n- La regla del paquete compara el pico de cada cilindro con la media. En chispa perdida los dos cilindros de la pareja difieren de forma normal en polaridad y amplitud: ajustar el umbral y valorar con la traza. [Inferido]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: avance-encendido"
+  },
+  {
+   "id": "N-ENC-04",
+   "titulo": "Trampas de diagnóstico",
+   "tema": "avance-encendido",
+   "texto": "# Trampas\n- Falta de chispa con inyección activa: el oxígeno sin quemar hace que la sonda lambda lo lea como mezcla pobre. [Medido]\n- Polímetro en bujía, cable o inyector: mide sin carga ni temperatura; los fallos térmicos (solo en frío) se escapan. [Criterio]\n- Un fallo solo en frío o con carga exige estresar el motor al capturar. [Medido]\n# Inyector\n- Con mezcla pobre en un cilindro: comparar dos inyectores (bueno y sospechoso) con pinza de corriente. [Medido]\n- Con alimentación y masa correctas pero sin rampa de corriente, el fallo es del propio inyector. [Medido]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: avance-encendido"
+  },
+  {
+   "id": "N-ENC-05",
+   "titulo": "Pinza de secundario genérica",
+   "tema": "avance-encendido",
+   "texto": "# Ajustes\n- Pinza genérica en PicoScope: sonda propia con y = 10 000·X (100 mV = 1 kV). [Medido]\n- Si la señal sale invertida, usar la función invertir. [Medido]\n- No abusar de la mejora de resolución: se pierde amplitud. [Medido]\n# Referencia\n- Señal de cigüeñal como referencia para ubicar cada cilindro. [Criterio]\n# Avance de encendido\n- Sin medida aún para el avance en grados: va como nota. Comparar siempre con el dato del fabricante.",
+   "valores": [
+    {
+     "magnitud": "Escala de la pinza de secundario",
+     "valor": 10,
+     "unidad": "kV/V",
+     "condicion": "100 mV = 1 kV, pinza genérica"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: avance-encendido"
+  }
+ ]
+}

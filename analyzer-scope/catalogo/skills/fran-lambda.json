@@ -1,0 +1,285 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-lambda",
+ "nombre": "Fran · Sonda lambda",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Sonda lambda de saltos (circonio y planar de salto), con la sonda conectada. Las dos reglas solo detectan una sonda de saltos que se queda fija en pobre o en rica; no distinguen delantera de trasera ni miden la respuesta (ciclos por segundo, tiempos). Banda ancha (LSU) y titanio no tienen regla: van como notas o quedan sin fuente. Umbrales en borrador (no de fabricante): validar con capturas reales.",
+ "acceso": "libre",
+ "reglas": [
+  {
+   "id": "FR-LAM-01",
+   "tema": "sonda-lambda",
+   "sintoma": "Sonda lambda de saltos fija en pobre: su máximo es de {valor} V y no sube de 0,3 V (referencia de 0,1-0,2 a 0,8-0,9 V con la sonda caliente)",
+   "contexto": {
+    "entidad": [
+     "sonda lambda"
+    ]
+   },
+   "si": [
+    {
+     "medida": "maximo",
+     "op": "<",
+     "valor": 0.3
+    }
+   ],
+   "confianza": "baja",
+   "etiqueta": "Inferido",
+   "notas": [
+    "N-LAM-01",
+    "N-LAM-02",
+    "N-LAM-03",
+    "N-LAM-05",
+    "N-LAM-06"
+   ],
+   "causas": [
+    {
+     "texto": "Sonda aún fría o con el calefactor sin funcionar",
+     "etiqueta": "Teórico OEM",
+     "separar": "Calentar 5-10 min en marcha o acelerando y repetir; con el calefactor correcto la señal debe empezar a saltar"
+    },
+    {
+     "texto": "Mezcla realmente pobre o toma de aire en el escape",
+     "etiqueta": "Inferido",
+     "separar": "Acelerón brusco: si la mezcla se enriquece y la sonda sube, la sonda está viva y el problema es la mezcla"
+    },
+    {
+     "texto": "Sonda envejecida o contaminada que ya no responde",
+     "etiqueta": "Inferido",
+     "separar": "Calefactor correcto, mezcla y escape descartados y sin respuesta al acelerón: sonda"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Comprobar el calefactor",
+     "tipo": "medida",
+     "donde": "Conector de la sonda, en el propio sensor",
+     "estado": "Sonda desconectada, motor parado y frío",
+     "herramienta": "Polímetro (resistencia)",
+     "pasos": [
+      "Medir la resistencia entre los dos cables del calefactor de la sonda desconectada.",
+      "Comparar con el dato del modelo.",
+      "Con la sonda conectada y contacto puesto, ver Vbat en los dos cables del calefactor."
+     ],
+     "esperado": "Circonio de 11 Ω aprox.; la mayoría, 16 Ω o menos (dato de un caso: 11,30 Ω con rango de 10 a 40 Ω)",
+     "si_bien": "Calefactor sano: calentar la sonda y repetir la captura.",
+     "si_mal": "Sin lectura: resistencia cortada. Cambiar la sonda tras revisar fusible y alimentación."
+    },
+    {
+     "texto": "Forzar rico y ver si la sonda responde",
+     "tipo": "medida",
+     "donde": "Conector de la sonda, con las puntas por detrás sin separarlo",
+     "estado": "Motor en marcha y caliente, 2.500 rpm, sonda conectada",
+     "herramienta": "Osciloscopio (100 mV/div, 1 s/div)",
+     "pasos": [
+      "Capturar a 2.500 rpm estables.",
+      "Dar un acelerón brusco y observar la señal.",
+      "Dejar volver a ralentí y ver si vuelve a ciclar."
+     ],
+     "esperado": "Cresta positiva ancha en el acelerón y la señal vuelve a oscilar después",
+     "si_bien": "La sonda responde: buscar toma de aire, presión de combustible o encendido.",
+     "si_mal": "Sin cambio con calefactor correcto, mezcla y escape descartados: sonda averiada."
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sonda lambda",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-LAM-02",
+   "tema": "sonda-lambda",
+   "sintoma": "Sonda lambda de saltos fija en rica: su mínimo es de {valor} V y no baja de 0,7 V (referencia de 0,1-0,2 V con la sonda caliente)",
+   "contexto": {
+    "entidad": [
+     "sonda lambda"
+    ]
+   },
+   "si": [
+    {
+     "medida": "minimo",
+     "op": ">",
+     "valor": 0.7
+    }
+   ],
+   "confianza": "baja",
+   "etiqueta": "Inferido",
+   "notas": [
+    "N-LAM-01",
+    "N-LAM-03",
+    "N-LAM-05",
+    "N-LAM-06"
+   ],
+   "causas": [
+    {
+     "texto": "Mezcla realmente rica (presión de combustible, inyectores, caudalímetro)",
+     "etiqueta": "Inferido",
+     "separar": "Deceleración: si el corte de inyección baja la señal a pobre, la sonda responde y la mezcla es la causa"
+    },
+    {
+     "texto": "Sonda averiada con la señal pegada arriba",
+     "etiqueta": "Inferido",
+     "separar": "No baja ni en deceleración con mezcla y escape descartados: sonda"
+    },
+    {
+     "texto": "Sonda trasera con catalizador deficiente (en la trasera se ve hacia 0,6 V)",
+     "etiqueta": "Criterio",
+     "separar": "Mirar si es la trasera; la plana habitual es de 450 mV y la trasera que alterna indica catalizador deficiente"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Forzar pobre con una deceleración",
+     "tipo": "medida",
+     "donde": "Conector de la sonda, con las puntas por detrás sin separarlo",
+     "estado": "Motor en marcha y caliente, sonda conectada",
+     "herramienta": "Osciloscopio (100 mV/div, 1 s/div)",
+     "pasos": [
+      "Subir a 2.500 rpm y capturar.",
+      "Soltar el acelerador de golpe (deceleración).",
+      "Ver si la señal baja y vuelve a ciclar."
+     ],
+     "esperado": "Señal estrecha arriba y ancha abajo en la deceleración, con el mínimo en 0,1-0,2 V",
+     "si_bien": "La sonda responde: la mezcla es rica; revisar presión de combustible e inyectores.",
+     "si_mal": "No baja: sonda pegada o alimentación errónea; revisar masa y calefactor."
+    },
+    {
+     "texto": "Leer códigos y datos en vivo",
+     "tipo": "prueba",
+     "donde": "Toma de diagnosis",
+     "estado": "Contacto puesto y motor caliente",
+     "herramienta": "Escáner",
+     "esperado": "Sin códigos de mezcla (P1131 siempre pobre y similares) y correcciones de combustible normales",
+     "si_bien": "Sin códigos: seguir con la señal en el osciloscopio.",
+     "si_mal": "Códigos de mezcla o de calefactor (P0141 en sonda 2): tratar primero ese circuito."
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sonda lambda",
+   "estado": "borrador"
+  }
+ ],
+ "notas": [
+  {
+   "id": "N-LAM-01",
+   "titulo": "Identificar el tipo de sonda",
+   "tema": "sonda-lambda",
+   "texto": "# Tipos (cambia todo lo demás)\n- Saltos (circonio): 1, 3 o 4 cables, calefactor + señal; señal de 0 a 1 V con umbral de 450 mV aprox. [Teórico OEM]\n- Planar de salto: misma señal, elemento planar. [Teórico OEM]\n- Banda ancha (LSU): conector de 6 vías con electrónica o 5 cables; λ de 0,6 a 2; la UCE lee la corriente de bombeo. [Teórico OEM]\n- Titanio: sin método en las fuentes; no se inventa. [Inferido]\n# Delantera y trasera\n- La delantera (sonda 1) regula la mezcla; la trasera (sonda 2) verifica el catalizador. [Criterio]\n# Antes de medir\n- Tensión siempre con la sonda conectada (prolongador). Desconectada, solo resistencia y continuidad. [Criterio]\n- Las reglas de este paquete son para sonda de saltos: en banda ancha la tensión no es la señal útil.",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sonda lambda"
+  },
+  {
+   "id": "N-LAM-02",
+   "titulo": "Orden del método y calefacción",
+   "tema": "sonda-lambda",
+   "texto": "# Orden\n- 1.º Códigos y datos en vivo antes de desmontar: P0141 (calefactor de la sonda 2), P1131 (siempre pobre). [Criterio]\n- 2.º Calefacción; una sonda fría no se juzga. [Criterio]\n- 3.º Calentar 5-10 min en marcha o acelerando. [Medido]\n- 4.º Forma de la señal con el osciloscopio. [Criterio]\n- Solo después, condenar la sonda si mezcla y escape están descartados. [Criterio]\n# Calefactor\n- Resistencia con la sonda desconectada, mejor en el propio sensor y a temperatura parecida: circonio de 11 Ω, la mayoría de 16 Ω o menos. [Medido]\n- Un caso dio 11,30 Ω con rango de 10 a 40 Ω. [Medido]\n- Sin lectura: resistencia cortada. [Medido]\n- LSU 4.2: 4,5 Ω aprox. a 20 °C entre los pines 3 y 4; aislamiento de más de 1 MΩ a los demás pines y a la carcasa. [Teórico OEM]\n- Con sonda conectada y contacto puesto: Vbat en los dos cables; el de la UCE pasa a ondas cuadradas al calentar. [Medido]\n- Banda ancha: control de calefactor a 100 Hz aprox. y pinza de 2 A aprox. con forma cuadrada. [Medido]\n- Un 0,4 V fijo en frío es la referencia de la UCE, no la sonda. [Medido]",
+   "valores": [
+    {
+     "magnitud": "Resistencia del calefactor, circonio",
+     "valor": 11,
+     "unidad": "ohm",
+     "condicion": "la mayoría, 16 Ω o menos"
+    },
+    {
+     "magnitud": "Resistencia del calefactor LSU 4.2 entre pines 3-4",
+     "valor": 4.5,
+     "unidad": "ohm",
+     "condicion": "a 20 °C"
+    },
+    {
+     "magnitud": "Aislamiento del calefactor LSU 4.2 a los demás pines y carcasa",
+     "min": 1,
+     "unidad": "Mohm",
+     "condicion": "más de 1 MΩ"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sonda lambda"
+  },
+  {
+   "id": "N-LAM-03",
+   "titulo": "Señal de una sonda de saltos con el osciloscopio",
+   "tema": "sonda-lambda",
+   "texto": "# Conexión\n- Puntas en el conector sin separarlo; a 2.500 rpm, 100 mV/div y 1 s/div. [Teórico OEM]\n# Delantera\n- Al menos 1 ciclo por segundo: señal sana. [Teórico OEM]\n- Plana: inservible. Menos de 1 ciclo por segundo: lenta o envejecida. [Teórico OEM]\n- Caliente, oscila de 0,1-0,2 V a 0,8-0,9 V aprox. [Medido]\n# Trasera\n- Plana a 450 mV aprox.; si alterna, catalizador deficiente. [Teórico OEM]\n- ⚠ Un experto la ve hacia 0,6 V; sin resolver, se dan ambos valores. [Medido]\n# Cuidado con las reglas\n- Una trasera sana plana en 450 mV no dispara las reglas (no está por debajo de 0,3 V ni por encima de 0,7 V). [Inferido]\n- Una sonda sin calentar puede dar un máximo bajo: calentar antes de decidir. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Oscilación de la delantera caliente, nivel bajo",
+     "min": 0.1,
+     "max": 0.2,
+     "unidad": "V",
+     "condicion": "sonda de saltos caliente"
+    },
+    {
+     "magnitud": "Oscilación de la delantera caliente, nivel alto",
+     "min": 0.8,
+     "max": 0.9,
+     "unidad": "V",
+     "condicion": "sonda de saltos caliente"
+    },
+    {
+     "magnitud": "Ciclos de la delantera sana",
+     "min": 1,
+     "unidad": "Hz",
+     "condicion": "a 2.500 rpm"
+    },
+    {
+     "magnitud": "Trasera sana, señal plana",
+     "valor": 0.45,
+     "unidad": "V",
+     "condicion": "⚠ un experto la ve hacia 0,6 V"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sonda lambda"
+  },
+  {
+   "id": "N-LAM-04",
+   "titulo": "Banda ancha (LSU): qué mirar",
+   "tema": "sonda-lambda",
+   "texto": "# Principio\n- La UCE lee la corriente de bombeo, no una tensión de salto. Lo mejor es el parámetro del escáner (mA o λ); el osciloscopio lo completa. [Criterio]\n- Desconectada da 0 mA y una λ sin sentido. [Medido]\n# A ralentí (LSU 4.2)\n- Célula de medida estable en 450 mV y bombeo en 0 V con λ = 1. [Teórico OEM]\n- Con acelerador a fondo, bombeo de +30 mV; en retención, de −158 mV. [Medido]\n# Ojo\n- La señal estable de 450 mV de la banda ancha es normal: no es una sonda de saltos plana. [Inferido]",
+   "valores": [
+    {
+     "magnitud": "Célula de medida LSU 4.2 a ralentí",
+     "valor": 450,
+     "unidad": "mV",
+     "condicion": "estable"
+    },
+    {
+     "magnitud": "Bombeo LSU 4.2 con λ = 1",
+     "valor": 0,
+     "unidad": "V",
+     "condicion": "ralentí"
+    },
+    {
+     "magnitud": "Bombeo LSU 4.2 a fondo",
+     "valor": 30,
+     "unidad": "mV",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Bombeo LSU 4.2 en retención",
+     "valor": -158,
+     "unidad": "mV",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sonda lambda"
+  },
+  {
+   "id": "N-LAM-05",
+   "titulo": "Forzar rico y pobre",
+   "tema": "sonda-lambda",
+   "texto": "# Prueba\n- Acelerón brusco: crestas positivas anchas (rico). [Teórico OEM]\n- Deceleración: estrecha arriba y ancha abajo (pobre). [Teórico OEM]\n- Hay que ver transiciones reales rico/pobre para juzgar la sonda. [Teórico OEM]\n- Tras acelerar, la señal queda arriba y vuelve a ciclar. [Medido]\n# Límite\n- Tiempos de respuesta en ms: sin cifra en las fuentes. [Inferido]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sonda lambda"
+  },
+  {
+   "id": "N-LAM-06",
+   "titulo": "¿Sonda o mezcla y escape?",
+   "tema": "sonda-lambda",
+   "texto": "# Antes de condenar la sonda\n- Mirar estado mecánico, estanqueidad, tomas de aire, presión de combustible y encendido: alteran las lecturas. [Teórico OEM]\n# Síntoma → causa\n- Trasera pobre: catalizador envejecido o toma de aire; sin parámetros, usar cámara termográfica o sonda de temperatura en el escape. [Criterio]\n- Sonda que bascula muy lenta (0,03 Hz en un Ferrari 355): no era la sonda; sondas pre y post cruzadas, aisladas desconectando primero las delanteras y luego las traseras. [Medido]\n- P0141 tras reparar el escape, con calefactor y pulsos de masa correctos: borrar y revisar a los 2 días; si vuelve, sonda 2. [Medido]\n- Falla con calefactor correcto y caídas de tensión correctas: sonda; preferir originales. [Criterio]\n# Regla de oro\n- Sonda fría no se juzga: primero calefacción y alimentación, luego forma de la señal, y solo después se condena la sonda. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Frecuencia de basculación de una sonda con las sondas cruzadas (Ferrari 355)",
+     "valor": 0.03,
+     "unidad": "Hz",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sonda lambda"
+  }
+ ]
+}

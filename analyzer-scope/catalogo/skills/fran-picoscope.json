@@ -1,0 +1,132 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-picoscope",
+ "nombre": "Fran · Manejo de PicoScope",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Receta de captura con PicoScope: rango, acoplamiento, base de tiempos, disparo, filtros, sondas propias, reglas y guardado. No interpreta la onda: eso es de la nota del sistema. Sin reglas: es un procedimiento sin medida del motor; todo va como notas.",
+ "acceso": "libre",
+ "reglas": [],
+ "notas": [
+  {
+   "id": "N-PICO-01",
+   "titulo": "Receta de captura: conexión, cero y rango",
+   "tema": "manejo-picoscope",
+   "texto": "# Orden de la receta\n- 1. Conectar por USB antes de abrir el programa: lo detecta solo. [Medido]\n- Sonda x10: decirlo en las opciones de sonda (el rango sube de 20 V a 200 V). Si no está en la lista, sonda propia. [Medido]\n- Los accesorios BNC+ (pinza) los reconoce el software en el menú de sondas. [Teórico OEM]\n- 2. Poner a cero antes de medir: con sonda x1, unir punta y masa y pulsar «Zero» en las opciones de canal. Solo corrige hasta ±50 mV y resta ese margen al rango. [Teórico OEM]\n- Con pinza: poner el cero tras moverla. [Criterio]\n- 3. Rango vertical bipolar. Empezar amplio; si la señal lo supera sale «sobrerrango», no daña el equipo y se sube el rango. Luego ajustar para llenar la pantalla. [Medido]",
+   "valores": [
+    {
+     "magnitud": "Rango con sonda x1",
+     "valor": 20,
+     "unidad": "V",
+     "condicion": "sube a 200 V con sonda x10 declarada"
+    },
+    {
+     "magnitud": "Corrección máxima de «Zero»",
+     "valor": 50,
+     "unidad": "mV",
+     "condicion": "resta ese margen al rango"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: manejo-picoscope"
+  },
+  {
+   "id": "N-PICO-02",
+   "titulo": "Acoplamiento y offset",
+   "tema": "manejo-picoscope",
+   "texto": "# Acoplamiento\n- DC primero para ver el nivel real respecto a masa. [Teórico OEM]\n- AC para quitar el nivel continuo (corte por debajo de 1 Hz) y ampliar rizado o pulsaciones. [Teórico OEM]\n- En AC se pierde la tensión real: para máximos con polaridad, DC. [Criterio]\n# Offset analógico\n- Para una oscilación pequeña sobre un nivel alto: desplaza la traza sin saturar el ADC. [Teórico OEM]\n- Un offset del 10 % sube la traza una división. [Medido]\n# Divisiones\n- ⚠ En el taller se cuentan 8 divisiones verticales; PicoScope muestra 10. Para cálculos con el Pico valen las 10 del equipo. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: manejo-picoscope"
+  },
+  {
+   "id": "N-PICO-03",
+   "titulo": "Base de tiempos y muestreo",
+   "tema": "manejo-picoscope",
+   "texto": "# Base de tiempos\n- Tiempo en pantalla = ms/div × 10 divisiones horizontales (defecto: 20 ms/div = 200 ms). [Teórico OEM]\n- Calcular el evento: una vuelta a 800 rpm = 75 ms; un ciclo de 4 tiempos = 150 ms. [Inferido]\n# Muestreo y búfer\n- Ver cuánto se ve y con qué detalle. [Criterio]\n- En «Sampling» se prioriza memoria de búfer o tasa de muestreo; al alargar la base con búfer fijo, baja la tasa. [Teórico OEM]\n- Por debajo de 200 ms/div captura en bloque; desde ahí, streaming. [Medido]\n- Primera medida en streaming: siempre se ve algo. [Criterio]\n- Falta de detalle o flancos con escalones (posible aliasing): subir la tasa o acortar la base. [Inferido]\n- Evento recortado: alargar la base o el predisparo; si se pierde detalle, más búfer. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Tiempo en pantalla con 20 ms/div",
+     "valor": 200,
+     "unidad": "ms",
+     "condicion": "10 divisiones horizontales"
+    },
+    {
+     "magnitud": "Una vuelta de motor a 800 rpm",
+     "valor": 75,
+     "unidad": "ms",
+     "condicion": "ciclo de 4 tiempos = 150 ms"
+    },
+    {
+     "magnitud": "Cambio de bloque a streaming",
+     "valor": 200,
+     "unidad": "ms/div",
+     "condicion": "por debajo, bloque"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: manejo-picoscope"
+  },
+  {
+   "id": "N-PICO-04",
+   "titulo": "Disparo",
+   "tema": "manejo-picoscope",
+   "texto": "# Modos\n- Auto: muestra aunque no cumpla. [Teórico OEM]\n- Repeat: cada vez que cumple. [Teórico OEM]\n- Single: solo la primera; útil en arranque o compresión. [Teórico OEM]\n- En bloque usar Auto; en streaming, Repeat (no actualiza si no se cumple). [Criterio]\n# Ajuste\n- Rombo amarillo para el umbral; flanco; predisparo como % de la base de tiempos. [Teórico OEM]\n- Ejemplo de la demo: 20 V, ascendente, predisparo 20 %. [Medido]\n- Flanco con rampa curva: disparar por el otro (corriente de bobina: bajada, umbral 4 A). [Medido]\n- Señal débil: cuesta fijar el disparo. [Criterio]\n- Un canal usado como disparo no se apaga: se oculta en Vistas. [Teórico OEM]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: manejo-picoscope"
+  },
+  {
+   "id": "N-PICO-05",
+   "titulo": "Filtros y resolución",
+   "tema": "manejo-picoscope",
+   "texto": "# Límite de ancho de banda\n- Filtro analógico de 20 kHz, sin retardo; solo si la señal está por debajo. [Teórico OEM]\n- Guardado el fichero con el filtro activo, lo atenuado no se recupera. [Teórico OEM]\n- Las pinzas BNC+ lo aplican solas. [Teórico OEM]\n# Paso bajo DSP (software)\n- Reversible: no toca los datos brutos. [Teórico OEM]\n- Primera medida con todos los filtros apagados y filtrar después. [Criterio]\n- Ejemplo: un CKP contado como 61 flancos; con 10 kHz salen 58 estables (dato de un caso). [Medido]\n# Mejora de resolución\n- Promedia: exige más tasa de muestreo o deforma picos y flancos. [Teórico OEM]\n- En un equipo de 8 bits suaviza escalones pero pierde amplitud: no subirla mucho. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Filtro analógico de ancho de banda",
+     "valor": 20,
+     "unidad": "kHz",
+     "condicion": "sin retardo"
+    },
+    {
+     "magnitud": "Paso bajo DSP en el caso del CKP",
+     "valor": 10,
+     "unidad": "kHz",
+     "condicion": "61 flancos → 58 estables, dato de un caso"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: manejo-picoscope"
+  },
+  {
+   "id": "N-PICO-06",
+   "titulo": "Síntoma en pantalla → ajuste",
+   "tema": "manejo-picoscope",
+   "texto": "# Tabla\n- Traza cortada o «sobrerrango»: subir el rango o usar offset/AC. [Criterio]\n- Señal diminuta sobre un nivel alto: AC u offset analógico y bajar el rango. [Criterio]\n- La onda corre por la pantalla: activar el disparo (canal, umbral dentro de la señal, flanco). [Criterio]\n- Dispara pero no actualiza (Repeat): umbral fuera de la señal; pasar a Auto. [Criterio]\n- Falta de detalle o escalones: subir la tasa de muestreo o acortar la base. [Inferido]\n- Evento recortado: alargar la base o el predisparo. [Criterio]\n- Ruido de alta frecuencia o recuento de flancos que baila: ancho de banda de 20 kHz o paso bajo DSP. [Criterio]\n- Señal invertida (pinza al revés): función invertir del canal. [Medido]\n- Escala absurda en amperios o kV: sonda propia o canal matemático con unidad y límites. [Medido]\n- Desplazamiento del cero con sonda x1: «Zero channel offsets». [Teórico OEM]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: manejo-picoscope"
+  },
+  {
+   "id": "N-PICO-07",
+   "titulo": "Sondas propias y canales matemáticos",
+   "tema": "manejo-picoscope",
+   "texto": "# Sonda propia\n- Ecuación o tabla, unidad, acoplamiento y filtro; se guarda con la captura. [Teórico OEM]\n- Para ver cómo se hace, abrir con «Edit» una sonda de Automotive. [Medido]\n- Secundario de encendido: y = 10.000·X (100 mV = 1 kV). [Medido]\n# Canal matemático\n- A/B (resistencia), A×B (potencia), frecuencia y RPM; con shunt, intensidad = caída / R. [Medido]\n- Las funciones de fábrica no se editan; las propias, en Herramientas > Canales matemáticos. [Medido]\n- En el CAN, A + B debe dar unos 5 V. [Medido]",
+   "valores": [
+    {
+     "magnitud": "Suma de CAN H + CAN L",
+     "valor": 5,
+     "unidad": "V",
+     "condicion": "aproximado, canal matemático A+B"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: manejo-picoscope"
+  },
+  {
+   "id": "N-PICO-08",
+   "titulo": "Reglas, referencia, guardar y compartir",
+   "tema": "manejo-picoscope",
+   "texto": "# Reglas\n- Dos de señal por canal y dos de tiempo; dan Δ, frecuencia y RPM. Reglas de fase de 0 a 720° en 4 tiempos. Cerrar el resumen las borra. [Teórico OEM]\n# Análisis\n- Al parar quedan 64 pantallas hacia atrás (más búfer en equipos de memoria profunda). [Medido]\n- Referencia: copiar a «A2» y comparar lado a lado; la que difiere salta a la vista. [Medido]\n# Guardar y compartir\n- Guardar los ajustes como «User Default» y «Reset Configuration» para volver. [Teórico OEM]\n- Biblioteca de formas de onda con cuenta y equipo conectado; los campos rojos son obligatorios y es pública tras validar. Compartir por ID o enlace. [Teórico OEM]\n- Nunca subir ni compartir capturas con matrícula, VIN o datos personales. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Pantallas de historial al parar",
+     "valor": 64,
+     "unidad": "pantallas",
+     "condicion": "más con memoria profunda"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: manejo-picoscope"
+  }
+ ]
+}

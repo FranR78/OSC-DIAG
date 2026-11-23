@@ -1,0 +1,291 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-sensores-motor",
+ "nombre": "Fran · Sensores de gestión del motor",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Método general para caudalímetro (MAF), MAP, NTC, potenciómetros y sensor de picado. Solo hay dos reglas, para un MAP analógico de 5 V que se queda en 0 V o en 5 V; no sirven para MAP de frecuencia ni para MAF digital. Los umbrales de cada modelo, la frecuencia del MAF, el MAF teórico y el rendimiento volumétrico van como notas. Umbrales en borrador (no de fabricante).",
+ "acceso": "libre",
+ "reglas": [
+  {
+   "id": "FR-SEN-01",
+   "tema": "sensores-motor",
+   "sintoma": "Sensor MAP analógico pegado a masa: su mínimo es de {valor} V (la señal útil vive entre 0,5 y 4,5 V)",
+   "contexto": {
+    "entidad": [
+     "sensor MAP"
+    ]
+   },
+   "si": [
+    {
+     "medida": "minimo",
+     "op": "<",
+     "valor": 0.2
+    }
+   ],
+   "confianza": "baja",
+   "etiqueta": "Criterio",
+   "notas": [
+    "N-SEN-01",
+    "N-SEN-03",
+    "N-SEN-07"
+   ],
+   "causas": [
+    {
+     "texto": "Cortocircuito a masa de la señal o corte de la alimentación de 5 V",
+     "etiqueta": "Criterio",
+     "separar": "Medir alimentación, masa y señal a la vez: si los 5 V no llegan al sensor, es el cableado o la UCE"
+    },
+    {
+     "texto": "Sensor MAP averiado",
+     "etiqueta": "Inferido",
+     "separar": "Alimentación de 5 V y masa de 0 V correctas en el conector y la señal sigue pegada a 0 V"
+    },
+    {
+     "texto": "Línea de señal cortada entre el sensor y la UCE",
+     "etiqueta": "Criterio",
+     "separar": "Medir en los dos extremos del cable: si la salida del sensor no coincide con lo que llega a la UCE, la línea está cortada"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Alimentación, masa y señal a la vez",
+     "tipo": "medida",
+     "donde": "Conector del sensor MAP, por detrás con el conector enchufado",
+     "estado": "Contacto puesto o motor en ralentí, sensor conectado",
+     "herramienta": "Osciloscopio de 3 canales (alimentación, masa y señal)",
+     "pasos": [
+      "Poner un canal en la alimentación, otro en la masa y otro en la señal.",
+      "Dar un acelerón suave.",
+      "Ver si la señal se mueve con la carga."
+     ],
+     "esperado": "Alimentación de 5 V constante, masa de 0 V y señal de 1 V aprox. a ralentí que sube hasta 4 V aprox. al acelerar",
+     "si_bien": "Sensor y cableado correctos: la captura puede ser puntual; repetir con barrido lento.",
+     "si_mal": "Sin 5 V o masa elevada: cableado o UCE. Con 5 V y masa correctos y señal pegada: sensor."
+    },
+    {
+     "texto": "Medir en los dos extremos del cable",
+     "tipo": "medida",
+     "donde": "Pin de señal en el sensor y pin de señal en la UCE",
+     "estado": "Contacto puesto, sensor conectado",
+     "herramienta": "Osciloscopio de 2 canales",
+     "esperado": "La misma señal en el sensor y en la UCE",
+     "si_bien": "Línea correcta: seguir con el sensor.",
+     "si_mal": "Lo que sale del sensor no llega a la UCE: línea cortada o terminal sulfatado."
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores de gestión del motor",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-SEN-02",
+   "tema": "sensores-motor",
+   "sintoma": "Sensor MAP analógico pegado a 5 V: su máximo es de {valor} V (la señal útil vive entre 0,5 y 4,5 V)",
+   "contexto": {
+    "entidad": [
+     "sensor MAP"
+    ]
+   },
+   "si": [
+    {
+     "medida": "maximo",
+     "op": ">",
+     "valor": 4.8
+    }
+   ],
+   "confianza": "baja",
+   "etiqueta": "Criterio",
+   "notas": [
+    "N-SEN-01",
+    "N-SEN-03",
+    "N-SEN-07"
+   ],
+   "causas": [
+    {
+     "texto": "Señal cortada (circuito abierto) y levantada a 5 V por la UCE",
+     "etiqueta": "Criterio",
+     "separar": "Desconectar y volver a conectar el sensor con el osciloscopio puesto; medir en los dos extremos del cable"
+    },
+    {
+     "texto": "Masa del sensor perdida o con caída alta",
+     "etiqueta": "Inferido",
+     "separar": "Medir la masa del sensor con carga: debe estar en 0 V"
+    },
+    {
+     "texto": "Sensor MAP averiado",
+     "etiqueta": "Inferido",
+     "separar": "Alimentación y masa correctas y señal pegada arriba"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Alimentación, masa y señal a la vez",
+     "tipo": "medida",
+     "donde": "Conector del sensor MAP, por detrás con el conector enchufado",
+     "estado": "Contacto puesto o motor en ralentí, sensor conectado",
+     "herramienta": "Osciloscopio de 3 canales (alimentación, masa y señal)",
+     "pasos": [
+      "Poner un canal en la alimentación, otro en la masa y otro en la señal.",
+      "Dar un acelerón suave y soltar.",
+      "Ver si la señal baja al soltar."
+     ],
+     "esperado": "Masa de 0 V, alimentación de 5 V y señal que baja a 1 V aprox. a ralentí",
+     "si_bien": "Todo correcto: repetir con barrido lento por si fue puntual.",
+     "si_mal": "Masa elevada o señal fija arriba con masa correcta: revisar masa y línea; si están bien, cambiar el sensor."
+    },
+    {
+     "texto": "Comprobar fugas o turbo parado",
+     "tipo": "prueba",
+     "donde": "Toma de vacío o de presión del MAP",
+     "estado": "Motor parado y en ralentí",
+     "herramienta": "Osciloscopio y vacuómetro",
+     "esperado": "Con el motor parado y sin turbo, la señal cerca de la presión atmosférica; en ralentí baja a 1 V aprox.",
+     "si_bien": "Si baja en ralentí, el sensor y la toma funcionan.",
+     "si_mal": "Si no baja en ralentí con vacío en la toma, sensor o cableado."
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores de gestión del motor",
+   "estado": "borrador"
+  }
+ ],
+ "notas": [
+  {
+   "id": "N-SEN-01",
+   "titulo": "Método común para cualquier sensor",
+   "tema": "sensores-motor",
+   "texto": "# Orden\n- 1.º Alimentación, masa y señal a la vez (4 canales): alimentación de Vbat o 5 V constante, masa de 0 V, señal moviéndose con la magnitud. [Teórico OEM]\n- Un caudalímetro puede dar código por masa o alimentación y no por el sensor. [Teórico OEM]\n- 2.º Barrido completo: base de tiempos larga, mover el mando despacio (subida y bajada) y dar un golpe brusco; los cortes de décimas de segundo no los ve el polímetro. [Criterio]\n- 3.º Margen útil: la señal vive entre 0,5 y 4,5 V; 0 V o 5 V es fallo (cortocircuito o corte). [Criterio]\n- 4.º Valor teórico: comparar con la tabla del fabricante o con un cálculo.\n- 5.º Plausibilidad entre sensores. El código del escáner llega procesado y con retardo: manda el osciloscopio. [Criterio]\n- 6.º Medir en los dos extremos del cable: si la salida del sensor no coincide con lo que llega a la UCE, la línea está cortada. [Criterio]\n- 7.º Antes de cambiar la pieza: masa y alimentación con carga; si se repara con un recambio, borrar adaptativos. [Criterio]\n# Conexión\n- Tensión siempre con el componente conectado (prolongador o por detrás del conector); suelto, solo resistencias y continuidad. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Margen útil de la señal de un sensor analógico",
+     "min": 0.5,
+     "max": 4.5,
+     "unidad": "V",
+     "condicion": "0 V o 5 V es fallo"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores de gestión del motor"
+  },
+  {
+   "id": "N-SEN-02",
+   "titulo": "Caudalímetro (MAF): tipos y qué mirar",
+   "tema": "sensores-motor",
+   "texto": "# Analógico\n- La tensión sube al acelerar y sale limpia; a ralentí 1 V aprox. y 4 V aprox. a 4.000 rpm. [Teórico OEM]\n# De frecuencia\n- Medir la frecuencia con cursores y compararla con la tabla del modelo. [Teórico OEM]\n- Ejemplo de tabla: 2,35 kHz a 850 rpm y 5,30 kHz a 4.000 rpm. [Teórico OEM]\n- Dato medido: 2,7 kHz a 2.000 rpm, donde la tabla da 2,93 kHz; dato de un caso, no de fabricante. [Medido]\n# SENT o LIN\n- No cambian ni la tensión ni la frecuencia: solo los mensajes. [Medido]\n- Una frecuencia plana tras reparar el pin: señal presente no es señal válida. [Medido]\n# Masa\n- Caso con 12 V en la masa del MAF y 0,2 Ω de cable: masa interna de la UCE; confirmar con una masa auxiliar. [Medido]\n- No hay regla para el caudalímetro: la señal digital oscila de 0 a 5 V y un umbral de tensión daría falsos positivos. [Inferido]",
+   "valores": [
+    {
+     "magnitud": "MAF analógico a ralentí",
+     "valor": 1,
+     "unidad": "V",
+     "condicion": "orientativo"
+    },
+    {
+     "magnitud": "MAF analógico a 4.000 rpm",
+     "valor": 4,
+     "unidad": "V",
+     "condicion": "orientativo"
+    },
+    {
+     "magnitud": "MAF de frecuencia a 850 rpm",
+     "valor": 2.35,
+     "unidad": "kHz",
+     "condicion": "tabla de un modelo"
+    },
+    {
+     "magnitud": "MAF de frecuencia a 4.000 rpm",
+     "valor": 5.3,
+     "unidad": "kHz",
+     "condicion": "tabla de un modelo"
+    },
+    {
+     "magnitud": "MAF de frecuencia medido a 2.000 rpm",
+     "valor": 2.7,
+     "unidad": "kHz",
+     "condicion": "dato de un caso, no de fabricante (la tabla daba 2,93 kHz)"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores de gestión del motor"
+  },
+  {
+   "id": "N-SEN-03",
+   "titulo": "Sensor MAP",
+   "tema": "sensores-motor",
+   "texto": "# Valores\n- Alimentación de 5 V y masa de 0 V. [Teórico OEM]\n- A ralentí, 1 V aprox.; acelerando, 4 V aprox. [Teórico OEM]\n- Con turbo parado, presión atmosférica. [Teórico OEM]\n- Dato medido: 1,6 V en un caso; dato de un caso, no de fabricante. [Medido]\n# Reglas del paquete\n- Valen para un MAP analógico de 5 V: máximo por encima de 4,8 V o mínimo por debajo de 0,2 V. [Criterio]\n- No valen para un MAP de frecuencia: su señal digital cambia entre 0 y 5 V. [Inferido]",
+   "valores": [
+    {
+     "magnitud": "MAP a ralentí",
+     "valor": 1,
+     "unidad": "V",
+     "condicion": "orientativo"
+    },
+    {
+     "magnitud": "MAP acelerando",
+     "valor": 4,
+     "unidad": "V",
+     "condicion": "orientativo"
+    },
+    {
+     "magnitud": "MAP medido en un caso",
+     "valor": 1.6,
+     "unidad": "V",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores de gestión del motor"
+  },
+  {
+   "id": "N-SEN-04",
+   "titulo": "NTC, potenciómetros y sensor de picado",
+   "tema": "sensores-motor",
+   "texto": "# NTC\n- Calentamiento en modo ROLL (200 mV/div, 5 s): de 4 V aprox. a 1 V aprox. sin escalones. [Teórico OEM]\n- En las de aire, spray de frío. [Teórico OEM]\n# Potenciómetro de dos pistas\n- Relación B/A constante (pedal, 2:1) o suma de 5 V (mariposa con pista invertida). [Medido]\n- Fallo del pedal o la mariposa sin código: mirar cortes de décimas de segundo con base larga. [Criterio]\n# Sensor de picado\n- Repicar cerca del sensor, nunca encima: sale una señal alterna. [Teórico OEM]",
+   "valores": [
+    {
+     "magnitud": "NTC en calentamiento, inicio",
+     "valor": 4,
+     "unidad": "V",
+     "condicion": "orientativo"
+    },
+    {
+     "magnitud": "NTC en calentamiento, final",
+     "valor": 1,
+     "unidad": "V",
+     "condicion": "orientativo"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores de gestión del motor"
+  },
+  {
+   "id": "N-SEN-05",
+   "titulo": "MAF teórico y rendimiento volumétrico",
+   "tema": "sensores-motor",
+   "texto": "# RPM desde el CKP\n- Canal matemático 60/36 × frecuencia con filtro paso bajo; contar los dientes geométricos (36 en 36-2), no los físicos. [Medido]\n- Filtro de 50 Hz: 6802 rpm frente a 6807 con reglas; con 8 Hz, 6547 rpm (un filtro excesivo recorta el pico). [Medido]\n# Caudal teórico\n- g/s = rpm / 60 / 2 × cilindrada (l) × densidad × VE. [Teórico OEM]\n- Densidad de 1,223 g/l a nivel del mar y 15 °C. [Teórico OEM]\n- Con turbo se usa la presión del colector en lugar de la densidad fija. [Inferido]\n# Rendimiento volumétrico\n- VE = MAF leído / MAF teórico al 100 %. [Medido]\n- Ejemplo: 111,85 / 129,88 = 86,11 % en un atmosférico a plena carga; dato de un caso, no de fabricante. [Medido]\n- Si sale por encima de 100 %, la densidad o el filtro están mal. [Inferido]\n# Dudas\n- ⚠ Un ejemplo de 73 % de VE sale de dividir g/s por PS y su fuente enlazada habla de otra magnitud: tratarlo como ejemplo, no como regla. [Inferido]\n- ⚠ La pendiente de la sonda a medida depende de la ficha: con otro rango de presión el error fue de 8 % aprox.; verificar con transductor. [Medido]",
+   "valores": [
+    {
+     "magnitud": "Densidad del aire a nivel del mar y 15 °C",
+     "valor": 1.223,
+     "unidad": "g/l",
+     "condicion": "Teórico OEM"
+    },
+    {
+     "magnitud": "Rendimiento volumétrico en un atmosférico a plena carga",
+     "valor": 86.11,
+     "unidad": "%",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores de gestión del motor"
+  },
+  {
+   "id": "N-SEN-06",
+   "titulo": "Plausibilidad entre sensores",
+   "tema": "sensores-motor",
+   "texto": "# Síntoma → causa\n- MAP alto y MAF bajo, o caudal bajo sin fallo del sensor: fuga tras el MAF, EGR abierta o turbo sin presión. [Criterio]\n- Caudal que baja al acelerar con presión de turbo baja: probar el vacío del depresor antes de condenar el MAF. [Medido]\n- MAF digital con frecuencia plana tras reparar el pin: señal presente no es señal válida. [Medido]\n- MAF con 12 V en la masa y 0,2 Ω de cable: masa interna de la UCE. [Medido]\n# Ejemplos que solo ilustran el método\n- Celica 1.8 con P0172: el MAF daba más tensión a ralentí y poca respuesta a fondo. [Medido]\n- Mazo cortado: picos de 50 V aprox. en una electroválvula por falta de positivo en la UCE. [Medido]\n# Remisiones\n- CKP y CMP: paquete de sincronismo. Lambda y mezcla: paquete de sonda lambda. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores de gestión del motor"
+  },
+  {
+   "id": "N-SEN-07",
+   "titulo": "Margen útil y qué hacer con un 0 V o un 5 V",
+   "tema": "sensores-motor",
+   "texto": "# Lectura\n- Señal en 0 V: cortocircuito a masa o falta de alimentación. [Criterio]\n- Señal en 5 V: circuito abierto o masa perdida. [Criterio]\n- Con 5 V y masa correctos y señal fija: sensor. [Inferido]\n# Antes de cambiar\n- Medir con carga y moviendo el mazo. [Criterio]\n- Medir en los dos extremos del cable. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores de gestión del motor"
+  }
+ ]
+}

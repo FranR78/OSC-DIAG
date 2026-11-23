@@ -1,0 +1,124 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-abs",
+ "nombre": "Fran · Sensores de rueda ABS",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Método para sensores de velocidad de rueda (ABS/ESP/TC): tipo de sensor, cómo medir, comparar las 4 ruedas y separar sensor, cableado, anillo y mecánica. Cada caso es de un vehículo: sirve de ejemplo, no de valor de referencia. Sin reglas: no hay medida de entidad «sensor de rueda» ni de amplitud por diente; todo va como notas.",
+ "acceso": "libre",
+ "reglas": [],
+ "notas": [
+  {
+   "id": "N-ABS-01",
+   "titulo": "Identificar el tipo de sensor",
+   "tema": "sensores-rueda-abs",
+   "texto": "# Tipos (determinan cómo se mide)\n- Inductivo (reluctancia): tensión alterna propia, sin alimentación; más frecuencia y amplitud al girar más rápido. Se mide tensión; resistencia con el sensor suelto. [Teórico OEM]\n- Activo Hall/MR de 2 hilos: corriente conmutada de 5-15 mA (dato de un caso, no de fabricante). Se mide corriente con pinza y bucle x10. [Teórico OEM]\n- Activo protocolo AK: niveles de 7/14/28 mA y trama Manchester de 9 bits a 19,2 kBd. Tensión DC y AC + corriente. [Teórico OEM]\n# Alimentación de un activo\n- Vbat en un pin y retorno de 0,81 a 1,74 V en el otro, medidos contra chasis con el sensor conectado. [Medido]\n- Consumo del manual de un Kia Soul: 7-14 mA. Fuera de ese margen o sin consumo, lo más habitual es el cableado. [Criterio]\n# Ojo\n- ⚠ Los 7-14 mA y 0,81-1,74 V son de un sensor activo: NO valen para un inductivo. La ficha original mezcla ambos casos: pendiente de revisar. [Criterio]\n- ⚠ La UCE aplica unos 0,18 V DC a un inductivo: es polarización de vigilancia, no alimentación. No asumir señal flotante. [Medido]",
+   "valores": [
+    {
+     "magnitud": "Corriente de un activo Hall/MR de 2 hilos",
+     "min": 5,
+     "max": 15,
+     "unidad": "mA",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Consumo de un activo (manual de un Kia Soul)",
+     "min": 7,
+     "max": 14,
+     "unidad": "mA",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Retorno de un activo medido contra chasis",
+     "min": 0.81,
+     "max": 1.74,
+     "unidad": "V",
+     "condicion": "sensor conectado, dato de un caso"
+    },
+    {
+     "magnitud": "Velocidad de la trama AK",
+     "valor": 19.2,
+     "unidad": "kBd",
+     "condicion": "trama Manchester de 9 bits"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores-rueda-abs"
+  },
+  {
+   "id": "N-ABS-02",
+   "titulo": "Método de diagnóstico paso a paso",
+   "tema": "sensores-rueda-abs",
+   "texto": "# Orden\n- 1. Síntoma y códigos: confirmar en carretera (pedal que pulsa solo a muy baja velocidad, tirones, testigo). Leer códigos y las 4 velocidades en vivo. [Criterio]\n- Sin código ni testigo, la UCE da por buenas las señales: el fallo puede ser de amplitud o de dientes, no eléctrico. [Medido]\n- 2. Descartar neumáticos antes que electrónica: marca, presión, desgaste y circunferencia iguales. Unos 15 mm de diferencia pueden bastar. [Inferido]\n- 3. Eléctrico con el sensor suelto (solo resistencia y continuidad): bobina, aislamiento a masa, entrehierro; valores del manual. Una resistencia buena no garantiza amplitud. [Criterio]\n- 4. Medir las 4 ruedas a la vez, a velocidad baja y constante (unos 16 km/h en el caso) o girando a mano a 1 vuelta/s. Comparar amplitud, regularidad por vuelta y eje con eje. [Medido]\n- 5. Leer el patrón (nota siguiente). [Criterio]\n- 6. Cableado y alimentación bajo carga, con el sensor conectado. [Medido]\n- 7. Tras reparar, volver a medir con el sensor montado: un recambio nuevo también puede venir mal. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores-rueda-abs"
+  },
+  {
+   "id": "N-ABS-03",
+   "titulo": "Leer la traza: patrón → causa",
+   "tema": "sensores-rueda-abs",
+   "texto": "# Tabla síntoma → causa\n- Caída de amplitud en 1-2 dientes consecutivos: anillo o corona dañado, o reparado con material no ferromagnético (probar con un imán). [Medido]\n- Amplitud baja homogénea en las dos ruedas del eje: entrehierro excesivo (óxido en la placa de fijación). [Medido]\n- Caída periódica de frecuencia en cada vuelta: anillo alabeado o hinchado por corrosión. Confirmar con comparador. [Medido]\n- Activo con corriente fija y sin pulsos: sensor o buje. [Medido]\n- Activo con mínimo que no baja del umbral de la UCE (unos 6 mA): sensor o buje. [Teórico OEM]\n- Frecuencia distinta entre ejes a la misma velocidad: número de polos del anillo magnético erróneo (44 en vez de 48). Contar con captador óptico o visor magnético. [Medido]\n- Pico de la bomba ABS que baja la alimentación a unos 10 V: revisar cableado y alimentación bajo carga. [Medido]\n- Las interferencias de las electroválvulas en la señal fueron pista falsa, no la causa. [Medido]",
+   "valores": [
+    {
+     "magnitud": "Alabeo del anillo",
+     "valor": 1.7,
+     "unidad": "mm",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Diferencia de circunferencia de neumático que puede bastar",
+     "valor": 15,
+     "unidad": "mm",
+     "condicion": "dato de un caso, aproximado"
+    },
+    {
+     "magnitud": "Umbral mínimo de corriente que ve la UCE",
+     "valor": 6,
+     "unidad": "mA",
+     "condicion": "aproximado, dato de un caso"
+    },
+    {
+     "magnitud": "Alimentación bajo el pico de la bomba ABS",
+     "valor": 10,
+     "unidad": "V",
+     "condicion": "aproximado, dato de un caso"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores-rueda-abs"
+  },
+  {
+   "id": "N-ABS-04",
+   "titulo": "Medir corriente en sensores activos",
+   "tema": "sensores-rueda-abs",
+   "texto": "# Montaje\n- Pinza de baja intensidad con bucle de 10 espiras y canal matemático C/10 (o B/10) para recuperar los amperios reales. [Medido]\n- Filtro paso bajo a 1 kHz para limpiar la traza. [Criterio]\n- La pinza evita el ruido de modo común que falsea la tensión. [Medido]\n# Acoplamiento\n- AC solo para ver el rizado. El nivel DC o corriente base se verifica en DC. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores-rueda-abs"
+  },
+  {
+   "id": "N-ABS-05",
+   "titulo": "Sensor AK: captura y ajustes",
+   "tema": "sensores-rueda-abs",
+   "texto": "# Captura de la trama\n- Con el límite de 20 kHz de hardware la trama se deforma («aleta de tiburón»). Usar filtro digital de unos 100 kHz. [Medido]\n- Ancho de banda de al menos 5 veces el baudio. [Inferido]\n# Niveles\n- 7, 14 y 28 mA y trama Manchester de 9 bits a 19,2 kBd. [Teórico OEM]\n- Medir tensión DC y AC y corriente: el nivel de corriente dice el estado, la trama dice la información. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Filtro digital recomendado para AK",
+     "valor": 100,
+     "unidad": "kHz",
+     "condicion": "con el límite de 20 kHz de hardware se deforma la trama"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores-rueda-abs"
+  },
+  {
+   "id": "N-ABS-06",
+   "titulo": "Velocidad de rueda en canal matemático",
+   "tema": "sensores-rueda-abs",
+   "texto": "# Fórmulas\n- Velocidad por rueda con freq(canal) en un canal matemático. [Teórico OEM]\n- En mph con 48 dientes y neumático 215/45 R17: 60/48·freq(B)·(3,14·0,625)·60/1000·0,621371. [Teórico OEM]\n- km/h = frecuencia / dientes × perímetro × 3,6. [Inferido]\n# Ojo\n- ⚠ La fórmula en km/h de la ficha original solo lleva un ×60: no cuadra con la de mph. Verificar antes de usarla. [Inferido]\n- Un dato mal (dientes o neumático) falsea la velocidad: comparar con la velocidad de la UCE. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores-rueda-abs"
+  },
+  {
+   "id": "N-ABS-07",
+   "titulo": "Casos reales: solo ilustran el método",
+   "tema": "sensores-rueda-abs",
+   "texto": "# Casos (cada uno es de un vehículo, no valor de referencia)\n- Frecuencia distinta entre ejes: 68 frente a 62 mph a 70 mph. Causa: anillo de 44 polos en vez de 48. [Medido]\n- Caída periódica de frecuencia por vuelta: anillo hinchado por corrosión, 1,70 mm de alabeo en el comparador. [Medido]\n- Amplitud baja en 1-2 dientes: corona reparada con material no ferromagnético. [Medido]\n- Amplitud baja en ambas ruedas del eje: óxido bajo la placa de fijación. [Medido]\n- Un recambio nuevo también puede venir mal: comprobar siempre tras montar. [Criterio]\n# Regla\n- Primero neumáticos, luego sensor suelto, luego las 4 ruedas a la vez. No cambiar piezas sin medir. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: sensores-rueda-abs"
+  }
+ ]
+}

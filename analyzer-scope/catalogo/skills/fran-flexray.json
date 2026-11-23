@@ -1,0 +1,87 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-flexray",
+ "nombre": "Fran · Red FlexRay",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "FlexRay con osciloscopio: señal patrón, conexión y método para localizar la fuente de una tensión anómala (nodo, cable a positivo o masa). Los valores de reposo y velocidad son teóricos y los casos son de un vehículo. Sin reglas: no hay entidad «FlexRay» para medidas por canal; todo va como notas.",
+ "acceso": "libre",
+ "reglas": [],
+ "notas": [
+  {
+   "id": "N-FX-01",
+   "titulo": "Señal patrón FlexRay",
+   "tema": "red-flexray",
+   "texto": "# Valores\n- Reposo de las dos líneas: 2,5 V. [Teórico OEM]\n- BP (parecida a CAN H) en «1»: unos 3,5 V. [Teórico OEM]\n- BM (parecida a CAN L): espejo, unos 1,5 V. [Teórico OEM]\n- Velocidad: 10 Mbit/s. [Teórico OEM]\n- Las dos líneas de un mismo ramal muestran tramas idénticas en espejo. [Medido]\n# Ojo\n- ⚠ Una explicación habla de «2,5→3 V / 2,5→2 V» y otra dice «el doble que CAN (1000 frente a 500)». Son errores de explicación: manda la tabla de arriba. [Inferido]",
+   "valores": [
+    {
+     "magnitud": "Reposo de BP y BM",
+     "valor": 2.5,
+     "unidad": "V",
+     "condicion": "sin tráfico"
+    },
+    {
+     "magnitud": "BP en nivel 1",
+     "valor": 3.5,
+     "unidad": "V",
+     "condicion": "aproximado"
+    },
+    {
+     "magnitud": "BM en nivel 1",
+     "valor": 1.5,
+     "unidad": "V",
+     "condicion": "aproximado, espejo de BP"
+    },
+    {
+     "magnitud": "Velocidad del bus",
+     "valor": 10,
+     "unidad": "Mbit/s",
+     "condicion": ""
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: red-flexray"
+  },
+  {
+   "id": "N-FX-02",
+   "titulo": "Conexión al bus y canales",
+   "tema": "red-flexray",
+   "texto": "# Conexión\n- Localizar los pines en el esquema del fabricante y seguir cada hilo hasta el otro nodo (en VAG, la casilla con el número de origen). [Criterio]\n- Si la UCE tiene dos pares (entrada y salida), puede puentearlos por dentro: un canal en cada par debe dar la misma imagen. [Medido]\n- Contacto puesto. [Criterio]\n# Canales\n- Rango de ±5 V (o 0,5 V/div) con los ceros desplazados para que las trazas no se monten. [Criterio]\n- La biblioteca de automoción de Pico solo como guía de forma y conexión. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: red-flexray"
+  },
+  {
+   "id": "N-FX-03",
+   "titulo": "Decodificación serie FlexRay",
+   "tema": "red-flexray",
+   "texto": "# Ajustes\n- Decodificación serie → FlexRay → 10 Mbit/s. [Teórico OEM]\n- «Custom» significa que no reconoce el protocolo: revisar la escala de tiempo o hay fallo. [Medido]\n- Negro = trama válida; rojo = trama errónea. [Medido]\n# Cómo usarla\n- Reducir la base de tiempos y filtrar tramas buenas y malas. [Criterio]\n- Decodificar cada ramal por separado: ver en cuál salen las tramas en rojo. [Medido]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: red-flexray"
+  },
+  {
+   "id": "N-FX-04",
+   "titulo": "Método: localizar quién mete la tensión anómala",
+   "tema": "red-flexray",
+   "texto": "# Objetivo\n- Encontrar la fuente, no solo reparar. Una tensión fuera de patrón (12 V clavados, reposo alto, desplazado) puede venir de un cable derivado a positivo, un nodo que la mete (transceptor dañado) o un retorno de masa por el bus. [Inferido]\n# Orden\n- 1. Caracterizar con el osciloscopio, no con polímetro: qué línea (BP, BM o ambas), valor fijo (≈ Vbat) o reposo desplazado, y con contacto, en arranque o con carga. [Criterio]\n- 2. Acotar el ramal en el esquema: FlexRay suele ser punto a punto o estrella, con pocos nodos por ramal. [Teórico OEM]\n- 3. Desconectar los nodos de uno en uno sin dejar de medir. [Criterio]\n- 4. Si el reposo de ambas líneas está desplazado, sospechar masa antes que nodo. [Inferido]\n- 5. Antes de cambiar el nodo culpable, comprobar su alimentación y su masa con carga. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: red-flexray"
+  },
+  {
+   "id": "N-FX-05",
+   "titulo": "Tabla síntoma → causa en FlexRay",
+   "tema": "red-flexray",
+   "texto": "# Tabla\n- La tensión desaparece al soltar un nodo: ese nodo la mete. [Medido]\n- Sigue con todos los nodos sueltos: cableado derivado a positivo. Comprobar continuidad a + y aislamiento con el mazo suelto. [Inferido]\n- Reposo de ambas líneas alto o desplazado (no clavado): masa de potencia mala. Medir la caída de tensión en las masas de los nodos de potencia con carga. [Inferido]\n- Una masa provisional que devuelve el patrón lo confirma. [Medido]\n- Un nodo que mete tensión puede ser víctima de otra avería: en un caso, la mala masa quemó el módulo. [Medido]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: red-flexray"
+  },
+  {
+   "id": "N-FX-06",
+   "titulo": "Casos reales: solo ilustran el método",
+   "tema": "red-flexray",
+   "texto": "# Caso 1: Audi Q8\n- Una línea clavada a unos 12 V y la otra con trama. Arranca, pero hay códigos U y de ABS. [Medido]\n- Al desconectar un nodo, la línea cae a 0 V: era la centralita. Cuál de ellas es dudoso en la explicación original. [Medido]\n# Caso 2: BMW F20\n- Reposo de las dos líneas alto y sin comunicación con la dirección asistida. [Medido]\n- La causa era la masa del motor de la dirección, corroída en el chasis. [Medido]\n# Dato de un caso, no de fabricante\n- Estos valores y causas no son umbrales: ilustran el método. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: red-flexray"
+  },
+  {
+   "id": "N-FX-07",
+   "titulo": "Regla de oro y límites",
+   "tema": "red-flexray",
+   "texto": "# Regla\n- Primero se mide y se desconecta para aislar la fuente; después se repara. [Criterio]\n- Un 0 Ω no valida una masa: hay que probarla con carga. [Medido]\n# Límites\n- No hay medida de la app para el nivel de reposo de FlexRay: se hace con cursores a mano. [Criterio]\n- Antes de cambiar un módulo, descartar alimentación y masa. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: red-flexray"
+  }
+ ]
+}

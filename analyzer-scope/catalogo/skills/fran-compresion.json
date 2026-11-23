@@ -1,0 +1,178 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-compresion",
+ "nombre": "Fran · Compresión relativa y estado mecánico",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Orden de pruebas para valorar el estado mecánico del motor sin desmontar: compresión relativa, vacío de admisión, presión en cilindro y PCV. Señala el cilindro, no la causa. Umbral de la regla (85 % del mejor) en borrador, no de fabricante; el paquete de ortu usa 90 %, aquí se elige 85 % para evitar falsos positivos con la dispersión normal del arranque. Sin medida aún para equilibrio de cilindros ni rpm calculadas de híbridos: van como notas.",
+ "acceso": "libre",
+ "reglas": [
+  {
+   "id": "FR-COMP-01",
+   "tema": "compresion-relativa",
+   "sintoma": "Cilindro {cil}: compresión relativa baja ({valor} % del mejor)",
+   "si": [
+    {
+     "medida": "comp_rel_pct",
+     "op": "<",
+     "valor": 85,
+     "por_cilindro": true
+    }
+   ],
+   "confianza": "baja",
+   "etiqueta": "Medido",
+   "notas": [
+    "N-COMP-01",
+    "N-COMP-02",
+    "N-COMP-03",
+    "N-COMP-04",
+    "N-COMP-05",
+    "N-COMP-06"
+   ],
+   "causas": [
+    {
+     "texto": "Pérdida de estanqueidad en el cilindro {cil}: segmentos, pistón, válvulas o junta de culata",
+     "etiqueta": "Inferido",
+     "separar": "Vacío de admisión y presión en cilindro: torres inclinadas = fuga; torres rectas y pico bajo = el cilindro no se llena"
+    },
+    {
+     "texto": "Cilindro {cil} que no se llena por distribución (válvula que no abre, árbol retrasado)",
+     "etiqueta": "Teórico OEM",
+     "separar": "Presión en cilindro: torres rectas, bolsillos iguales y pico bajo; bolsillo de admisión o escape redondeado"
+    },
+    {
+     "texto": "Estrategia de la UCE o captura mal hecha (anti-ahogo, distribución variable, batería floja)",
+     "etiqueta": "Teórico OEM",
+     "separar": "Repetir con batería sana y motor caliente; la avería sale siempre en el mismo cilindro"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Repetir la compresión relativa en buenas condiciones",
+     "tipo": "medida",
+     "donde": "Cable de batería (pinza de corriente) o bornes de batería (dos puntas)",
+     "estado": "Motor caliente, batería sana, arranque sin que llegue a arrancar",
+     "herramienta": "Osciloscopio + pinza de corriente (o dos puntas en la batería: la tensión sale invertida)",
+     "pasos": [
+      "Hacer varios ciclos de arranque.",
+      "Marcar el cilindro de referencia con la chispa de uno y el orden de encendido.",
+      "Ver si el cilindro {cil} vuelve a salir bajo."
+     ],
+     "esperado": "Picos iguales; el cilindro {cil} debería estar a más del 85 % del mejor",
+     "si_bien": "Era captura puntual o estrategia de la UCE: no es avería mecánica.",
+     "si_mal": "Se repite en el cilindro {cil}: separar la causa con el vacío de admisión y la presión en cilindro."
+    },
+    {
+     "texto": "Separar fuga de falta de llenado",
+     "tipo": "medida",
+     "donde": "Orificio de bujía o calentador del cilindro {cil}",
+     "estado": "Motor en arranque; inyector del cilindro desconectado",
+     "herramienta": "Transductor de cilindro (rango −15 a +500 psi) + osciloscopio",
+     "esperado": "Torres rectas y bolsillos iguales a los de un cilindro sano",
+     "si_bien": "Cilindro estanco: mirar distribución y respirabilidad.",
+     "si_mal": "Torres inclinadas = fuga; bolsillo redondeado = válvula que no abre; con pico de cárter, pistón o segmentos."
+    },
+    {
+     "texto": "Comprobar visualmente",
+     "tipo": "prueba",
+     "donde": "Cilindro {cil}",
+     "estado": "Motor parado, bujía o calentador desmontado",
+     "herramienta": "Boroscopio",
+     "esperado": "Pistón, válvulas y camisa sin daños",
+     "si_bien": "Sin daño visible: repetir pruebas y revisar distribución.",
+     "si_mal": "Pistón roto, válvula dañada o camisa rayada: desmontar."
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: compresion-relativa",
+   "estado": "borrador"
+  }
+ ],
+ "notas": [
+  {
+   "id": "N-COMP-01",
+   "titulo": "Principio y orden de pruebas",
+   "tema": "compresion-relativa",
+   "texto": "# Principio\n- De lo más rápido y barato a lo más fino: cada prueba afina la anterior. [Criterio]\n- Una prueba señala el cilindro; la siguiente, la causa (válvula de admisión, escape, pistón o segmentos, distribución). Ninguna sola es concluyente. [Criterio]\n# Orden\n- 1.º Compresión relativa (menos de 1 min, no desmonta nada). [Medido]\n- 2.º Equilibrio de cilindros (desde la batería, en marcha). [Medido]\n- 3.º Vacío de admisión en arranque. [Medido]\n- 4.º Presión en cilindro, solo si hay que separar la causa. [Medido]\n- 5.º PCV (presión de cárter). [Medido]\n- Para el secundario, la bobina y la bujía: ver el paquete de encendido.",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: compresion-relativa"
+  },
+  {
+   "id": "N-COMP-02",
+   "titulo": "Condiciones antes de leer",
+   "tema": "compresion-relativa",
+   "texto": "# Antes de medir\n- Batería sana y motor caliente. [Teórico OEM]\n- Algunas UCE bajan los picos de compresión sin avería mecánica: modo anti-ahogo y distribución variable (tipo SkyActiv o TwinAir). [Teórico OEM]\n- Si hay duda, repetir con otra estrategia o con el motor en otra condición. [Criterio]\n# Batería\n- El multímetro promedia y oculta la caída instantánea: mirar la tensión de arranque con osciloscopio. [Teórico OEM]\n- ⚠ Hay dos límites de tensión mínima: 8,6 V (límite de aceptación de manuales) y 8 V (criterio del curso). Manda 8 V y, si hay modelo, su documentación. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Tensión mínima de batería al arrancar (caso medido con osciloscopio)",
+     "valor": 8.841,
+     "unidad": "V",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Límite de aceptación de manuales",
+     "min": 8.6,
+     "unidad": "V",
+     "condicion": "Teórico OEM; el criterio del curso es 8 V"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: compresion-relativa"
+  },
+  {
+   "id": "N-COMP-03",
+   "titulo": "Compresión relativa: cómo medir",
+   "tema": "compresion-relativa",
+   "texto": "# Conexión\n- Pinza de corriente en el cable de batería, arranque sin que llegue a arrancar. [Medido]\n- Si no cabe la pinza: dos puntas en los bornes de la batería. La traza de tensión es la imagen invertida de la de corriente. [Medido]\n# Lectura\n- Varios ciclos de arranque; todos los picos iguales = compresión pareja. [Medido]\n- Un pico menor o ausente, repetido cada cuatro jorobas en un 4 cilindros = cilindro de baja compresión. [Medido]\n- Se identifica con la chispa de un cilindro de referencia y el orden de encendido. [Criterio]\n# Límite\n- Un fallo común a todo el motor (calado de distribución) mantiene los picos iguales. [Teórico OEM]\n- La app da el resultado en % del mejor cilindro: el umbral del paquete (85 %) es de borrador, no de fabricante. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: compresion-relativa"
+  },
+  {
+   "id": "N-COMP-04",
+   "titulo": "Híbridos y equilibrio de cilindros",
+   "tema": "compresion-relativa",
+   "texto": "# Híbridos\n- Sin corriente útil de arrastre, la compresión relativa sale de las rpm calculadas desde el sensor de cigüeñal (canal matemático). [Medido]\n- En el modo de test de un Prius el arrastre es de unas 250 rpm. [Medido]\n# Equilibrio de cilindros (PicoDiagnostics)\n- Se hace desde la batería: barra por cilindro con % de aporte en verde, ámbar y rojo. [Medido]\n- Es la versión «en marcha» de la compresión relativa: mide potencia, no solo compresión. [Medido]\n- No vale con desactivación de cilindros ni con motores de 8 o más cilindros de baja compresión. [Teórico OEM]",
+   "valores": [
+    {
+     "magnitud": "Arrastre en modo de test de un Prius",
+     "valor": 250,
+     "unidad": "rpm",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: compresion-relativa"
+  },
+  {
+   "id": "N-COMP-05",
+   "titulo": "Vacío de admisión en arranque",
+   "tema": "compresion-relativa",
+   "texto": "# Montaje\n- Transductor en un punto central del colector, después de la mariposa (la manguera de la PCV sirve). Un punto sesgado falsea la lectura. [Medido]\n- Comprobar el sentido de la traza antes de interpretar: depende del transductor. [Criterio]\n# Lectura\n- Cada cilindro da un jalón en admisión; en un 4 cilindros sano, 4 iguales. [Medido]\n- Dividir el ciclo de 720° con cursores y tabla de pistones. [Medido]\n- Desfase de 360°: el jalón de un cilindro cae 360° después de su PMS de compresión. No atribuirlo al cilindro que dispara en pantalla. [Teórico OEM]\n- Jalón débil con el cilindro en PMS de compresión y presión que sube en el colector: válvula de admisión que no sella. [Medido]\n- Jalón débil en su propia carrera de admisión: la válvula está abierta; mirar escape, pistón o segmentos, o junta. [Inferido]",
+   "valores": [
+    {
+     "magnitud": "Ciclo completo de 4 tiempos",
+     "valor": 720,
+     "unidad": "°",
+     "condicion": "Teórico OEM"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: compresion-relativa"
+  },
+  {
+   "id": "N-COMP-06",
+   "titulo": "Presión en cilindro y PCV: tabla de lectura",
+   "tema": "compresion-relativa",
+   "texto": "# Presión en cilindro (síntoma → causa)\n- Torres rectas, bolsillos iguales, pico bajo: el cilindro no se llena (distribución), no pierde. [Teórico OEM]\n- Torres inclinadas, diferencial de bolsillo: fuga de volumen. [Teórico OEM]\n- Bolsillo de admisión o escape redondeado: válvula sin abrir (falta IVO o EVO). [Teórico OEM]\n- Presión de cárter que sube al acercarse el PMS: fallo de sellado en la parte baja (pistón o segmentos). [Inferido]\n- Jalones o picos iguales pero el fallo persiste: respirabilidad; probar compresión en marcha. [Criterio]\n# PCV\n- Transductor en el cárter, ralentí en caliente. Estrangular un instante la manguera de la PCV y ver el cambio de presión y de rpm. [Medido]\n# Ejemplo\n- V6 con un cilindro de pico bajo: vacío (fuga con la admisión cerrada), escape sin empuje (no es la válvula), cárter y cilindro (torres inclinadas), pistón roto con boroscopio. [Medido]",
+   "valores": [
+    {
+     "magnitud": "Cambio de ralentí al estrangular la PCV (Prius 1.8)",
+     "valor": 78,
+     "unidad": "rpm",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Compresión en arranque con pistón roto (V6)",
+     "max": 0.35,
+     "unidad": "bar",
+     "condicion": "< 5 psi, dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: compresion-relativa"
+  }
+ ]
+}

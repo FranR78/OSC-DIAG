@@ -1,0 +1,124 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-trifasicos",
+ "nombre": "Fran · Motores trifásicos y resolver",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Motores y generadores trifásicos (híbridos, eléctricos, bombas EC, ventiladores BLDC) y resolver: seguridad, corrientes de fase, modo XY y separación inversor / motor / sensor / cableado. Los casos son de un vehículo, no de fabricante. Sin reglas: no hay entidad de motor trifásico ni medida de desfase entre fases; todo va como notas.",
+ "acceso": "libre",
+ "reglas": [],
+ "notas": [
+  {
+   "id": "N-TRI-01",
+   "titulo": "Seguridad antes de medir en alta tensión",
+   "tema": "motores-trifasicos",
+   "texto": "# Seguridad\n- Alta tensión desde 60 V CC (cables naranjas); guantes clase 0. [Criterio]\n- Consignar: contacto quitado, llave a más de 2 m, borne de 12 V fuera, conector de servicio bajo custodia, esperar 10 min y comprobar 0 V AC y CC en bornes del inversor. [Teórico OEM]\n- Quitar el conector no garantiza 0 V: comprobar con polímetro. [Medido]\n- Medir corrientes con pinza (sin tocar conductores) y señales de mando o retorno en baja tensión. [Criterio]\n- Medir directo en fases HV solo con equipo y formación homologados. Si no los hay, parar. [Criterio]\n- Los manuales de autoformación no sustituyen la formación en HV. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Umbral de alta tensión",
+     "min": 60,
+     "unidad": "V",
+     "condicion": "CC"
+    },
+    {
+     "magnitud": "Espera de consignación",
+     "valor": 10,
+     "unidad": "min",
+     "condicion": "antes de comprobar 0 V"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: motores-trifasicos"
+  },
+  {
+   "id": "N-TRI-02",
+   "titulo": "Método: ¿inversor, motor, sensor o cableado?",
+   "tema": "motores-trifasicos",
+   "texto": "# Orden\n- 1. Síntoma y contexto: no gira, gira a tirones, gira de más, códigos del inversor, fusible fundido. Leer DTC antes de pinchar. [Criterio]\n- 2. Alimentación y mando (baja tensión): fusible, tensión con carga, masa, señal PWM o serie de mando y retorno. [Criterio]\n- Un mando clavado a 0 V es cableado o mando, no motor. [Medido]\n- 3. Corrientes de fase. [Criterio]\n- 4. Vista XY (Martins). [Criterio]\n- 5. Sensor de posición (resolver). [Criterio]\n- 6. Sincronismo y consumo coherente con las rpm. [Criterio]\n- 7. Bobinado y aislamiento fuera del coche. [Criterio]\n- 8. Unión equipotencial tras desmontaje o chapa. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: motores-trifasicos"
+  },
+  {
+   "id": "N-TRI-03",
+   "titulo": "Corrientes de fase",
+   "tema": "motores-trifasicos",
+   "texto": "# Montaje\n- Tres pinzas, misma escala y simultáneas. [Criterio]\n# Lectura\n- Sano: tres senoides de igual amplitud desfasadas 120°. [Teórico OEM]\n- Las pequeñas distorsiones de conmutación de los IGBT no son avería. [Teórico OEM]\n- Tres fases iguales a 120° pero el motor no rinde: carga o mecánica, no electricidad. [Inferido]\n- Una fase de menor amplitud o ausente: etapa de potencia del inversor, cable o bobinado. Confirmar con miliohmios. [Inferido]",
+   "valores": [
+    {
+     "magnitud": "Desfase entre fases sanas",
+     "valor": 120,
+     "unidad": "°",
+     "condicion": "tres senoides de igual amplitud"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: motores-trifasicos"
+  },
+  {
+   "id": "N-TRI-04",
+   "titulo": "Vista XY (método Martins)",
+   "tema": "motores-trifasicos",
+   "texto": "# Cómo\n- Dibujar las corrientes (vector de Park iD/iQ) o el seno frente al coseno del resolver. [Teórico OEM]\n- Ventana XY cuadrada 1:1 o el círculo sale elipse; mismas escalas en los canales. [Teórico OEM]\n# Lectura\n- Círculo limpio: equilibrado. [Inferido]\n- Desequilibrio: fase débil. [Inferido]\n- Patrón deformado: fase perdida. [Inferido]\n- Las tres conclusiones salen de las capturas de la fuente, no de una norma. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: motores-trifasicos"
+  },
+  {
+   "id": "N-TRI-05",
+   "titulo": "Resolver: sensor de posición",
+   "tema": "motores-trifasicos",
+   "texto": "# Principio\n- Tres devanados flotantes: excitación, seno y coseno. Seno y coseno a 90°. [Teórico OEM]\n# Medida\n- Exige entradas flotantes o sondas diferenciales: con masa común se ponen en corto los devanados. [Teórico OEM]\n- Se filtra la portadora de excitación con un canal matemático. [Medido]\n# Lectura\n- Seno y coseno desiguales o fuera de 90°: resolver o su cableado. [Inferido]\n- Resolver con lóbulos distintos al original: fallo grave del control. [Teórico OEM]\n- ⚠ La ficha original da 10 kHz de excitación; es una inferencia. Manda la ficha del fabricante del vehículo. [Inferido]",
+   "valores": [
+    {
+     "magnitud": "Desfase seno-coseno del resolver",
+     "valor": 90,
+     "unidad": "°",
+     "condicion": ""
+    },
+    {
+     "magnitud": "Excitación del resolver (a confirmar con el fabricante)",
+     "valor": 10,
+     "unidad": "kHz",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: motores-trifasicos"
+  },
+  {
+   "id": "N-TRI-06",
+   "titulo": "Sincronismo y consumo coherente con las rpm",
+   "tema": "motores-trifasicos",
+   "texto": "# Sincronismo\n- La velocidad del campo (frecuencia de fase y pares de polos) debe coincidir punto a punto con la del rotor medida por su sensor. [Medido]\n- Campo y rotor que no coinciden: sensor de rotor o control. [Inferido]\n# Consumo\n- rpm = 60 · 2 · f / polos en un BLDC de 4 polos. [Medido]\n- Muchas rpm sin presión ni par con corriente moderada: carga ausente (fuga hidráulica), no el motor. [Medido]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: motores-trifasicos"
+  },
+  {
+   "id": "N-TRI-07",
+   "titulo": "Bobinado, aislamiento y unión equipotencial",
+   "tema": "motores-trifasicos",
+   "texto": "# Fuera del coche\n- Miliohmios entre fases (equilibrio) y megóhmetro de aislamiento. Separa motor de inversor. [Criterio]\n- Equilibrio de fases no garantiza buen estado si hay electrónica interna (MOSFET). [Medido]\n- Bobinados equilibrados y corriente anómala: electrónica interna o inversor. [Inferido]\n# Unión equipotencial\n- Tras desmontaje o chapa, medir la resistencia chasis-componentes HV (R100). [Criterio]\n# Mando\n- Mando a 0 V y ventilador a tope: cable a masa, estrategia de emergencia. [Medido]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: motores-trifasicos"
+  },
+  {
+   "id": "N-TRI-08",
+   "titulo": "Casos reales: solo ilustran el método",
+   "tema": "motores-trifasicos",
+   "texto": "# Ejemplos (dato de un caso, no de fabricante)\n- Ventilador IPU de Honda con picos de 33 A que fundían el fusible. [Medido]\n- Bomba EC de un Audi SQ5 a 10 000 rpm y 7,6 A por una avería hidráulica. [Medido]\n# Límite\n- Sin ficha de vídeo sobre un inversor Lexus ni un Mini eléctrico: no se usan como ejemplo. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Picos del ventilador IPU que fundían el fusible",
+     "valor": 33,
+     "unidad": "A",
+     "condicion": "dato de un caso"
+    },
+    {
+     "magnitud": "Bomba EC con avería hidráulica: velocidad",
+     "valor": 10000,
+     "unidad": "rpm",
+     "condicion": "dato de un caso"
+    },
+    {
+     "magnitud": "Bomba EC con avería hidráulica: corriente",
+     "valor": 7.6,
+     "unidad": "A",
+     "condicion": "dato de un caso"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: motores-trifasicos"
+  }
+ ]
+}

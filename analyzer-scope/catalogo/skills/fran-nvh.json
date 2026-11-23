@@ -1,0 +1,107 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-nvh",
+ "nombre": "Fran · NVH (ruido y vibración)",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Diagnóstico de ruidos, vibraciones y aspereza con PicoScope y kit NVH (acelerómetros triaxiales): condición, colocación, órdenes y reparto de causas. Material de guías y casos de un vehículo, no de fabricante. Sin reglas: no hay entidad de acelerómetro ni medida de orden; todo va como notas.",
+ "acceso": "libre",
+ "reglas": [],
+ "notas": [
+  {
+   "id": "N-NVH-01",
+   "titulo": "Conceptos NVH y kit de acelerómetros",
+   "tema": "nvh",
+   "texto": "# Conceptos\n- Ruido = acústico; vibración = táctil; aspereza = respuesta brusca a irregularidades. [Teórico OEM]\n- La amplitud se da en mg y la frecuencia en Hz. [Medido]\n- Hz = rpm / 60. [Teórico OEM]\n# Kit\n- Acelerómetro triaxial: 3 ejes (longitudinal X, vertical Y, lateral Z) por canal; 4 canales dan 12 ejes. [Inferido]\n- El PicoBNC+ lo reconoce solo y no necesita pilas (series 4225A y 4425A). [Teórico OEM]",
+   "valores": [
+    {
+     "magnitud": "Ejes por acelerómetro",
+     "valor": 3,
+     "unidad": "ejes",
+     "condicion": "X longitudinal, Y vertical, Z lateral"
+    },
+    {
+     "magnitud": "Ejes con 4 canales",
+     "valor": 12,
+     "unidad": "ejes",
+     "condicion": ""
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: nvh"
+  },
+  {
+   "id": "N-NVH-02",
+   "titulo": "Órdenes: motor, rueda y transmisión",
+   "tema": "nvh",
+   "texto": "# Definición\n- E = motor (E1 = 1 × régimen). [Teórico OEM]\n- T = rueda. [Teórico OEM]\n- P = transmisión. [Teórico OEM]\n# Tabla orden → causa\n- E1, E2, E4… (varía con rpm, no con velocidad): motor y auxiliares. [Inferido]\n- T1, T2, T3 (varía con velocidad): rueda, neumático, llanta, freno, palier. [Inferido]\n- P según la transmisión: cardán o transmisión. [Teórico OEM]\n# Ojo\n- ⚠ T1 no siempre es la rueda: cualquier pieza que gire a la velocidad de rueda (un palier) da T1. [Medido]\n- Para discriminar: cambiar de marcha a igual velocidad. El orden T no se mueve; el E sí. [Inferido]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: nvh"
+  },
+  {
+   "id": "N-NVH-03",
+   "titulo": "Método de diagnóstico NVH",
+   "tema": "nvh",
+   "texto": "# Orden\n- 1. Definir la queja: ruido, vibración o aspereza; a qué velocidad o régimen, en aceleración o retención, con carga o sin ella. [Criterio]\n- 2. Leer códigos antes: la UCE no ve desequilibrios mecánicos. [Criterio]\n- 3. Reproducir la condición con el cliente o en una prueba dinámica idéntica. Si no se reproduce, no se mide. [Criterio]\n- 4. Referencia de régimen y velocidad por OBD (J2534) para que el software calcule órdenes. [Teórico OEM]\n- 5. Primer sensor de referencia en un punto fijo del habitáculo (tornillo o guía del asiento), con imán, orientando los ejes como la interfaz. [Criterio]\n- 6. Espectro: qué orden supera el nivel normal y en qué eje. [Criterio]\n- 7. Triangular con más sensores midiendo siempre el mismo eje, con uno en el habitáculo de testigo. [Criterio]\n- 8. Aislar por exclusión y validar al final. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: nvh"
+  },
+  {
+   "id": "N-NVH-04",
+   "titulo": "Datos del asistente y colocación de sensores",
+   "tema": "nvh",
+   "texto": "# Asistente del software\n- Pide cilindros, relaciones de cambio, grupo final y neumático. Un dato mal falsea los órdenes. [Teórico OEM]\n# Colocación\n- Imán en un punto fijo; con una caja de aluminio, pegar antes una arandela de acero para el imán. [Medido]\n- Cables bien guiados, fuera de palieres, ruedas y correas. [Criterio]\n- Repetir con el sensor en el mismo sitio y en las mismas condiciones. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: nvh"
+  },
+  {
+   "id": "N-NVH-05",
+   "titulo": "Aislar la fuente por exclusión",
+   "tema": "nvh",
+   "texto": "# Por sistema\n- Motor: quitar la correa de accesorios y ver si desaparece el orden E. [Inferido]\n- Ruedas: medir excentricidad y alabeo con reloj comparador. Equilibrar no corrige la excentricidad de la llanta. [Medido]\n- Palieres: buscar holguras. [Inferido]\n# Acelerómetro como estetoscopio\n- Con el orden ya identificado, buscar el punto de máxima amplitud de ese orden. [Criterio]\n# Validar\n- El objetivo es bajar la amplitud, no llegar a cero. [Criterio]\n- No sustituir piezas de oído ni sin medir antes de desmontar. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: nvh"
+  },
+  {
+   "id": "N-NVH-06",
+   "titulo": "Trampas habituales",
+   "tema": "nvh",
+   "texto": "# Trampas\n- Amplitud no es foco: una chapa fina vibra más que un larguero. [Medido]\n- Para impactos, comparar el retardo entre sensores con zoom: el primero en recibir está más cerca de la fuente (retardos de µs en el caso). [Medido]\n- Pueden coexistir varias fuentes en distintos rangos de velocidad: barrido completo al validar. [Medido]\n- Si no se reproduce la queja, no se mide. [Criterio]\n- Se puede confundir un palier con la rueda: ver nota de órdenes. [Inferido]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: nvh"
+  },
+  {
+   "id": "N-NVH-07",
+   "titulo": "Casos reales: solo ilustran el método",
+   "tema": "nvh",
+   "texto": "# Ejemplos (dato de un caso, no de fabricante)\n- Motor: pico en E1,5 a 1600 rpm, 113 mg antes y 6 mg después de reparar. [Medido]\n- Rueda: pico a 18,6 Hz a 83 mph, 18,3 mg; tras cambiar las llantas, 3,99 mg. [Medido]\n- Palier: T1 a 10,7 Hz, 101 mg en aceleración y casi 0 al desacelerar. [Medido]\n- Dirección: un impacto localizado por el retardo entre sensores. [Medido]",
+   "valores": [
+    {
+     "magnitud": "Motor: pico en E1,5 antes de reparar",
+     "valor": 113,
+     "unidad": "mg",
+     "condicion": "1600 rpm, dato de un caso"
+    },
+    {
+     "magnitud": "Motor: pico tras reparar",
+     "valor": 6,
+     "unidad": "mg",
+     "condicion": "1600 rpm, dato de un caso"
+    },
+    {
+     "magnitud": "Rueda: pico antes de cambiar llantas",
+     "valor": 18.3,
+     "unidad": "mg",
+     "condicion": "18,6 Hz a 83 mph, dato de un caso"
+    },
+    {
+     "magnitud": "Rueda: pico tras cambiar llantas",
+     "valor": 3.99,
+     "unidad": "mg",
+     "condicion": "dato de un caso"
+    },
+    {
+     "magnitud": "Palier: T1 en aceleración",
+     "valor": 101,
+     "unidad": "mg",
+     "condicion": "10,7 Hz, casi 0 al desacelerar, dato de un caso"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: nvh"
+  }
+ ]
+}

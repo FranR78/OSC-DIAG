@@ -3,6 +3,17 @@
  "indice": [
   {
    "tipo": "skill",
+   "id": "fran-abs",
+   "nombre": "Fran · Sensores de rueda ABS",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-abs.json",
+   "temas": [],
+   "reglas": 0
+  },
+  {
+   "tipo": "skill",
    "id": "fran-can",
    "nombre": "Fran · Red CAN (ISO 11898-2)",
    "autor": "Fran Rosales",
@@ -29,6 +40,102 @@
   },
   {
    "tipo": "skill",
+   "id": "fran-compresion",
+   "nombre": "Fran · Compresión relativa y estado mecánico",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-compresion.json",
+   "temas": [
+    "compresion-relativa"
+   ],
+   "reglas": 1
+  },
+  {
+   "tipo": "skill",
+   "id": "fran-distribucion",
+   "nombre": "Fran · Sincronismo de la distribución",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-distribucion.json",
+   "temas": [],
+   "reglas": 0
+  },
+  {
+   "tipo": "skill",
+   "id": "fran-encendido",
+   "nombre": "Fran · Fallo de cilindro y encendido",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-encendido.json",
+   "temas": [
+    "avance-encendido"
+   ],
+   "reglas": 1
+  },
+  {
+   "tipo": "skill",
+   "id": "fran-flexray",
+   "nombre": "Fran · Red FlexRay",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-flexray.json",
+   "temas": [],
+   "reglas": 0
+  },
+  {
+   "tipo": "skill",
+   "id": "fran-lambda",
+   "nombre": "Fran · Sonda lambda",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-lambda.json",
+   "temas": [
+    "sonda-lambda"
+   ],
+   "reglas": 2
+  },
+  {
+   "tipo": "skill",
+   "id": "fran-nvh",
+   "nombre": "Fran · NVH (ruido y vibración)",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-nvh.json",
+   "temas": [],
+   "reglas": 0
+  },
+  {
+   "tipo": "skill",
+   "id": "fran-picoscope",
+   "nombre": "Fran · Manejo de PicoScope",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-picoscope.json",
+   "temas": [],
+   "reglas": 0
+  },
+  {
+   "tipo": "skill",
+   "id": "fran-sensores-motor",
+   "nombre": "Fran · Sensores de gestión del motor",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-sensores-motor.json",
+   "temas": [
+    "sensores-motor"
+   ],
+   "reglas": 2
+  },
+  {
+   "tipo": "skill",
    "id": "fran-transductor",
    "nombre": "Fran · Transductor de presión",
    "autor": "Fran Rosales",
@@ -41,6 +148,17 @@
     "pulso-cilindro-car"
    ],
    "reglas": 3
+  },
+  {
+   "tipo": "skill",
+   "id": "fran-trifasicos",
+   "nombre": "Fran · Motores trifásicos y resolver",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-trifasicos.json",
+   "temas": [],
+   "reglas": 0
   }
  ]
 }
