@@ -600,7 +600,7 @@ const spanish = t => [...new Set((t.replace(/Ortu (&amp; |& )?(Rosales )?Automoc
     check('editor: un script mal escrito no se guarda y dice por qué', /No se guarda: no tiene pasos/.test(await k.textContent('#kESt')), await k.textContent('#kESt'));
     await k.evaluate(() => { const o = JSON.parse(JSON.stringify(SCRIPTS_BASE[0])); o.nombre = 'Mi mecánica'; $('kTx').value = JSON.stringify(o); }); await k.click('#kGu');
     check('editor: guarda los cambios en la copia', await KE(() => JSON.parse(localStorage.getItem('as_scripts'))[0].nombre === 'Mi mecánica' && /Mi mecánica/.test($('kL').textContent)));
-    check('catálogo: la app no trae activas las skills de CKP y CAN (se instalan)', await KE(() => !rgTodos().some(P => /^fran-/.test(P.paquete)) && CAT_IDX.filter(i => i.tipo === 'skill').map(i => i.id).sort().join() === 'fran-can,fran-ckp,fran-transductor'));
+    check('catálogo: la app no trae activas las skills de CKP y CAN (se instalan)', await KE(() => !rgTodos().some(P => /^fran-/.test(P.paquete)) && ['fran-can', 'fran-ckp', 'fran-transductor'].every(id => CAT_IDX.some(i => i.tipo === 'skill' && i.id === id))));
     await k.click('#kL .skI[data-k="FR-CAN-01"]'); await k.waitForTimeout(100);
     check('procedimiento sin su skill: ofrece «Instalar» desde el catálogo', /Instalar «Fran · Red CAN/.test(await k.textContent('#kCab')));
     await k.click('#kCab .skInst'); await k.waitForTimeout(150);
@@ -639,6 +639,8 @@ const spanish = t => [...new Set((t.replace(/Ortu (&amp; |& )?(Rosales )?Automoc
     await k.evaluate(() => rgSetActivo('fran-can', false)); await k.click('#kL .skI[data-k="FR-CAN-01"]'); await k.waitForTimeout(100);
     check('skill desactivada: ofrece activarla y al pulsar queda activa', /Activar «Fran · Red CAN/.test(await k.textContent('#kCab')) && await (async () => { await k.click('#kCab .skAct'); await k.waitForTimeout(100); return await KE(() => rgActivo({ paquete: 'fran-can' }) && !/necesita skills/.test($('kCab').textContent)); })());
     check('catálogo de medidas: cada medida que usan las skills existe en el motor', await KE(() => { const ids = new Set(MEDIDAS.map(m => m.id).concat(Object.keys(MLB))); return Object.values(CATALOGO.items).filter(P => P.reglas).every(P => P.reglas.every(r => r.si.every(c => ids.has(c.medida)))); }));
+    const todas = await KE(() => CAT_IDX.filter(i => i.tipo === 'skill').map(i => { const P = CATALOGO.items['skill:' + i.id]; return P ? [i.id, rgValida(P).concat((P.notas || []).filter(n => !n.texto).map(n => n.id + ' sin texto'), P.reglas.filter(r => r.estado !== 'borrador' && !/^fran-(can|ckp)$/.test(i.id)).map(r => r.id + ' no está en borrador'))] : [i.id, ['no está en el catálogo libre']]; }).filter(x => x[1].length));
+    check('catálogo: todas las skills son válidas, con notas con texto y reglas nuevas en borrador', !todas.length, JSON.stringify(todas));
     const tr = await KE(() => { const P = CATALOGO.items['skill:fran-transductor'], R = id => P.reglas.find(r => r.id === id);
       const p = (ent, id, pc) => ({ contexto: { motor: { cilindros: 4 }, senales: [{ canal: 'CH1', entidad: ent }] }, medidas: [{ id, canal: 'CH1', unidad: '%', por_cilindro: pc }] });
       const E = (r, q) => rgEval(R(r), P, q).map(h => h.sintoma);
