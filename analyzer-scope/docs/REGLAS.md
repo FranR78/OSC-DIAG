@@ -69,3 +69,8 @@ Una regla mal escrita no se evalúa. Un paquete importado mal escrito se rechaza
 | `can_ov_pct`, `can_crc_mal`, `can_err_tramas` | Sobreoscilación; CRC mal; tramas de error | %, — | — |
 | `can_dif_unidad`, `can_desv_unidad_pct`, `can_ov_unidad_pct`, `can_crc_unidad` | Lo mismo por unidad (ID) | V, % | unidad (`{unidad}` = ID en hex) |
 Skills base que las usan: `fran-ckp.json`, `fran-can.json`.
+
+## Comprobaciones detalladas (2026.12.02)
+Cada elemento de `comprobaciones` admite, además de `texto`, `tipo` y `esperado`:
+`donde` (conector, pines), `estado` (contacto, motor…), `herramienta`, `pasos` (lista), `si_bien`, `si_mal`. Todos aceptan `{cil}`, `{unidad}`, `{valor}`.
+La plantilla de hoja de cálculo sigue llevando solo «texto → esperado»; el detalle se escribe en el JSON (editor o importar).

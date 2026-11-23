@@ -3,7 +3,7 @@
  "paquete": "fran-can",
  "nombre": "Fran · Red CAN (ISO 11898-2)",
  "autor": "Fran Rosales",
- "version": "2026.12.01",
+ "version": "2026.12.02",
  "aviso": "CAN de alta velocidad. El CAN de baja velocidad tolerante a fallos tiene otros niveles. La terminación (60 Ω) se mide con polímetro.",
  "reglas": [
   {
@@ -32,8 +32,18 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Desconectar unidades una a una hasta que CAN-H vuelva a ≈ 2,5 V",
-     "tipo": "prueba"
+     "texto": "Buscar a qué unidad o tramo va el cortocircuito de CAN-H a positivo",
+     "tipo": "prueba",
+     "donde": "Conector de diagnosis (OBD): pin 6 = CAN-H, pin 14 = CAN-L, pin 4/5 = masa",
+     "estado": "Contacto quitado, batería conectada",
+     "herramienta": "Polímetro (y el osciloscopio para confirmar)",
+     "pasos": [
+      "Medir la resistencia entre el pin 6 y masa.",
+      "Desconectar las unidades de la red una a una (o soltar los empalmes del mazo) y repetir la medida.",
+      "Cuando la medida vuelve a ser normal, la última unidad o tramo desconectado es el del cortocircuito."
+     ],
+     "esperado": "Sin continuidad a masa ni a positivo (varios kΩ)",
+     "si_bien": "Si nunca vuelve a la normalidad con todo desconectado, el cortocircuito está en el cableado: revisar el mazo por zonas."
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
@@ -65,9 +75,18 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Medir resistencia de CAN-H a masa con el contacto quitado",
-     "tipo": "medida",
-     "esperado": "sin continuidad"
+     "texto": "Buscar a qué unidad o tramo va el cortocircuito de CAN-H a masa",
+     "tipo": "prueba",
+     "donde": "Conector de diagnosis (OBD): pin 6 = CAN-H, pin 14 = CAN-L, pin 4/5 = masa",
+     "estado": "Contacto quitado, batería conectada",
+     "herramienta": "Polímetro (y el osciloscopio para confirmar)",
+     "pasos": [
+      "Medir la resistencia entre el pin 6 y masa.",
+      "Desconectar las unidades de la red una a una (o soltar los empalmes del mazo) y repetir la medida.",
+      "Cuando la medida vuelve a ser normal, la última unidad o tramo desconectado es el del cortocircuito."
+     ],
+     "esperado": "Sin continuidad a masa ni a positivo (varios kΩ)",
+     "si_bien": "Si nunca vuelve a la normalidad con todo desconectado, el cortocircuito está en el cableado: revisar el mazo por zonas."
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
@@ -99,8 +118,18 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Desconectar unidades una a una hasta que CAN-L vuelva a ≈ 2,5 V",
-     "tipo": "prueba"
+     "texto": "Buscar a qué unidad o tramo va el cortocircuito de CAN-L a positivo",
+     "tipo": "prueba",
+     "donde": "Conector de diagnosis (OBD): pin 6 = CAN-H, pin 14 = CAN-L, pin 4/5 = masa",
+     "estado": "Contacto quitado, batería conectada",
+     "herramienta": "Polímetro (y el osciloscopio para confirmar)",
+     "pasos": [
+      "Medir la resistencia entre el pin 14 y masa.",
+      "Desconectar las unidades de la red una a una (o soltar los empalmes del mazo) y repetir la medida.",
+      "Cuando la medida vuelve a ser normal, la última unidad o tramo desconectado es el del cortocircuito."
+     ],
+     "esperado": "Sin continuidad a masa ni a positivo (varios kΩ)",
+     "si_bien": "Si nunca vuelve a la normalidad con todo desconectado, el cortocircuito está en el cableado: revisar el mazo por zonas."
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
@@ -132,9 +161,18 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Medir resistencia de CAN-L a masa con el contacto quitado",
-     "tipo": "medida",
-     "esperado": "sin continuidad"
+     "texto": "Buscar a qué unidad o tramo va el cortocircuito de CAN-L a masa",
+     "tipo": "prueba",
+     "donde": "Conector de diagnosis (OBD): pin 6 = CAN-H, pin 14 = CAN-L, pin 4/5 = masa",
+     "estado": "Contacto quitado, batería conectada",
+     "herramienta": "Polímetro (y el osciloscopio para confirmar)",
+     "pasos": [
+      "Medir la resistencia entre el pin 14 y masa.",
+      "Desconectar las unidades de la red una a una (o soltar los empalmes del mazo) y repetir la medida.",
+      "Cuando la medida vuelve a ser normal, la última unidad o tramo desconectado es el del cortocircuito."
+     ],
+     "esperado": "Sin continuidad a masa ni a positivo (varios kΩ)",
+     "si_bien": "Si nunca vuelve a la normalidad con todo desconectado, el cortocircuito está en el cableado: revisar el mazo por zonas."
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
@@ -178,13 +216,32 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Repetir con contacto puesto: tiene que haber tráfico",
-     "tipo": "prueba"
+     "texto": "Confirmar que la red está despierta",
+     "tipo": "prueba",
+     "donde": "Conector de diagnosis (OBD): pin 6 = CAN-H, pin 14 = CAN-L, pin 4/5 = masa",
+     "estado": "Contacto puesto (o motor en marcha)",
+     "herramienta": "Osciloscopio",
+     "pasos": [
+      "Dar contacto y repetir la captura de CAN-H y CAN-L."
+     ],
+     "esperado": "Tramas: CAN-H sube a ≈ 3,5 V y CAN-L baja a ≈ 1,5 V",
+     "si_bien": "La red estaba dormida: no hay avería.",
+     "si_mal": "Sigue sin tramas con contacto: medir la terminación (siguiente comprobación)."
     },
     {
-     "texto": "Medir resistencia entre CAN-H y CAN-L",
+     "texto": "Medir la terminación entre CAN-H y CAN-L",
      "tipo": "medida",
-     "esperado": "≈ 60 Ω"
+     "donde": "Conector de diagnosis (OBD): pin 6 = CAN-H, pin 14 = CAN-L, pin 4/5 = masa",
+     "estado": "Contacto quitado y red dormida (2–5 min sin tocar el coche)",
+     "herramienta": "Polímetro en Ω",
+     "pasos": [
+      "Quitar el contacto y esperar a que la red se duerma.",
+      "Puntas en el pin 6 (CAN-H) y el pin 14 (CAN-L).",
+      "Leer la resistencia."
+     ],
+     "esperado": "≈ 60 Ω (dos resistencias de 120 Ω en paralelo)",
+     "si_bien": "La terminación está bien: busca la avería en los niveles de cada unidad (tabla por ID).",
+     "si_mal": "≈ 120 Ω → falta una terminación (unidad del extremo desconectada o cable abierto) · < 50 Ω → sobra carga o hay derivación · ≈ 0 Ω → CAN-H y CAN-L unidos."
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
@@ -337,9 +394,19 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Medir entre CAN-H y CAN-L con el contacto quitado",
+     "texto": "Medir la terminación entre CAN-H y CAN-L",
      "tipo": "medida",
-     "esperado": "≈ 60 Ω (120 Ω = falta una)"
+     "donde": "Conector de diagnosis (OBD): pin 6 = CAN-H, pin 14 = CAN-L, pin 4/5 = masa",
+     "estado": "Contacto quitado y red dormida (2–5 min sin tocar el coche)",
+     "herramienta": "Polímetro en Ω",
+     "pasos": [
+      "Quitar el contacto y esperar a que la red se duerma.",
+      "Puntas en el pin 6 (CAN-H) y el pin 14 (CAN-L).",
+      "Leer la resistencia."
+     ],
+     "esperado": "≈ 60 Ω (dos resistencias de 120 Ω en paralelo)",
+     "si_bien": "La terminación está bien: busca la avería en los niveles de cada unidad (tabla por ID).",
+     "si_mal": "≈ 120 Ω → falta una terminación (unidad del extremo desconectada o cable abierto) · < 50 Ω → sobra carga o hay derivación · ≈ 0 Ω → CAN-H y CAN-L unidos."
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
@@ -366,9 +433,19 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Medir entre CAN-H y CAN-L con el contacto quitado",
+     "texto": "Medir la terminación entre CAN-H y CAN-L",
      "tipo": "medida",
-     "esperado": "≈ 60 Ω (< 50 Ω = sobra carga)"
+     "donde": "Conector de diagnosis (OBD): pin 6 = CAN-H, pin 14 = CAN-L, pin 4/5 = masa",
+     "estado": "Contacto quitado y red dormida (2–5 min sin tocar el coche)",
+     "herramienta": "Polímetro en Ω",
+     "pasos": [
+      "Quitar el contacto y esperar a que la red se duerma.",
+      "Puntas en el pin 6 (CAN-H) y el pin 14 (CAN-L).",
+      "Leer la resistencia."
+     ],
+     "esperado": "≈ 60 Ω (dos resistencias de 120 Ω en paralelo)",
+     "si_bien": "La terminación está bien: busca la avería en los niveles de cada unidad (tabla por ID).",
+     "si_mal": "≈ 120 Ω → falta una terminación (unidad del extremo desconectada o cable abierto) · < 50 Ω → sobra carga o hay derivación · ≈ 0 Ω → CAN-H y CAN-L unidos."
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
@@ -423,8 +500,28 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Revisar masas y trenzado del cableado",
-     "tipo": "prueba"
+     "texto": "Localizar las tramas dañadas en la señal",
+     "tipo": "prueba",
+     "donde": "En la app: botón «▶» de cada trama con CRC mal",
+     "estado": "—",
+     "herramienta": "Analyzer Scope",
+     "pasos": [
+      "Pulsa cada «▶»: se abre la señal ampliada en esa trama.",
+      "Busca picos, escalones o flancos lentos justo en esa trama."
+     ],
+     "esperado": "Flancos limpios, sin picos",
+     "si_bien": "Si las tramas se ven limpias, repetir la captura: puede ser un error puntual.",
+     "si_mal": "Picos coincidiendo con el encendido o un actuador → interferencia: revisar masas y trenzado."
+    },
+    {
+     "texto": "Medir la caída de tensión en las masas de las unidades",
+     "tipo": "medida",
+     "donde": "Entre la masa de cada unidad de la red y el borne negativo de la batería",
+     "estado": "Motor en marcha con consumidores encendidos",
+     "herramienta": "Polímetro en V (o osciloscopio)",
+     "esperado": "< 0,1 V",
+     "si_bien": "Masas correctas: revisar el trenzado y los empalmes del mazo CAN.",
+     "si_mal": "> 0,1 V → limpiar y apretar ese punto de masa y repetir la captura."
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
@@ -480,12 +577,33 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Medir en el conector de la unidad {unidad} y comparar con el de diagnosis",
-     "tipo": "prueba"
+     "texto": "Medir la señal en el conector de la unidad {unidad}",
+     "tipo": "medida",
+     "donde": "Conector de la unidad que envía el ID {unidad} (CAN-H y CAN-L en sus pines)",
+     "estado": "Contacto puesto",
+     "herramienta": "Osciloscopio, dos canales a masa",
+     "pasos": [
+      "Pinchar CAN-H y CAN-L por detrás del conector de la unidad, sin desconectarla.",
+      "Capturar unos 100 ms y analizarlo con la app.",
+      "Comparar el nivel de esa unidad con el de la captura en el conector de diagnosis."
+     ],
+     "esperado": "El mismo nivel que en el conector de diagnosis (± 5 %)",
+     "si_bien": "En el conector está bien y en diagnosis no → el fallo está en el cableado entre los dos: empalmes y conectores intermedios.",
+     "si_mal": "En el conector también sale bajo → terminal del conector con mala presión o transceptor de la unidad. Limpiar y ajustar el terminal; si sigue igual, la unidad."
     },
     {
-     "texto": "Revisar conector y empalmes del ramal de {unidad}",
-     "tipo": "prueba"
+     "texto": "Revisar el conector y los empalmes del ramal de {unidad}",
+     "tipo": "prueba",
+     "donde": "Conector de la unidad y empalmes del mazo CAN de ese ramal",
+     "estado": "Contacto quitado",
+     "herramienta": "Inspección visual y polímetro",
+     "pasos": [
+      "Buscar óxido, terminales abiertos o pines doblados.",
+      "Medir la resistencia de CAN-H y de CAN-L entre el conector de la unidad y el de diagnosis."
+     ],
+     "esperado": "< 1 Ω en cada hilo",
+     "si_bien": "Cableado correcto: revisar la unidad.",
+     "si_mal": "> 1 Ω → reparar el empalme o el terminal con resistencia."
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
@@ -516,8 +634,19 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Medir en el conector de la unidad {unidad}",
-     "tipo": "prueba"
+     "texto": "Medir la señal en el conector de la unidad {unidad}",
+     "tipo": "medida",
+     "donde": "Conector de la unidad que envía el ID {unidad} (CAN-H y CAN-L en sus pines)",
+     "estado": "Contacto puesto",
+     "herramienta": "Osciloscopio, dos canales a masa",
+     "pasos": [
+      "Pinchar CAN-H y CAN-L por detrás del conector de la unidad, sin desconectarla.",
+      "Capturar unos 100 ms y analizarlo con la app.",
+      "Comparar el nivel de esa unidad con el de la captura en el conector de diagnosis."
+     ],
+     "esperado": "El mismo nivel que en el conector de diagnosis (± 5 %)",
+     "si_bien": "En el conector está bien y en diagnosis no → el fallo está en el cableado entre los dos: empalmes y conectores intermedios.",
+     "si_mal": "En el conector también sale bajo → terminal del conector con mala presión o transceptor de la unidad. Limpiar y ajustar el terminal; si sigue igual, la unidad."
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
@@ -609,9 +738,14 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Comprobar alimentación y masa de las demás unidades de la red",
+     "texto": "Comprobar que las demás unidades están alimentadas",
      "tipo": "medida",
-     "esperado": "batería en su alimentación"
+     "donde": "Alimentación (+30 / +15) y masa (31) de cada unidad de la red",
+     "estado": "Contacto puesto",
+     "herramienta": "Polímetro",
+     "esperado": "Tensión de batería en +30 y +15, < 0,1 V en masa",
+     "si_bien": "Alimentadas: revisar la continuidad de CAN-H y CAN-L hasta ellas.",
+     "si_mal": "Sin alimentación → fusible, relé o cableado de esa unidad."
     }
    ],
    "fuente": "ISO 11898-1 (acuse de recibo)",

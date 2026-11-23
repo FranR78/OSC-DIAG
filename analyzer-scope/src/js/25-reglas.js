@@ -38,7 +38,8 @@ function rgCondTxt(c){const u=c.unidad?' '+c.unidad:'';
   if(c.op==='entre')return i18('entre')+' '+c.valor[0]+' '+i18('y')+' '+c.valor[1]+u;
   if(c.op==='fuera')return i18('fuera de')+' '+c.valor[0]+'–'+c.valor[1]+u;
   return c.op+' '+c.valor+u}
-const rgSub=(t,v)=>String(t==null?'':t).replace(/\{(cil|valor|pct|canal|unidad)\}/g,(m,k)=>v[k]!=null?v[k]:m);
+const rgNumTxt=x=>typeof x==='number'&&isFinite(x)&&LANG!=='en'?String(x).replace('.',','):x;  // 32,5 % en español
+const rgSub=(t,v)=>String(t==null?'':t).replace(/\{(cil|valor|pct|canal|unidad)\}/g,(m,k)=>v[k]!=null?rgNumTxt(v[k]):m);
 /* evalúa una regla con la petición del diagnóstico → hallazgos (uno por cilindro o canal que cumple) */
 function rgEval(r,P,p){const H=[],motor=(p.contexto&&p.contexto.motor)||{},S=(p.contexto&&p.contexto.senales)||[],cx=r.contexto||{};
   if(motor.combustible&&rgL(cx.combustible).length&&!rgL(cx.combustible).includes(motor.combustible))return H;
@@ -66,7 +67,8 @@ function rgEval(r,P,p){const H=[],motor=(p.contexto&&p.contexto.motor)||{},S=(p.
         local:true,comparativa:r.si.some(c=>c.op==='peor'),confianza:r.confianza||'media',etiqueta:r.etiqueta||'',
         sintoma:i18(rgSub(r.sintoma,V)),evidencia:ev,
         causas:(r.causas||[]).map(c=>({texto:i18(rgSub(c.texto,V)),etiqueta:c.etiqueta||'Inferido',como_separar:c.separar?i18(rgSub(c.separar,V)):''})),
-        comprobaciones:(r.comprobaciones||[]).map((c,i)=>({orden:i+1,texto:i18(rgSub(c.texto,V)),tipo:c.tipo||'',esperado:c.esperado?rgSub(c.esperado,V):''}))})})}
+        comprobaciones:(r.comprobaciones||[]).map((c,i)=>{const q=x=>x?i18(rgSub(x,V)):'';return{orden:i+1,texto:q(c.texto),tipo:c.tipo||'',esperado:c.esperado?rgSub(c.esperado,V):'',
+          donde:q(c.donde),estado:q(c.estado),herramienta:q(c.herramienta),pasos:(c.pasos||[]).map(q),si_bien:q(c.si_bien),si_mal:q(c.si_mal)}})})})}
   return H}
 /* diagnóstico con los paquetes activos; los temas con criterio de varios paquetes llevan «criterios» (cumple o no cada uno) */
 const rgKey=x=>{const e=(x.evidencia||[])[0]||{};return(e.cilindro==null?'':e.cilindro)+'|'+(e.canal||'')};

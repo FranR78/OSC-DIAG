@@ -652,6 +652,8 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     if (!(await k.$('#kCkGo'))) { await k.click('#kDemo'); }
     await k.click('#kCkGo'); await k.waitForTimeout(500); await k.click('#kPaso .mdV'); await k.waitForTimeout(300);
     check('«Ver en la señal»: abre la captura en el osciloscopio, amplía la carrera del cilindro y la marca', await KE(() => curTab === 'S' && MARCA && /Cilindro 3/.test(MARCA.txt) && view.t0 < MARCA.t0 && view.t0 + view.span > MARCA.t1 && view.span < 0.2));
+    const cmp = await KE(() => { const a = canAnaliza(canDemo(), { ih: 0, il: 1 }), h = mdSkills(canMedidas(a)).H.find(x => x.regla === 'FR-CAN-15'), c = h && h.comprobaciones[0]; return c ? { donde: c.donde, pasos: c.pasos.length, bien: !!c.si_bien, mal: !!c.si_mal, sint: h.sintoma, html: mdHallazgosHTML({ H: [h], usadas: ['x'] }, '', null) } : null; });
+    check('comprobaciones detalladas: dónde, pasos, si sale bien / mal, con la unidad sustituida y números con coma', cmp && /0x2F1/.test(cmp.donde) && cmp.pasos === 3 && cmp.bien && cmp.mal && /32,5 %/.test(cmp.sint) && /2\. Revisar el conector/.test(cmp.html), JSON.stringify(cmp && { d: cmp.donde, s: cmp.sint }));
     check('procedimientos: sin errores JS', ke.length === 0, ke.join(' | '));
     await k.close();
   }

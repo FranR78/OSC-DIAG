@@ -3,7 +3,7 @@
  "paquete": "fran-ckp",
  "nombre": "Fran · Equilibrio de cilindros (CKP)",
  "autor": "Fran Rosales",
- "version": "2026.11.28",
+ "version": "2026.12.02",
  "aviso": "Aporte de cada cilindro medido con el sensor de cigüeñal en su propia carrera de trabajo: el cilindro señalado es el responsable. Umbral del 85 % en borrador: validar con capturas reales.",
  "reglas": [
   {
@@ -29,8 +29,18 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Repetir la captura con tramo sin combustión (apagar grabando o corte de encendido)",
-     "tipo": "prueba"
+     "texto": "Repetir la captura con un tramo sin combustión",
+     "tipo": "prueba",
+     "donde": "Sensor de cigüeñal + sincronismo del cilindro 1",
+     "estado": "Motor a temperatura",
+     "herramienta": "Osciloscopio",
+     "pasos": [
+      "Grabar a ralentí unos segundos.",
+      "Acelerar por encima de 3000 RPM.",
+      "Gasolina: cortar el encendido con la mariposa abierta y dejar que el motor se pare grabando. Diésel: acelerón y apagar el motor grabando."
+     ],
+     "esperado": "Aparece el tramo «Sin combustión» en la tabla del análisis",
+     "si_bien": "Con ese tramo la app separa mecánica de combustión."
     }
    ],
    "fuente": "Curso de scripts (Autoscope), script CSS, pág. 56–71",
@@ -65,14 +75,29 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Compresión relativa (procedimiento «Integridad mecánica»)",
+     "texto": "Compresión relativa",
      "tipo": "prueba",
-     "esperado": "cilindro {cil} por debajo del 90 %"
+     "donde": "Procedimiento «Integridad mecánica» → Compresión relativa",
+     "estado": "Inyección cortada, batería cargada",
+     "herramienta": "Pinza amperimétrica + osciloscopio",
+     "esperado": "Cilindro {cil} por encima del 90 % del mejor",
+     "si_bien": "No confirma la fuga: repetir el análisis del cigüeñal.",
+     "si_mal": "Confirma la fuga: prueba de fugas en el cilindro {cil}."
     },
     {
      "texto": "Prueba de fugas en el cilindro {cil}",
      "tipo": "prueba",
-     "esperado": "< 20 %"
+     "donde": "Hueco de la bujía o del calentador del cilindro {cil}",
+     "estado": "Motor parado, cilindro {cil} en el PMS de compresión, motor caliente",
+     "herramienta": "Comprobador de fugas (aire a 5–7 bar)",
+     "pasos": [
+      "Poner el cilindro {cil} en el PMS de compresión.",
+      "Conectar el comprobador y meter aire.",
+      "Leer la fuga y escuchar por dónde sale."
+     ],
+     "esperado": "Fuga < 20 %",
+     "si_bien": "Cilindro estanco: revisar la distribución (procedimiento «Integridad mecánica»).",
+     "si_mal": "Aire por la admisión → válvula de admisión · por el escape → válvula de escape · por el cárter (tapón de aceite) → segmentos · burbujas en el vaso de expansión → junta de culata."
     }
    ],
    "fuente": "Curso de scripts, pág. 67 (caída con encendido cortado)",
@@ -112,8 +137,28 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Procedimiento «Encendido» o «Inyección» en el cilindro {cil}",
-     "tipo": "prueba"
+     "texto": "Cambiar la bobina del cilindro {cil} con la de otro cilindro",
+     "tipo": "prueba",
+     "donde": "Bobinas de encendido",
+     "estado": "Motor parado",
+     "herramienta": "Herramienta manual",
+     "pasos": [
+      "Intercambiar la bobina del cilindro {cil} con la de un cilindro que va bien.",
+      "Repetir la captura y el análisis."
+     ],
+     "esperado": "El fallo sigue en el cilindro {cil}",
+     "si_bien": "El fallo no es de la bobina: revisar la bujía y el inyector del cilindro {cil}.",
+     "si_mal": "El fallo se ha ido al otro cilindro → la bobina está mal."
+    },
+    {
+     "texto": "Corriente del inyector del cilindro {cil}",
+     "tipo": "prueba",
+     "donde": "Procedimiento «Inyección» → Corriente de inyector",
+     "estado": "Ralentí",
+     "herramienta": "Pinza de corriente + punta 10:1",
+     "esperado": "Escalón de apertura de la aguja visible, igual que en el resto",
+     "si_bien": "Inyector correcto: revisar la bujía (aspecto, separación).",
+     "si_mal": "Sin escalón o retrasado → inyector obstruido o agarrotado."
     }
    ],
    "fuente": "Curso de scripts (Autoscope), script CSS, pág. 56–71",
@@ -153,13 +198,19 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Procedimiento «Inyección» en el cilindro {cil}",
-     "tipo": "prueba"
-    },
-    {
      "texto": "Prueba de retorno de los inyectores",
      "tipo": "medida",
-     "esperado": "retorno del cilindro {cil} similar al resto"
+     "donde": "Retornos de los inyectores (probetas)",
+     "estado": "Ralentí, motor caliente, 2–5 min",
+     "herramienta": "Kit de probetas de retorno",
+     "pasos": [
+      "Conectar una probeta a cada retorno.",
+      "Dejar el motor a ralentí el tiempo que indique el fabricante.",
+      "Comparar los volúmenes."
+     ],
+     "esperado": "Volúmenes parecidos entre cilindros (dato del fabricante)",
+     "si_bien": "Retornos iguales: revisar la compresión del cilindro {cil}.",
+     "si_mal": "El cilindro {cil} retorna bastante más → inyector con fuga interna."
     }
    ],
    "fuente": "Curso de scripts, casos diésel, pág. 72–86",
@@ -199,8 +250,14 @@
    ],
    "comprobaciones": [
     {
-     "texto": "Procedimiento «Encendido» con acelerones",
-     "tipo": "prueba"
+     "texto": "Encendido con carga en el cilindro {cil}",
+     "tipo": "prueba",
+     "donde": "Bobina del cilindro {cil} (pinza inductiva o secundario)",
+     "estado": "Acelerones o carga",
+     "herramienta": "Osciloscopio",
+     "esperado": "Tensión de chispa y tiempo de quemado parecidos al resto",
+     "si_bien": "Encendido correcto: revisar el inyector del cilindro {cil}.",
+     "si_mal": "Tensión muy alta o quemado corto con carga → bujía o bobina."
     }
    ],
    "fuente": "Curso de scripts, pág. 64",

@@ -92,7 +92,8 @@ function dxShow(res){
     if(h.causas&&h.causas.length){d.appendChild(T('h4',i18('Posibles causas')));h.causas.forEach(c=>d.appendChild(T('div','• '+c.texto+' ('+c.etiqueta+')'+(c.como_separar?' — '+c.como_separar:''),'hint')))}
     if(h.comprobaciones&&h.comprobaciones.length){d.appendChild(T('h4',i18('Comprobaciones')));
       h.comprobaciones.forEach((c,ci)=>{const l=T('label',null,'dxc'),cb=document.createElement('input');cb.type='checkbox';cb.checked=!!c._ok;cb.onchange=()=>{c._ok=cb.checked};
-        l.appendChild(cb);l.appendChild(document.createTextNode(' '+c.orden+'. '+c.texto+(c.esperado?' → '+c.esperado:'')));d.appendChild(l)})}
+        l.appendChild(cb);l.appendChild(document.createTextNode(' '+c.orden+'. '+c.texto+(c.esperado&&!(c.si_bien||c.si_mal||(c.pasos&&c.pasos.length))?' → '+c.esperado:'')));d.appendChild(l);
+        if(typeof mdCompHTML==='function'&&(c.donde||c.estado||c.herramienta||c.si_bien||c.si_mal||(c.pasos&&c.pasos.length))){const x=document.createElement('div');x.className='dxcd';x.innerHTML=mdCompHTML(c,true);d.appendChild(x)}})}
     (h.notas_paquete||[]).forEach(n=>{const b=T('button','📖 '+n.titulo,'nu');b.onclick=()=>rgNotaVer(n,h.paquete_nombre);d.appendChild(b)});
     if(h.url_portal)d.appendChild(lnk(h.url_portal,i18('Nota técnica')+': '+(h.nt_titulo||h.nt_id)));box.appendChild(d)});
   if(res.relacionadas&&res.relacionadas.length){box.appendChild(T('h4',i18('Notas relacionadas')));res.relacionadas.forEach(r=>{const d=T('div');d.appendChild(lnk(r.url_portal,r.titulo));box.appendChild(d)})}

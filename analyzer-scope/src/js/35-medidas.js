@@ -56,7 +56,7 @@ function mdHallazgosHTML(res,vacio,ctx){
   if(!res.H.length)h+='<div class="skA ok"><b>✓</b><span>'+vacio+'</span></div>';
   res.H.forEach(x=>{h+='<div class="skA '+mdSev(x)+' mdH"><b>'+(mdSev(x)==='bad'?'✗':'!')+'</b><span><b>[Medido]</b> '+esc(x.sintoma)+(x.estado==='borrador'?' <span class="skB">BORRADOR</span>':'')+
     (x.causas.length?'<br><b>[Inferido]</b> '+x.causas.map(c=>esc(c.texto)+(c.como_separar?' <i>('+esc(c.como_separar)+')</i>':'')).join(' · '):'')+
-    (x.comprobaciones.length?'<br><b>Comprobar:</b> '+x.comprobaciones.map(c=>esc(c.texto)+(c.esperado?' → '+esc(c.esperado):'')).join(' · '):'')+
+    (x.comprobaciones.length?'<details class="mdDet"><summary><b>Comprobar ('+x.comprobaciones.length+')</b></summary>'+x.comprobaciones.map(c=>mdCompHTML(c)).join('')+'</details>':'')+
     (ctx&&typeof mdDondeHTML==='function'?mdDondeHTML(ctx.r,x,ctx.ds):'')+
     '<br><small class="hint">'+esc(x.paquete_nombre)+(x.fuente?' · '+esc(x.fuente):'')+'</small></span></div>'});
   return h+'</div><p class="hint">Skills usadas: '+res.usadas.map(esc).join(' · ')+'</p>'}
@@ -66,3 +66,8 @@ const mdMarcados=(res,medida)=>new Set(res.H.map(h=>h.evidencia[0]).filter(e=>e&
 function mdFaltan(S){const t=new Set();rgActivos().forEach(P=>(P.reglas||[]).forEach(r=>r.tema&&t.add(r.tema)));
   const todas=new Map();rgTodos().forEach(P=>(P.reglas||[]).forEach(r=>{if(r.tema&&!todas.has(r.tema))todas.set(r.tema,P)}));
   return(S.skills||[]).filter(x=>!t.has(x)).map(x=>({tema:x,paquete:todas.get(x)||null,cat:typeof catDeTema==='function'?catDeTema(x)||null:null}))}
+/* detalle de una comprobación (skill): dónde, estado del vehículo, herramienta, pasos, valor esperado y qué hacer según salga */
+function mdCompHTML(c,sinTitulo){const m=[['Dónde',c.donde],['Estado del vehículo',c.estado],['Herramienta',c.herramienta]].filter(x=>x[1]),r=[['Valor correcto',c.esperado,''],['Si sale bien',c.si_bien,' bien'],['Si sale mal',c.si_mal,' mal']].filter(x=>x[1]);
+  return '<div class="mdC">'+(sinTitulo?'':'<b>'+c.orden+'. '+esc(c.texto)+'</b>')+(m.length?'<div class="mdCm">'+m.map(x=>'<span><i>'+i18(x[0])+':</i> '+esc(x[1])+'</span>').join('')+'</div>':'')+
+    (c.pasos&&c.pasos.length?'<ol>'+c.pasos.map(p=>'<li>'+esc(p)+'</li>').join('')+'</ol>':'')+r.map(x=>'<div class="mdCr'+x[2]+'"><i>'+i18(x[0])+':</i> '+esc(x[1])+'</div>').join('')+'</div>'}
+function mdCompLineas(c){return[['Dónde',c.donde],['Estado del vehículo',c.estado],['Herramienta',c.herramienta],['Valor correcto',c.esperado],['Si sale bien',c.si_bien],['Si sale mal',c.si_mal]].filter(x=>x[1]).map(x=>[i18(x[0]),x[1]])}

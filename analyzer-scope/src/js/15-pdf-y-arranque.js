@@ -48,7 +48,7 @@ async function report(){
       if(h.criterios){line((h.discrepancia?'Discrepancia entre fuentes:':'Criterios de las fuentes activas:'),8.5,hc,4);h.criterios.forEach(c=>line((c.cumple?'[cumple] ':'[no cumple] ')+c.paquete+': '+c.condicion+(c.fuente&&c.fuente!==c.paquete?' ('+c.fuente+')':''),8,tc,8))}
       (h.evidencia||[]).forEach(e=>line(e.medida+(e.canal?' · '+e.canal:'')+(e.cilindro!=null?(typeof MEDIDAS!=='undefined'&&(MEDIDAS.find(m=>m.id===e.medida)||{}).por==='unidad'?' · unidad 0x'+Number(e.cilindro).toString(16).toUpperCase().padStart(3,'0'):' · cilindro '+e.cilindro):'')+': '+e.valor+' ('+e.condicion+') · '+(e.etiqueta||'Medido'),8.5,tc,4));
       (h.causas||[]).forEach(c=>line('- '+c.texto+' ('+c.etiqueta+')'+(c.como_separar?' - '+c.como_separar:''),8.5,tc,4));
-      (h.comprobaciones||[]).forEach(c=>line((c._ok?'[x] ':'[ ] ')+c.orden+'. '+c.texto+(c.esperado?' -> '+c.esperado:''),8.5,tc,8));yy+=2});
+      (h.comprobaciones||[]).forEach(c=>{line((c._ok?'[x] ':'[ ] ')+c.orden+'. '+c.texto,8.5,tc,8);if(typeof mdCompLineas==='function'){mdCompLineas(c).forEach(([k,v])=>line(k+': '+v,8,mc,13));(c.pasos||[]).forEach((p,j)=>line((j+1)+') '+p,8,mc,13))}});yy+=2});
     if(DXR.aviso)line(DXR.aviso,8,mc)}
   foot();
   await saveFile('informe_osciloscopio.pdf',doc.output('blob'));

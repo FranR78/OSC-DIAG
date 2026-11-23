@@ -3,6 +3,11 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.12.02
+- **Comprobaciones detalladas** (formato de skill ampliado): cada comprobación puede llevar **dónde** (conector, pines), **estado del vehículo**, **herramienta**, **pasos**, **valor correcto** y qué hacer **si sale bien / si sale mal**. Se ven en Procedimientos (desplegable «Comprobar»), en Diagnóstico y en el PDF.
+- Skills **Fran · Red CAN** y **Fran · Equilibrio de cilindros (CKP)** 2026.12.02 con todas sus comprobaciones detalladas (terminación 60 Ω en pines 6–14, aislar cortocircuitos, masas, conector de la unidad, prueba de fugas, cambio de bobina, retorno de inyectores…).
+- Los números de los hallazgos salen con coma en español (32,5 %).
+
 ## 2026.12.01
 - **Dónde está cada hallazgo:** cada hallazgo de CAN y del cigüeñal lista los tramos que lo muestran: trama con CRC mal (instante e ID leído, «dudoso»), tramas de la unidad que se aparta, carrera del cilindro flojo en cada ciclo.
 - **«Ver en la señal»:** abre la captura en el osciloscopio, amplía ese tramo y lo marca en rojo con su nombre. En «Procedimientos» y en «Diagnóstico» («Dónde está en la señal»).
