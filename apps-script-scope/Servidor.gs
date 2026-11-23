@@ -14,7 +14,7 @@
  *   Reglas    correo · json («Mis reglas») · actualizado
  *   Canales   id · nombre · autor · visibilidad · version · json · actualizado   (canales matemáticos compartidos)
  * Catálogo central (skills y procedimientos verificados): analyzer-scope/catalogo del repo, leído de GitHub (catalogo_lista / catalogo_bajar).
- * Propiedades: URL_SCOPE (URL /exec, para los enlaces), INV_<hash código> {c,t,k}, K_<hash clave> correo, KC_<correo> hash.
+ * Propiedades: URL_SCOPE (URL /exec, para los enlaces), DOMINIOS_LIBRES (dominios que entran sin fila, separados por comas), INV_<hash código> {c,t,k}, K_<hash clave> correo, KC_<correo> hash.
  */
 var HOJAS = {
   Usuarios: ['correo', 'nombre', 'activo', 'caduca', 'paquetes', 'rol', 'alta'],
@@ -149,6 +149,10 @@ function permisos_() {
   if (correo === dueno_()) return { ok: true, correo: correo, paquetes: '*', rol: 'admin', notas: false };
   var u = null;
   try { u = filas_('Usuarios').filter(function (x) { return String(x.correo).trim().toLowerCase() === correo; })[0] || null; } catch (e) { u = null; }
+  if (!u) {   // sin fila: entra si su dominio está en DOMINIOS_LIBRES (p. ej. el alumnado del centro), como cliente
+    var dl = String(PropertiesService.getScriptProperties().getProperty('DOMINIOS_LIBRES') || '').toLowerCase().split(/[,;\s]+/).filter(Boolean);
+    if (dl.indexOf(correo.split('@')[1]) !== -1) return { ok: true, correo: correo, caduca: '', notas: false, paquetes: [], rol: 'cliente' };
+  }
   if (!u || !si_(u.activo)) return { ok: false, correo: correo, motivo: 'Tu cuenta (' + correo + ') no tiene acceso a Analyzer Scope o está desactivada.' };
   var cad = fecha_(u.caduca);
   if (cad && cad < hoy_()) return { ok: false, correo: correo, motivo: 'Tu acceso a Analyzer Scope caducó el ' + cad + '.' };
