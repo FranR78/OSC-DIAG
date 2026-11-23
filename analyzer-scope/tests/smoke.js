@@ -634,6 +634,8 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await k.evaluate(() => rgSetActivo('fran-can', false)); await k.click('#kL .skI[data-k="FR-CAN-01"]'); await k.waitForTimeout(100);
     check('skill desactivada: ofrece activarla y al pulsar queda activa', /Activar «Fran · Red CAN/.test(await k.textContent('#kCab')) && await (async () => { await k.click('#kCab .skAct'); await k.waitForTimeout(100); return await KE(() => rgActivo({ paquete: 'fran-can' }) && !/necesita skills/.test($('kCab').textContent)); })());
     check('catálogo de medidas: cada medida que usan las skills existe en el motor', await KE(() => { const ids = new Set(MEDIDAS.map(m => m.id)); return Object.values(CATALOGO.items).filter(P => P.reglas).every(P => P.reglas.every(r => r.si.every(c => ids.has(c.medida)))); }));
+    await k.evaluate(() => { const d = canDemo(); d.chs[0].n = 'Canal A'; d.chs[1].n = 'Canal B'; addPages([d]); showTab('X'); }); await k.waitForTimeout(200); await k.click('#xGo'); await k.waitForTimeout(600);
+    check('Diagnóstico: con la skill CAN instalada analiza la señal cargada y da el hallazgo (unidad en hex)', await KE(() => /500 kbit\/s/.test($('xAn').textContent) && /Unidad 0x2F1: su nivel se aparta/.test($('xRes').textContent) && /unidad 0x2F1/.test($('xRes').textContent) && !/cilindro 753/.test($('xRes').textContent)), await KE(() => $('xRes').textContent.slice(0, 300)));
     check('procedimientos: sin errores JS', ke.length === 0, ke.join(' | '));
     await k.close();
   }

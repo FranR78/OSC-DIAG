@@ -3,6 +3,10 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.30b
+- **Diagnóstico usa las skills instaladas sobre la señal cargada:** si una skill activa necesita un análisis (red CAN, cigüeñal), «Diagnóstico» lo ejecuta con los canales cargados (bloque «Análisis de las skills activas», con elección de canales) y sus medidas entran en la consulta. Antes solo ocurría en «Procedimientos».
+- La evidencia de una unidad CAN sale como «unidad 0x2F1» (antes «cilindro 753»), en pantalla y en el PDF.
+
 ## 2026.11.30
 - **Catálogo central** (`analyzer-scope/catalogo/`, `docs/CATALOGO.md`): skills y procedimientos instalables. La app ya no trae activas las skills de CKP y CAN: se **instalan** desde «Procedimientos → Catálogo» o con el botón «Instalar» del procedimiento que las necesita.
 - **Con servidor**, el catálogo se lee de GitHub `main` y lo **VIP** solo se sirve a quien lo tenga asignado (`catalogo_lista` / `catalogo_bajar` en `Servidor.gs`). **Sin servidor**, la app lleva una copia de lo libre.
