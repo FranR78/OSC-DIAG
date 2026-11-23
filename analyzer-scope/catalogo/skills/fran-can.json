@@ -3,7 +3,7 @@
  "paquete": "fran-can",
  "nombre": "Fran · Red CAN (ISO 11898-2)",
  "autor": "Fran Rosales",
- "version": "2026.12.05",
+ "version": "2026.12.07",
  "aviso": "CAN de alta velocidad (ISO 11898-2). El CAN de baja velocidad tolerante a fallos, LIN y FlexRay tienen otros niveles: ver la nota «Otras redes». La terminación (60 Ω) se mide con polímetro.",
  "reglas": [
   {
@@ -716,6 +716,21 @@
      "esperado": "< 1 Ω en cada hilo",
      "si_bien": "Cableado correcto: revisar la unidad.",
      "si_mal": "> 1 Ω → reparar el empalme o el terminal con resistencia."
+    },
+    {
+     "texto": "Confirmar qué unidad emite el ID {unidad}",
+     "tipo": "prueba",
+     "donde": "Toma de diagnosis (caja de ruptura) y alimentación de la unidad sospechosa",
+     "estado": "Contacto puesto, red despierta",
+     "herramienta": "Osciloscopio con decodificación CAN (archivo DBC si lo hay); pinza amperimétrica de baja corriente",
+     "pasos": [
+      "Grabar con la decodificación activa y filtrar el ID {unidad}.",
+      "Pinza en la alimentación de la unidad sospechosa en otro canal: ver si su consumo cambia cuando sale el ID {unidad}.",
+      "Si no está claro, desconectar unidades una a una y ver cuándo desaparece el ID {unidad}."
+     ],
+     "esperado": "El ID {unidad} desaparece (o el consumo coincide) con una sola unidad",
+     "si_bien": "Esa es la unidad que emite el ID {unidad}: revisar su alimentación, masa y conector.",
+     "si_mal": "Si ninguna desconexión lo quita, revisar el archivo DBC o la lista de IDs del fabricante."
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
@@ -759,6 +774,21 @@
      "esperado": "El mismo nivel que en el conector de diagnosis (± 5 %)",
      "si_bien": "En el conector está bien y en diagnosis no → el fallo está en el cableado entre los dos: empalmes y conectores intermedios.",
      "si_mal": "En el conector también sale bajo → terminal del conector con mala presión o transceptor de la unidad. Limpiar y ajustar el terminal; si sigue igual, la unidad."
+    },
+    {
+     "texto": "Confirmar qué unidad emite el ID {unidad}",
+     "tipo": "prueba",
+     "donde": "Toma de diagnosis (caja de ruptura) y alimentación de la unidad sospechosa",
+     "estado": "Contacto puesto, red despierta",
+     "herramienta": "Osciloscopio con decodificación CAN (archivo DBC si lo hay); pinza amperimétrica de baja corriente",
+     "pasos": [
+      "Grabar con la decodificación activa y filtrar el ID {unidad}.",
+      "Pinza en la alimentación de la unidad sospechosa en otro canal: ver si su consumo cambia cuando sale el ID {unidad}.",
+      "Si no está claro, desconectar unidades una a una y ver cuándo desaparece el ID {unidad}."
+     ],
+     "esperado": "El ID {unidad} desaparece (o el consumo coincide) con una sola unidad",
+     "si_bien": "Esa es la unidad que emite el ID {unidad}: revisar su alimentación, masa y conector.",
+     "si_mal": "Si ninguna desconexión lo quita, revisar el archivo DBC o la lista de IDs del fabricante."
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
@@ -788,6 +818,21 @@
     {
      "texto": "Revisar conector de la unidad {unidad}",
      "tipo": "prueba"
+    },
+    {
+     "texto": "Confirmar qué unidad emite el ID {unidad}",
+     "tipo": "prueba",
+     "donde": "Toma de diagnosis (caja de ruptura) y alimentación de la unidad sospechosa",
+     "estado": "Contacto puesto, red despierta",
+     "herramienta": "Osciloscopio con decodificación CAN (archivo DBC si lo hay); pinza amperimétrica de baja corriente",
+     "pasos": [
+      "Grabar con la decodificación activa y filtrar el ID {unidad}.",
+      "Pinza en la alimentación de la unidad sospechosa en otro canal: ver si su consumo cambia cuando sale el ID {unidad}.",
+      "Si no está claro, desconectar unidades una a una y ver cuándo desaparece el ID {unidad}."
+     ],
+     "esperado": "El ID {unidad} desaparece (o el consumo coincide) con una sola unidad",
+     "si_bien": "Esa es la unidad que emite el ID {unidad}: revisar su alimentación, masa y conector.",
+     "si_mal": "Si ninguna desconexión lo quita, revisar el archivo DBC o la lista de IDs del fabricante."
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)",
@@ -1003,7 +1048,7 @@
    "id": "N-CAN-02",
    "titulo": "Orden de diagnóstico de una red",
    "tema": "red-can",
-   "texto": "# Antes del osciloscopio\n1. Prueba de funciones: qué hace y qué no hace el vehículo.\n2. Escaneo completo (gateway): quién habla y quién no.\n3. La unidad que no responde: alimentación, masa (caída en mV) y fusibles. Es la causa más común.\n4. Polímetro en el conector de diagnosis (valor medio: orienta, no diagnostica).\n5. Osciloscopio en CAN-H y CAN-L a la vez.\n6. Desconectar unidades una a una (las accesibles primero) o partir la red por la mitad.\n# Ojo\n- Desconectar unidades genera códigos: borrarlos al acabar.\n- Una unidad de un asiento o una puerta con agua puede tumbar toda la red y dejar el coche sin arrancar.",
+   "texto": "# Antes del osciloscopio\n1. Prueba de funciones: qué hace y qué no hace el vehículo.\n2. Escaneo completo (gateway): quién habla y quién no.\n3. La unidad que no responde: alimentación, masa (caída en mV) y fusibles. Es la causa más común.\n4. Polímetro en el conector de diagnosis (valor medio: orienta, no diagnostica).\n5. Osciloscopio en CAN-H y CAN-L a la vez. Con una caja de ruptura entre la toma de diagnosis y el escáner se ven a la vez la onda y los datos del escáner. [Criterio]\n6. Desconectar unidades una a una (las accesibles primero) o partir la red por la mitad.\n# Ojo\n- Desconectar unidades genera códigos: borrarlos al acabar.\n- Una unidad de un asiento o una puerta con agua puede tumbar toda la red y dejar el coche sin arrancar.\n# Quitar y poner unidades\n- Primero las que no llevan terminación: si una está muda o tiene mala masa, puede provocar códigos U en otras; al quitarla, el escáner o la onda se corrigen. [Inferido]\n- Las que llevan terminación: sin ellas la red suele seguir, pero menos fiable y más sensible a interferencias. [Inferido]\n- Motor y gateway: al desconectarlas se puede caer la red y perder lo que se quiere ver. [Inferido]\n# Tiempo\n- Batería, carga, masas generales y de las unidades con códigos U, más resistencia y tensión de la red: alrededor de una hora de trabajo base antes del osciloscopio. [Criterio]",
    "fuente": "Vídeos de diagnóstico de redes (transcripciones) · ISO 11898-2"
   },
   {
@@ -1082,6 +1127,13 @@
     }
    ],
    "fuente": "Vídeos de diagnóstico de redes (transcripciones) · ISO 11898-2"
+  },
+  {
+   "id": "N-CAN-07",
+   "titulo": "Quién emite cada mensaje: ID, DBC, pinza y desconexión",
+   "tema": "red-can",
+   "texto": "# Lo que el CAN no dice\n- CAN es multimaestro y de difusión: emite quien gana el arbitraje y todas escuchan. [Teórico OEM]\n- El CAN clásico no lleva dirección de origen. J1939 (camiones, vehículos pesados) sí: la dirección de origen va en el ID extendido y el decodificador la muestra. [Teórico OEM]\n- Ningún osciloscopio dice solo qué unidad emite: hace falta saber qué ID es de cada una. [Criterio]\n# Cómo se identifica\n- Por el ID: cada unidad emite sus IDs (motor: RPM y carga; ABS: velocidades de rueda). [Teórico OEM]\n- Con un archivo DBC (o equivalente) cargado en el decodificador de PicoScope, el ID se convierte en nombres de señales y a veces de unidad. [Teórico OEM]\n- Desconectar unidades una a una y ver qué IDs desaparecen de la tabla. [Criterio]\n- Pinza amperimétrica en la alimentación de la unidad mientras se graba: el consumo cambia cuando esa unidad transmite. [Inferido]\n- Invasivo, solo si lo anterior no basta: sacar los pines CAN del conector (o cortar el par) y medir solo la salida de la unidad, con su alimentación y masa conectadas; al acabar, reparar el mazo. Ve si la unidad está muda. [Criterio]\n# Qué da el decodificador\n- ID, datos, CRC y ACK; errores de relleno de bits, CRC y confirmación; disparo por ID, rango de IDs o datos; diagrama de ojo para la integridad de la señal. [Teórico OEM]\n# Ojo\n- Fuente de divulgación (autor no mecánico): orientación, no criterio de fabricante.",
+   "fuente": "Vídeo de diagnóstico de red CAN: procedimiento resumido y quién emite (dato de divulgación, no de fabricante)"
   }
  ],
  "acceso": "libre"
