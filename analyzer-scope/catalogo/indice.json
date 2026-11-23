@@ -1,0 +1,31 @@
+{
+ "formato": "analyzer-scope-catalogo/1",
+ "indice": [
+  {
+   "tipo": "skill",
+   "id": "fran-can",
+   "nombre": "Fran · Red CAN (ISO 11898-2)",
+   "autor": "Fran Rosales",
+   "version": "2026.11.28",
+   "acceso": "libre",
+   "archivo": "skills/fran-can.json",
+   "temas": [
+    "red-can"
+   ],
+   "reglas": 17
+  },
+  {
+   "tipo": "skill",
+   "id": "fran-ckp",
+   "nombre": "Fran · Equilibrio de cilindros (CKP)",
+   "autor": "Fran Rosales",
+   "version": "2026.11.28",
+   "acceso": "libre",
+   "archivo": "skills/fran-ckp.json",
+   "temas": [
+    "aporte-cilindro"
+   ],
+   "reglas": 5
+  }
+ ]
+}

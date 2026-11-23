@@ -13,6 +13,7 @@
  *   Paquetes  id · nombre · autor · visibilidad (todos|asignado) · version · json · actualizado
  *   Reglas    correo · json («Mis reglas») · actualizado
  *   Canales   id · nombre · autor · visibilidad · version · json · actualizado   (canales matemáticos compartidos)
+ * Catálogo central (skills y procedimientos verificados): analyzer-scope/catalogo del repo, leído de GitHub (catalogo_lista / catalogo_bajar).
  * Propiedades: URL_SCOPE (URL /exec, para los enlaces), INV_<hash código> {c,t,k}, K_<hash clave> correo, KC_<correo> hash.
  */
 var HOJAS = {
@@ -22,7 +23,7 @@ var HOJAS = {
   Canales: ['id', 'nombre', 'autor', 'visibilidad', 'version', 'json', 'actualizado']
 };
 var V = 1, JSON_MAX = 45000, INV_CADUCA_MS = 14 * 24 * 3600 * 1000, CORREO_RE = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
-var OPS = { reglas_leer: 1, reglas_guardar: 1, paquetes_lista: 1, paquete_bajar: 1, paquete_publicar: 1, buscar: 1, nt: 1, diagnostico: 1 };
+var OPS = { reglas_leer: 1, reglas_guardar: 1, paquetes_lista: 1, paquete_bajar: 1, paquete_publicar: 1, catalogo_lista: 1, catalogo_bajar: 1, buscar: 1, nt: 1, diagnostico: 1 };
 
 /* ------------------------------------------------------------- entrada --- */
 
@@ -72,7 +73,8 @@ function apiDiagnostico(pt) {
   if (op === 'buscar' || op === 'nt' || op === 'diagnostico') return err_(op, 'sin_notas', 'Este servidor no tiene notas técnicas: el diagnóstico usa tus paquetes de reglas.');
   try {
     var r = op === 'reglas_leer' ? reglasLeer_(pm) : op === 'reglas_guardar' ? reglasGuardar_(pm, pt)
-      : op === 'paquetes_lista' ? paquetesLista_(pm) : op === 'paquete_bajar' ? paqueteBajar_(pm, pt) : paquetePublicar_(pm, pt);
+      : op === 'paquetes_lista' ? paquetesLista_(pm) : op === 'paquete_bajar' ? paqueteBajar_(pm, pt)
+      : op === 'catalogo_lista' ? catalogoLista_(pm) : op === 'catalogo_bajar' ? catalogoBajar_(pm, pt) : paquetePublicar_(pm, pt);
     if (r.ok === false) return r;
     r.ok = true; r.v = V; r.op = op;
     return r;
@@ -234,6 +236,34 @@ function paquetePublicar_(pm, pt) {
   guardaFila_('Paquetes', id, [id, String(p.nombre || id), ya ? ya.autor : pm.correo, ya ? ya.visibilidad || 'asignado' : 'asignado', String(p.version || hoy_()), txt, new Date()]);
   return { id: id };
 }
+
+/* ----------------------------------------------------- catálogo central --- */
+/* Skills y procedimientos verificados: carpeta analyzer-scope/catalogo del repo (main), leída de GitHub con caché de 10 min.
+   Lo «libre» lo ve todo el que entra; lo «vip» solo quien lo tenga en su columna «paquetes» (o «*»). Propiedad opcional CATALOGO_URL. */
+var CAT_URL_ = 'https://raw.githubusercontent.com/FranR78/OSC-DIAG/main/analyzer-scope/catalogo/';
+function catUrl_() { return PropertiesService.getScriptProperties().getProperty('CATALOGO_URL') || CAT_URL_; }
+function catLee_(ruta) {
+  var c = CacheService.getScriptCache(), k = 'cat:' + ruta, v = c.get(k);
+  if (v) return JSON.parse(v);
+  var r = UrlFetchApp.fetch(catUrl_() + ruta + '?t=' + Date.now(), { muteHttpExceptions: true });
+  if (r.getResponseCode() !== 200) throw new Error('catálogo: ' + ruta + ' → ' + r.getResponseCode());
+  var txt = r.getContentText('UTF-8');
+  try { if (txt.length < 95000) c.put(k, txt, 600); } catch (e) { /* sin caché */ }
+  return JSON.parse(txt);
+}
+function catVe_(pm, it) { return it.acceso !== 'vip' || pm.paquetes === '*' || pm.paquetes.indexOf(String(it.id)) !== -1; }
+function catalogoLista_(pm) {
+  var ix = catLee_('indice.json').indice || [];
+  return { indice: ix.filter(function (it) { return catVe_(pm, it); }), permisos: { notas: false, rol: pm.rol, caduca: pm.caduca || '' } };
+}
+function catalogoBajar_(pm, pt) {
+  var ix = catLee_('indice.json').indice || [], it = ix.filter(function (x) { return x.tipo === pt.tipo && String(x.id) === String(pt.id); })[0];
+  if (!it || !catVe_(pm, it)) return err_('catalogo_bajar', 'no_autorizado', 'Ese elemento no existe en el catálogo o no lo tienes asignado.');
+  if (!/^(skills|procedimientos)\/[a-z0-9._-]+\.json$/i.test(it.archivo)) return err_('catalogo_bajar', 'interno', 'Ruta no válida en el índice.');
+  return { item: catLee_(it.archivo) };
+}
+/** Editor: tras publicar algo nuevo en el catálogo, que se vea ya (sin esperar a la caché). */
+function catalogoActualizar() { var c = CacheService.getScriptCache(); c.remove('cat:indice.json'); return catalogoLista_({ paquetes: '*', rol: 'admin' }).indice.length; }
 
 /* ------------------------------------------- para el dueño, desde el editor --- */
 

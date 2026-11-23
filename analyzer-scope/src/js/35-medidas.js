@@ -62,4 +62,4 @@ const mdMarcados=(res,medida)=>new Set(res.H.map(h=>h.evidencia[0]).filter(e=>e&
 /* skills (temas) que pide un procedimiento y no tiene ninguna skill activa */
 function mdFaltan(S){const t=new Set();rgActivos().forEach(P=>(P.reglas||[]).forEach(r=>r.tema&&t.add(r.tema)));
   const todas=new Map();rgTodos().forEach(P=>(P.reglas||[]).forEach(r=>{if(r.tema&&!todas.has(r.tema))todas.set(r.tema,P)}));
-  return(S.skills||[]).filter(x=>!t.has(x)).map(x=>({tema:x,paquete:todas.get(x)||null}))}
+  return(S.skills||[]).filter(x=>!t.has(x)).map(x=>({tema:x,paquete:todas.get(x)||null,cat:typeof catDeTema==='function'?catDeTema(x)||null:null}))}

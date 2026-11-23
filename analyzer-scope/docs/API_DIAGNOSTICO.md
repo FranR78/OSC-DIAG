@@ -283,3 +283,8 @@ maestras → `buscar`, `nt` y `diagnostico` responden `sin_notas` y la app hace 
 * `paquetes_lista` → `{ paquetes: [{ id, nombre, autor, version, reglas }], permisos }` (los `todos` y los asignados).
 * `paquete_bajar` `{ id }` → `{ paquete }` (formato `analyzer-scope-reglas/1`). La app lo guarda como fuente de solo lectura.
 * `paquete_publicar` `{ paquete }` (rol autor o admin) → `{ id }`. Nace `asignado`.
+
+## 14. Catálogo central (2026.11.30)
+* `catalogo_lista` → `{ indice: [{ tipo: "skill"|"procedimiento", id, nombre, autor, version, acceso: "libre"|"vip", archivo, temas, reglas|pasos }], permisos }` (solo lo que el usuario puede ver).
+* `catalogo_bajar` `{ tipo, id }` → `{ item }` (el JSON completo). VIP sin permiso → `no_autorizado`.
+* Origen: `analyzer-scope/catalogo/indice.json` y sus archivos en GitHub `main` (propiedad `CATALOGO_URL` para otra rama). Detalle: `docs/CATALOGO.md`.

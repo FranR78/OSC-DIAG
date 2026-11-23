@@ -3,6 +3,12 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.30
+- **Catálogo central** (`analyzer-scope/catalogo/`, `docs/CATALOGO.md`): skills y procedimientos instalables. La app ya no trae activas las skills de CKP y CAN: se **instalan** desde «Procedimientos → Catálogo» o con el botón «Instalar» del procedimiento que las necesita.
+- **Con servidor**, el catálogo se lee de GitHub `main` y lo **VIP** solo se sirve a quien lo tenga asignado (`catalogo_lista` / `catalogo_bajar` en `Servidor.gs`). **Sin servidor**, la app lleva una copia de lo libre.
+- Instalado = en el navegador, sin conexión; si sube la versión en el catálogo, «Actualizar».
+- **Qué probar:** Red CAN → «Instalar «Fran · Red CAN»» → señal de ejemplo → Analizar; «Quitar» desde el catálogo.
+
 ## 2026.11.29
 - **Tablas de DeepMeasure en el análisis del cigüeñal:** en una prueba con CKP se puede cargar el CSV de DeepMeasure (columnas «Tiempo de inicio» y «Tiempo final»). Sale el mismo análisis, sin sincronismo: la fase se indica con «PMS del cil. 1 en el diente n.º» y la app avisa de que cada cilindro puede ser su pareja.
 - **Aviso de poco muestreo:** si los periodos van a saltos (p. ej. 100 µs a 10 kS/s) lo dice, con el % del periodo que se pierde.

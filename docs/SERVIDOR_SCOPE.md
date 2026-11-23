@@ -29,6 +29,10 @@ implementaciones → Editar → Versión nueva» (misma URL `/exec`).
 * **Paquetes compartidos** (pestaña **Paquetes**): Ortu, tú o cualquier `autor` los publica desde la app
   (Diagnóstico → «Publicar para compartir»); nacen `asignado` y tú decides a quién (columna `paquetes` de cada usuario)
   o los pones `todos`. Cada uno los baja desde la app y le funcionan sin conexión. Subir `version` = «Actualizar».
+* **Catálogo central** (`analyzer-scope/catalogo/` del repo, `analyzer-scope/docs/CATALOGO.md`): skills y procedimientos verificados por ti.
+  El servidor los lee de GitHub `main` (10 min de caché; `catalogoActualizar()` para verlos ya). Los `vip` solo los ve quien
+  los tenga en su columna `paquetes` (o `*`). **Tras cambiar `Servidor.gs` hay que pegarlo en el proyecto e implementar nueva versión**
+  (la app se actualiza sola; el servidor no).
 * **Sin notas técnicas:** este servidor no las tiene. El diagnóstico con las NT y las pruebas complementarias está en tu portal.
 
 ## Límites

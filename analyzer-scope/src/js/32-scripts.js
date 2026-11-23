@@ -11,7 +11,8 @@ const skPasos=S=>S.pasos.filter(p=>!p.combustible||p.combustible.includes(SK.fue
 const skKey=(S,p)=>S.id+'|'+(p.id||p.titulo);
 const skUser=()=>{let a=null;try{a=JSON.parse(LS.get('as_scripts')||'null')}catch(e){}return Array.isArray(a)?a:[]};
 const skSave=a=>LS.set('as_scripts',JSON.stringify(a));
-const skAll=()=>[...SCRIPTS_BASE.map(s=>Object.assign({},s,{_o:true})),...skUser()];
+const skBase=()=>[...SCRIPTS_BASE,...(typeof catProcs==='function'?catProcs():[])].map(s=>Object.assign({},s,{_o:true}));  // originales: los de la app y los instalados del catálogo
+const skAll=()=>[...skBase(),...skUser()];
 const skCur=()=>{const A=skAll();return A.find(s=>s.id===SK.sel)||A[0]};
 const skDur=p=>p.maniobra.reduce((a,f)=>a+(+f.s||0),0);
 const skT=s=>s===0?'0 s':s>=1?(+(+s).toFixed(1)).toLocaleString('es')+' s':s*1e3>=1?(+(s*1e3).toFixed(1)).toLocaleString('es')+' ms':Math.round(s*1e6)+' µs';
@@ -70,15 +71,15 @@ function skPerfil(p,win){
 }
 /* skills que pide el procedimiento y no están activas: las medidas salen igual, la interpretación no */
 function skFaltaHTML(S){const F=mdFaltan(S);if(!F.length)return(S.skills||[]).length?'<p class="hint skOkS">✓ Skills necesarias activas: '+S.skills.map(skE).join(' · ')+'</p>':'';
-  return '<div class="skA warn skFalta"><b>!</b><span>Este procedimiento necesita skills que no tienes activas: '+F.map(f=>'<b>'+skE(f.tema)+'</b>'+(f.paquete?' <button class="skAct" data-pq="'+esc(f.paquete.paquete)+'">Activar «'+skE(f.paquete.nombre||f.paquete.paquete)+'»</button>':' <small>(aún no hay ninguna)</small>')).join(' · ')+
+  return '<div class="skA warn skFalta"><b>!</b><span>Este procedimiento necesita skills que no tienes activas: '+F.map(f=>'<b>'+skE(f.tema)+'</b>'+(f.paquete?' <button class="skAct" data-pq="'+esc(f.paquete.paquete)+'">Activar «'+skE(f.paquete.nombre||f.paquete.paquete)+'»</button>':f.cat?' <button class="p skInst" data-i="'+esc(f.cat.id)+'">Instalar «'+skE(f.cat.nombre)+'»</button>':' <small>(aún no hay ninguna)</small>')).join(' · ')+
     '. Las medidas salen igual; esas partes quedan sin interpretar.</span></div>'}
 /* ---- pintado ---- */
 function skTab(){
   const S=skCur();if(!S)return;SK.sel=S.id;const U=skUser();
   const it=s=>'<button class="skI'+(s.id===S.id?' on':'')+'" data-k="'+esc(s.id)+'"><b>'+skE(s.nombre)+'</b><small>'+(s.sintomas?skE(s.sintomas):skE(s.autor||''))+'</small></button>';
-  $('kL').innerHTML='<b class="skH">Qué quieres comprobar</b>'+SCRIPTS_BASE.map(s=>it(Object.assign({},s,{_o:true}))).join('')+
+  $('kL').innerHTML='<b class="skH">Qué quieres comprobar</b>'+skBase().map(it).join('')+
     '<b class="skH">Mis procedimientos</b>'+(U.length?U.map(it).join(''):'<p class="hint">Duplica un original para hacer el tuyo.</p>')+
-    '<div class="row"><button id="kImpB">Importar procedimiento (.json)…</button></div>';
+    '<div class="row"><button id="kImpB">Importar procedimiento (.json)…</button></div>'+(typeof catHTML==='function'?catHTML():'');
   const ori=S._o?null:SCRIPTS_BASE.find(b=>S.origen&&b.id===S.origen.id),nuevo=ori&&S.origen.version&&ori.version!==S.origen.version;
   $('kCab').innerHTML='<div class="skCab"><div class="skTt"><h2>'+skE(S.nombre)+(S.estado==='borrador'?' <span class="skB">BORRADOR</span>':'')+'</h2>'+(S.sintomas?'<p class="skSi"><b>Cuándo entrar:</b> '+skE(S.sintomas)+'</p>':'')+'<p class="hint">'+skE(S.descripcion||'')+'</p>'+
     ((S.combustible||[]).length>1&&S.pasos.some(p=>p.combustible)?'<div class="row skFu"><span class="hint">Motor:</span><button id="kFg" class="'+(SK.fuel==='gasolina'?'on':'')+'">Gasolina</button><button id="kFd" class="'+(SK.fuel==='diesel'?'on':'')+'">Diésel</button></div>':'')+
@@ -158,6 +159,8 @@ function skWire(S){
   $('kSteps').querySelectorAll('.skS').forEach(b=>b.onclick=()=>{SK.step=+b.dataset.s;SK.edit=false;skTab()});
   $('kPaso').querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{SK.step=+b.dataset.go;skTab()});
   $('kImpB').onclick=()=>$('kImp').click();
+  if(typeof catWire==='function')catWire();
+  document.querySelectorAll('#kCab .skInst').forEach(bt=>bt.onclick=()=>{const it=CAT_IDX.find(x=>x.tipo==='skill'&&x.id===bt.dataset.i);if(it)catInstala(it)});
   document.querySelectorAll('#kCab .skAct').forEach(bt=>bt.onclick=()=>{rgSetActivo(bt.dataset.pq,true);if(typeof rgPanel==='function')rgPanel();skTab();st('Skill activada.')});
   const on=(id,f)=>{const e=$(id);if(e)e.onclick=f};
   on('kDup',()=>{const U=skUser(),c=JSON.parse(JSON.stringify(Object.assign({},S,{_o:undefined})));

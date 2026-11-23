@@ -595,6 +595,15 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('editor: un script mal escrito no se guarda y dice por qué', /No se guarda: no tiene pasos/.test(await k.textContent('#kESt')), await k.textContent('#kESt'));
     await k.evaluate(() => { const o = JSON.parse(JSON.stringify(SCRIPTS_BASE[0])); o.nombre = 'Mi mecánica'; $('kTx').value = JSON.stringify(o); }); await k.click('#kGu');
     check('editor: guarda los cambios en la copia', await KE(() => JSON.parse(localStorage.getItem('as_scripts'))[0].nombre === 'Mi mecánica' && /Mi mecánica/.test($('kL').textContent)));
+    check('catálogo: la app no trae activas las skills de CKP y CAN (se instalan)', await KE(() => !rgTodos().some(P => /^fran-/.test(P.paquete)) && CAT_IDX.filter(i => i.tipo === 'skill').map(i => i.id).sort().join() === 'fran-can,fran-ckp'));
+    await k.click('#kL .skI[data-k="FR-CAN-01"]'); await k.waitForTimeout(100);
+    check('procedimiento sin su skill: ofrece «Instalar» desde el catálogo', /Instalar «Fran · Red CAN/.test(await k.textContent('#kCab')));
+    await k.click('#kCab .skInst'); await k.waitForTimeout(150);
+    check('instalar: la skill queda en este navegador, activa, y desaparece el aviso', await KE(() => rgActivos().some(P => P.paquete === 'fran-can') && !/necesita skills/.test($('kCab').textContent) && /✓ Instalado/.test($('kL').textContent)));
+    await k.evaluate(() => { const b = [...document.querySelectorAll('.catB')].find(x => x.dataset.i === 'fran-can' && x.dataset.a === 'q'); b.click(); });
+    check('quitar desde el catálogo: vuelve el aviso de skill que falta', await KE(() => !rgTodos().some(P => P.paquete === 'fran-can') && /necesita skills/.test($('kCab').textContent)));
+    await k.evaluate(() => { [...document.querySelectorAll('.catB')].filter(x => x.dataset.a === 'i').forEach(x => x.click()); }); await k.waitForTimeout(150);
+    check('instalar todo el catálogo: CKP y CAN instaladas', await KE(() => ['fran-can', 'fran-ckp'].every(id => rgSubs().some(P => P.paquete === id))));
     const ck = await KE(() => { const o = { ick: 0, isy: 1, order: [1, 3, 4, 2], off: 0 }, r = {};
       for (const [k, q, f] of [['flojo', { flojo: 3 }, 'gasolina'], ['flojoD', { flojo: 3 }, 'diesel'], ['fuga', { flojo: 3, fuga: 3 }, 'gasolina'], ['bien', {}, 'gasolina'], ['flojo2', { flojo: 2 }, 'gasolina']]) {
         SK.fuel = f; const a = ckpAnaliza(ckpDemo(q), o); r[k] = { a, d: a.err ? [] : mdSkills(ckpMedidas(a), { cilindros: 4 }).H.map(h => h.regla + ':' + h.sintoma) }; } SK.fuel = 'gasolina'; return r; });
@@ -624,7 +633,7 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('procedimiento con skills que faltan: lo avisa (arranque-carga) sin bloquear', /necesita skills que no tienes activas: arranque-carga/.test(await k.textContent('#kCab')));
     await k.evaluate(() => rgSetActivo('fran-can', false)); await k.click('#kL .skI[data-k="FR-CAN-01"]'); await k.waitForTimeout(100);
     check('skill desactivada: ofrece activarla y al pulsar queda activa', /Activar «Fran · Red CAN/.test(await k.textContent('#kCab')) && await (async () => { await k.click('#kCab .skAct'); await k.waitForTimeout(100); return await KE(() => rgActivo({ paquete: 'fran-can' }) && !/necesita skills/.test($('kCab').textContent)); })());
-    check('catálogo de medidas: cada medida que usan las skills existe en el motor', await KE(() => { const ids = new Set(MEDIDAS.map(m => m.id)); return REGLAS_BASE.filter(P => /^fran-/.test(P.paquete)).every(P => P.reglas.every(r => r.si.every(c => ids.has(c.medida)))); }));
+    check('catálogo de medidas: cada medida que usan las skills existe en el motor', await KE(() => { const ids = new Set(MEDIDAS.map(m => m.id)); return Object.values(CATALOGO.items).filter(P => P.reglas).every(P => P.reglas.every(r => r.si.every(c => ids.has(c.medida)))); }));
     check('procedimientos: sin errores JS', ke.length === 0, ke.join(' | '));
     await k.close();
   }

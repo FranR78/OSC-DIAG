@@ -16,6 +16,8 @@
  *   {{ejemplos:dir}}  los .csv de src/dir como JSON [{name, txt}] (el desarrollador añade ejemplos soltándolos ahí)
  *   {{reglas:dir}}    los .json de src/dir (paquetes de reglas base) como JSON [paquete]
  *   {{scripts:dir}}   los .json de src/dir (scripts de captura base, docs/SCRIPTS.md) como JSON [script]
+ *   {{catalogo}}      catálogo central (../catalogo, docs/CATALOGO.md): índice + contenido de lo «libre» (lo «vip» solo lo sirve el servidor).
+ *                     También escribe catalogo/indice.json, que lee el servidor desde GitHub.
  *   {{appcfg}}        APP_CFG = {modo, ver, portalUrl, apiUrl}
  *   {{js/*.js}}       todos los .js de src/js en orden alfabético (un solo <script>, ámbito global compartido)
  * Sin dependencias. */
@@ -23,6 +25,34 @@ const fs = require('fs'), path = require('path');
 const SRC = path.join(__dirname, 'src'), DIST = path.join(__dirname, 'dist');
 const OUTS = { libre: 'analyzer-scope.html', portal: 'analyzer-scope-portal.html' };
 const rd = p => fs.readFileSync(path.join(SRC, p));
+
+/* Catálogo central: skills (paquetes de reglas) y procedimientos instalables. La app no los trae activos: se instalan. */
+const CAT = path.join(__dirname, 'catalogo');
+let CATALOGO = null;
+function catalogo() {
+  if (CATALOGO) return CATALOGO;
+  const indice = [], items = {};
+  for (const [tipo, d] of [['skill', 'skills'], ['procedimiento', 'procedimientos']]) {
+    const dir = path.join(CAT, d);
+    if (!fs.existsSync(dir)) continue;
+    for (const f of fs.readdirSync(dir).filter(f => /\.json$/i.test(f)).sort()) {
+      const o = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
+      const id = tipo === 'skill' ? o.paquete : o.id;
+      if (tipo === 'skill' && (o.formato !== 'analyzer-scope-reglas/1' || !id || !Array.isArray(o.reglas))) throw new Error('skill mal escrita: ' + f);
+      if (tipo === 'procedimiento' && (o.formato !== 'analyzer-scope-script/1' || !id || !Array.isArray(o.pasos))) throw new Error('procedimiento mal escrito: ' + f);
+      const acceso = o.acceso === 'vip' ? 'vip' : 'libre';
+      indice.push({ tipo, id, nombre: o.nombre || id, autor: o.autor || '', version: o.version || '', acceso, archivo: d + '/' + f,
+        temas: tipo === 'skill' ? [...new Set(o.reglas.map(r => r.tema).filter(Boolean))] : (o.skills || []),
+        reglas: tipo === 'skill' ? o.reglas.length : undefined, pasos: tipo === 'procedimiento' ? o.pasos.length : undefined });
+      if (acceso === 'libre') items[tipo + ':' + id] = o;
+    }
+  }
+  CATALOGO = { indice, items };
+  const txt = JSON.stringify({ formato: 'analyzer-scope-catalogo/1', indice }, null, 1) + '\n', fi = path.join(CAT, 'indice.json');
+  if (process.argv.includes('--check')) { if (!fs.existsSync(fi) || fs.readFileSync(fi, 'utf8') !== txt) { console.error('catalogo/indice.json no está al día: ejecuta node build.js'); process.exitCode = 1; } }
+  else if (!fs.existsSync(fi) || fs.readFileSync(fi, 'utf8') !== txt) fs.writeFileSync(fi, txt);
+  return CATALOGO;
+}
 
 function build(modo) {
   const tpl = rd('index.html').toString('utf8');
@@ -46,6 +76,7 @@ function build(modo) {
       list.forEach(s => { if (s.formato !== 'analyzer-scope-script/1' || !s.id || !Array.isArray(s.pasos) || !s.pasos.length) throw new Error('script mal escrito: ' + d + ' ' + (s.id || '')); });
       return JSON.stringify(list).replace(/<\//g, '<\\/').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
     }
+    if (k === 'catalogo') return JSON.stringify(catalogo()).replace(/<\//g, '<\\/').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
     if (k === 'appcfg') {
       const cfg = fs.existsSync(path.join(SRC, 'config.json')) ? JSON.parse(rd('config.json')) : {};
       return JSON.stringify({ modo, ver: rd('version.txt').toString('utf8').trim(), portalUrl: modo === 'libre' ? cfg.portalUrl || '' : '', apiUrl: modo === 'libre' ? cfg.apiUrl || '' : '', bibliotecaUrl: cfg.bibliotecaUrl || '' });

@@ -244,3 +244,4 @@ body.light .skA.ok{background:#e3f6ea;color:#15803d}body.light .skA.warn{backgro
 .ckB{position:relative;min-width:110px;height:20px;border-radius:5px;background:rgba(127,127,127,.15);overflow:hidden}.ckB i{position:absolute;inset:0 auto 0 0;background:rgba(34,197,94,.45)}.ckB.lo i{background:rgba(255,77,77,.55)}.ckB span{position:relative;padding-left:6px;font-size:12px;font-variant-numeric:tabular-nums;line-height:20px}.ckT small{font-weight:400;color:var(--mu)}
 .canMal td{background:rgba(255,77,77,.08)}
 .skFalta{margin-top:8px}.skAct{padding:1px 8px;font-size:12px;margin-left:4px}.skOkS{margin:6px 0 0}.mdH span small{display:inline}
+.catI{display:grid;gap:4px;padding:6px 0;border-top:1px solid var(--bd)}.catI small{display:block;color:var(--mu);font-size:12px}.catI .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.catI button{padding:2px 10px;font-size:12px}
