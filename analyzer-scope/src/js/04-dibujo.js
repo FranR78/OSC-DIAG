@@ -61,7 +61,7 @@ function draw(theme){
   const VC=pkca(['#ff9a5c','#2ee6a0','#ff5c5c','#5ddc8a'],['#c2530a','#0f9d6c','#c92a2a','#15803d']);
   const AC=pkca(['#ff7bf1','#7bffe3','#b6ff5c'],['#b3199e','#0f8f7a','#4d8f00']),PMC=pkc('#ff4d6d','#d11a40');
   const GRID=mixc(BGP,txc,.18),GRIDB=mixc(BGP,txc,.32);
-  g.font='11px system-ui';
+  g.font='11px '+FONT_UI;
   const tag=(t,x,y,col,al)=>{g.textAlign=al||'left';const w=g.measureText(t).width,x0=al==='right'?x-w:al==='center'?x-w/2:x;
     g.fillStyle=BGA;g.fillRect(x0-3,y-11,w+6,15);g.fillStyle=col;g.fillText(t,x,y)};
   g.fillStyle=BGO;g.fillRect(0,0,W,H);g.fillStyle=BGP;g.fillRect(M.l,M.t,pw,hh);
@@ -119,20 +119,20 @@ function draw(theme){
       if(isVis(e.cyl)&&xc>M.l-12&&xc<M.l+pw+12){const hl=one?e.cyl===eng.show:(eng.sync&&e.cyl===eng.c0);
         g.globalAlpha=one&&!hl?.55:1;g.fillStyle=gold;g.beginPath();g.arc(xc,M.t+11,9,0,6.2832);g.fill();g.globalAlpha=1;
         if(hl){g.strokeStyle=pkc('#ffffff','#000000');g.lineWidth=2;g.stroke()}
-        g.fillStyle=lumHex(gold)>.4?'#1b1400':'#fff';g.textAlign='center';g.font='bold 11px system-ui';g.fillText(e.cyl,xc,M.t+15);g.font='11px system-ui'}});
+        g.fillStyle=lumHex(gold)>.4?'#1b1400':'#fff';g.textAlign='center';g.font='bold 11px '+FONT_UI;g.fillText(e.cyl,xc,M.t+15);g.font='11px '+FONT_UI}});
     if(one)EVS.filter(e=>e.cyl===eng.show).forEach(e=>{
       for(let s2=0;s2<4;s2++){const t0s=e.t+(s2-2)*ph.T/4,xa=X(t0s),xm=X(t0s+ph.T/8);
         if(xa<W0-1||xa>W1+1)continue;
         g.strokeStyle=gold;g.globalAlpha=.6;g.lineWidth=1;g.setLineDash([2,4]);g.beginPath();g.moveTo(xa,M.t+22);g.lineTo(xa,yb);g.stroke();g.setLineDash([]);g.globalAlpha=1;
         if(xm>M.l&&xm<M.l+pw&&xm>W0&&xm<W1){g.fillStyle=gold;g.textAlign='center';g.fillText(ST4[s2][0],xm,M.t+38)}}});
-    if(multi){const T=ph.T,i0=Math.max(0,eng.order.indexOf(eng.c0)),rot=[...eng.order.slice(i0),...eng.order.slice(0,i0)].filter(isVis),rh=eng.rh||14,y0=M.t+26,fz=Math.round(Math.min(16,Math.max(9,rh*.62))),ty=rh/2+fz*.36;g.font=fz+'px system-ui';
+    if(multi){const T=ph.T,i0=Math.max(0,eng.order.indexOf(eng.c0)),rot=[...eng.order.slice(i0),...eng.order.slice(0,i0)].filter(isVis),rh=eng.rh||14,y0=M.t+26,fz=Math.round(Math.min(16,Math.max(9,rh*.62))),ty=rh/2+fz*.36;g.font=fz+'px '+FONT_UI;
       rot.forEach((cyl,r)=>{const y=y0+r*(rh+1);
         EVS.filter(e=>e.cyl===cyl).forEach(e=>{for(let s2=0;s2<4;s2++){const ta=e.t+(s2-2)*T/4,xa=X(ta),xb=X(ta+T/4);
           const x0=Math.max(xa,M.l+24,W0),x1=Math.min(xb,M.l+pw,W1);if(x1-x0<3)continue;
           g.globalAlpha=D?.38:.45;g.fillStyle=ST4[s2][1];g.fillRect(x0,y,x1-x0-1,rh);g.globalAlpha=1;
           g.strokeStyle=ST4[s2][1];g.lineWidth=1;g.strokeRect(x0+.5,y+.5,x1-x0-2,rh-1);
           if(x1-x0>fz*3){g.fillStyle=pkc('#f2f6fb','#1b2430');g.textAlign='center';g.fillText(ST4[s2][0],(x0+x1)/2,y+ty)}}});
-        g.fillStyle=gold;g.textAlign='left';g.font='bold '+fz+'px system-ui';g.fillText('C'+cyl,M.l+3,y+ty);g.font=fz+'px system-ui'});g.font='11px system-ui'}
+        g.fillStyle=gold;g.textAlign='left';g.font='bold '+fz+'px '+FONT_UI;g.fillText('C'+cyl,M.l+3,y+ty);g.font=fz+'px '+FONT_UI});g.font='11px '+FONT_UI}
   }
   /* trazas */
   const t1=view.t0+view.span;
@@ -194,7 +194,7 @@ function draw(theme){
     if(ci===sel){g.strokeStyle=col;g.globalAlpha=.45;g.lineWidth=1;g.setLineDash([2,4]);g.beginPath();g.moveTo(M.l+24,y);g.lineTo(M.l+pw,y);g.stroke();g.setLineDash([]);g.globalAlpha=1}
     g.fillStyle=col;g.strokeStyle=BGP;g.lineWidth=1.5;g.beginPath();
     g.moveTo(M.l,y-8);g.lineTo(M.l+14,y-8);g.lineTo(M.l+24,y);g.lineTo(M.l+14,y+8);g.lineTo(M.l,y+8);g.closePath();g.fill();g.stroke();
-    g.fillStyle=lumHex(col)>.4?'#0b1018':'#ffffff';g.textAlign='center';g.font='bold 10px system-ui';g.fillText(ci+1,M.l+8,y+3.5);g.font='11px system-ui'});
+    g.fillStyle=lumHex(col)>.4?'#0b1018':'#ffffff';g.textAlign='center';g.font='bold 10px '+FONT_UI;g.fillText(ci+1,M.l+8,y+3.5);g.font='11px '+FONT_UI});
   drawAnn(g,X,hh,D);
   g.restore();
   $('phi').textContent=ph.T>0?'720° = '+fmt(ph.T,'s')+' · 1° = '+fmt(ph.T/720,'s')+' · '+Math.round(120/ph.T)+' rpm (4 tiempos = 2 vueltas)':'Sin datos.';

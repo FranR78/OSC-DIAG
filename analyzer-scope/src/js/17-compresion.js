@@ -49,7 +49,7 @@ function crDraw(){
   {const ft=g3.fillText.bind(g3);g3.fillText=(t,x,y)=>ft(i18(String(t)),x,y)}
   const tx='#e6edf6',mu='#8fa2b8',gr='#22324a';
   g3.fillStyle='#050a13';g3.fillRect(0,0,W,H);
-  const txt=(s,x,y,col,al,fs,b)=>{g3.font=(b?'bold ':'')+(fs||13)+'px system-ui';g3.fillStyle=col||tx;g3.textAlign=al||'center';g3.fillText(s,x,y)};
+  const txt=(s,x,y,col,al,fs,b)=>{g3.font=(b?'bold ':'')+(fs||13)+'px '+FONT_UI;g3.fillStyle=col||tx;g3.textAlign=al||'center';g3.fillText(s,x,y)};
   txt('Compresión relativa',W/2,30,tx,'center',18,1);
   const r=crRes,ml=56,mr=16,mt=56,mb=56,pw=W-ml-mr,ph2=H-mt-mb,Y=v=>mt+ph2*(1-v/100);
   g3.strokeStyle=gr;g3.lineWidth=1;

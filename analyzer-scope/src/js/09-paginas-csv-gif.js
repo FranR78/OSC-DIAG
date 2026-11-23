@@ -145,7 +145,7 @@ async function makeGif(){
   try{
     for(let p=a;p<=b;p++){showPage(p-1);gst('Capturando la página '+p+' ('+(p-a+1)+' de '+(b-a+1)+')…');draw(th);await tick();
       const H=Math.round(W*cv.height/cv.width),oc=document.createElement('canvas');oc.width=W;oc.height=H;const o=oc.getContext('2d');
-      o.drawImage(cv,0,0,W,H);o.font='bold 13px system-ui';const lab=i18('Pág. ')+p+' / '+N+' · '+PG[p-1].name,tw=o.measureText(lab).width;
+      o.drawImage(cv,0,0,W,H);o.font='bold 13px '+FONT_UI;const lab=i18('Pág. ')+p+' / '+N+' · '+PG[p-1].name,tw=o.measureText(lab).width;
       o.fillStyle=th==='light'?'rgba(255,255,255,.9)':'rgba(5,10,20,.85)';o.fillRect(6,H-26,tw+14,20);o.fillStyle=th==='light'?'#1b2430':'#ffd24d';o.fillText(lab,13,H-12);
       fr.push(o.getImageData(0,0,W,H))}
     gst('Codificando el GIF ('+fr.length+' imágenes)…');await tick();

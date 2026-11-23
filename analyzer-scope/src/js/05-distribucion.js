@@ -7,7 +7,7 @@ function drawDist(cn,th,W,H){
   const c=distCalc(),cx=W/2,cy=H/2+4,R=Math.min(W,H)*.285,wd=W*.045,f=v=>v.toFixed(1)+'°';
   const P=(r,t)=>[cx+r*Math.sin(t*Math.PI/180),cy-r*Math.cos(t*Math.PI/180)];
   const arc=(r,t0,t1,col,lw)=>{g2.beginPath();g2.arc(cx,cy,r,(t0-90)*Math.PI/180,(t1-90)*Math.PI/180);g2.lineWidth=lw;g2.strokeStyle=col;g2.stroke()};
-  const txt=(s,x,y,col,al,fs)=>{g2.font=(fs||W*.024)+'px system-ui';g2.fillStyle=col||tx;g2.textAlign=al||'center';g2.fillText(s,x,y)};
+  const txt=(s,x,y,col,al,fs)=>{g2.font=(fs||W*.024)+'px '+FONT_UI;g2.fillStyle=col||tx;g2.textAlign=al||'center';g2.fillText(s,x,y)};
   const rI=R+wd*.65,rE=R-wd*.65;
   [rI+wd/2,R,rE-wd/2].forEach(r=>arc(r,0,360,gr,1));
   g2.strokeStyle=gr;g2.lineWidth=1;g2.beginPath();g2.moveTo(cx,cy-R-wd*2.6);g2.lineTo(cx,cy+R+wd*2.6);g2.moveTo(cx-R-wd*2,cy);g2.lineTo(cx+R+wd*2,cy);g2.stroke();

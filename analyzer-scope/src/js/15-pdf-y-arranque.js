@@ -12,12 +12,15 @@ async function report(){
   const K=$('pdfBg').value==='k',{jsPDF}=window.jspdf,doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'}),lg=$('logo').src,
     cl=s=>String(s).replace(/Δ/g,'Dif ').replace(/∞/g,'inf').replace(/–/g,'-').replace(/●/g,'-'),
     tc=K?[235,240,248]:[25,25,25],hc=K?[255,255,255]:[20,40,80],mc=K?[160,172,190]:[100,100,100];
-  let page=1;{const _tx=doc.text.bind(doc);doc.text=(t,...a)=>_tx(Array.isArray(t)?t.map(x=>i18(String(x))):i18(String(t)),...a)}
-  const head=()=>{if(K){doc.setFillColor(5,10,19);doc.rect(0,0,297,210,'F');doc.setFillColor(255,255,255);doc.roundedRect(8.5,6,31,15,2,2,'F')}
-    doc.addImage(lg,'JPEG',10,7.5,28,12.6);doc.setTextColor(...hc);doc.setFontSize(16);doc.text('Informe de señales',46,14);
-    doc.setFontSize(9);doc.setTextColor(...mc);doc.text('Analyzer Scope · by J.A.Ortúñez y Fran Rosales · '+new Date().toLocaleString(LANG==='en'?'en-GB':'es-ES'),46,20);
+  // Open Sans en el PDF (la misma letra que la app y la gráfica); los signos que no tiene se cambian por texto
+  if(typeof FONT_OS==='object'){try{doc.addFileToVFS('OS-R.ttf',FONT_OS.r);doc.addFont('OS-R.ttf','OpenSans','normal');doc.addFileToVFS('OS-B.ttf',FONT_OS.b);doc.addFont('OS-B.ttf','OpenSans','bold');doc.setFont('OpenSans','normal')}catch(e){}}
+  const pdfTx=x=>String(x).replace(/→/g,'›').replace(/↔/g,'–').replace(/✓/g,'OK').replace(/✗/g,'X').replace(/⚠/g,'!').replace(/▶ ?/g,'').replace(/📖 ?/g,'');
+  let page=1;window.PDF_TXT=[];{const _tx=doc.text.bind(doc);doc.text=(t,...a)=>{const v=Array.isArray(t)?t.map(x=>pdfTx(i18(String(x)))):pdfTx(i18(String(t)));PDF_TXT.push(Array.isArray(v)?v.join(' '):v);return _tx(v,...a)}}  // PDF_TXT: el texto del informe (la letra incrustada no deja buscarlo en el archivo)
+  const head=()=>{if(K){doc.setFillColor(5,10,19);doc.rect(0,0,297,210,'F');doc.setFillColor(255,255,255);doc.roundedRect(8.5,6.3,36,13.8,2,2,'F')}
+    doc.addImage(lg,'JPEG',10,7.5,33,11.4);doc.setTextColor(...hc);doc.setFontSize(16);doc.text('Informe de señales',50,14);
+    doc.setFontSize(9);doc.setTextColor(...mc);doc.text('Analyzer Scope · by J.A.Ortúñez y Fran Rosales · '+new Date().toLocaleString(LANG==='en'?'en-GB':'es-ES'),50,20);
     doc.setDrawColor(217,169,58);doc.line(10,25,287,25)};
-  const foot=()=>{doc.setFontSize(8);doc.setTextColor(...mc);doc.text('Ortu Automoción · ortuautomocion.com · Analyzer Scope '+APP_CFG.ver,10,205);doc.text('Pág. '+page,287,205,{align:'right'})};
+  const foot=()=>{doc.setFontSize(8);doc.setTextColor(...mc);doc.text('Ortu & Rosales Automoción · ortuautomocion.com · Analyzer Scope '+APP_CFG.ver,10,205);doc.text('Pág. '+page,287,205,{align:'right'})};
   head();
   const R=draw(K?'dark':'light'),img=cv.toDataURL('image/png');draw();
   let w=277,h=w*cv.height/cv.width;if(h>108){h=108;w=h*cv.width/cv.height}

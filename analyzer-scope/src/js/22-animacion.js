@@ -49,17 +49,17 @@ function amPaint(g2,W,Hh,t,ov){
     g2.fillStyle=tx;g2.beginPath();g2.arc(kx,ky,2.6,0,6.2832);g2.fill();
     /* grados de cada cilindro en la misma escala que la regla de 720° (cilindro 1 = la regla) */
     const gd=Math.round((((q.a-q1.a+cyc)%720)+720)%720);
-    g2.font='600 12px system-ui';g2.fillStyle=tx;g2.fillText('Cil. '+n+' · '+gd+'°',cx,13);g2.font='600 11px system-ui';g2.fillStyle=col;g2.fillText(ST4[q.st][0],cx,Hh-5)}
+    g2.font='600 12px '+FONT_UI;g2.fillStyle=tx;g2.fillText('Cil. '+n+' · '+gd+'°',cx,13);g2.font='600 11px '+FONT_UI;g2.fillStyle=col;g2.fillText(ST4[q.st][0],cx,Hh-5)}
   /* lateral: diagrama de distribución del cilindro 1 con el punto del ciclo en que está (0° = PMS de cruce, arriba) */
   if(dg){const R0=dg/2-16,cx=W-dg/2-4,cy=Hh/2+6,th=((q1.a-360)%720+720)%720,rd=d=>(d-90)*Math.PI/180,
       arc=(r,a0,a1,c,lw)=>{g2.beginPath();g2.arc(cx,cy,r,rd(a0),rd(a1));g2.strokeStyle=c;g2.lineWidth=lw;g2.stroke()};
     arc(R0,0,360,bd,1);arc(R0+5,-V.aaa,180+V.rca,'#3da5ff',4);arc(R0-5,180-V.aae,360+V.rce,'#ff6b4d',4);
     g2.strokeStyle=bd;g2.lineWidth=1;g2.beginPath();g2.moveTo(cx,cy-R0-8);g2.lineTo(cx,cy-18);g2.moveTo(cx,cy+20);g2.lineTo(cx,cy+R0+8);g2.stroke();
-    g2.font='600 10px system-ui';g2.fillStyle=tx;g2.fillText('PMS',cx,cy-R0-11);g2.fillText('PMI',cx,cy+R0+19);
+    g2.font='600 10px '+FONT_UI;g2.fillStyle=tx;g2.fillText('PMS',cx,cy-R0-11);g2.fillText('PMI',cx,cy+R0+19);
     const mx=cx+(R0+5)*Math.sin(rd(th)+Math.PI/2),my=cy-(R0+5)*Math.cos(rd(th)+Math.PI/2);
     g2.strokeStyle=tx;g2.lineWidth=2;g2.beginPath();g2.moveTo(cx,cy);g2.lineTo(mx,my);g2.stroke();
     g2.fillStyle=ST4[q1.st][1];g2.beginPath();g2.arc(mx,my,5.5,0,6.2832);g2.fill();
-    g2.font='600 11px system-ui';g2.fillStyle=tx;g2.fillText('Cil. 1 · vuelta '+(th<360?1:2),cx,cy-3);
+    g2.font='600 11px '+FONT_UI;g2.fillStyle=tx;g2.fillText('Cil. 1 · vuelta '+(th<360?1:2),cx,cy-3);
     g2.fillStyle=ST4[q1.st][1];g2.fillText(ST4[q1.st][0]+' · '+Math.round(cyc)+'°',cx,cy+12)}
   return cyc;
 }
@@ -68,7 +68,7 @@ function amDraw(){
   const g2=c.getContext('2d');g2.setTransform(dp,0,0,dp,0,0);{const ft=g2.fillText.bind(g2);g2.fillText=(t,x,y)=>ft(i18(String(t)),x,y)}
   const mu=getComputedStyle(document.body).getPropertyValue('--mu').trim();
   g2.clearRect(0,0,W,Hh);g2.textAlign='center';
-  if(!(ph.T>0)||!eng.on||AM.t==null){g2.fillStyle=mu;g2.font='13px system-ui';g2.fillText('Activa «Cilindros» y ajusta el ciclo de 720° para ver la animación',W/2,Hh/2);$('anT').textContent='';$('anN').textContent='';return}
+  if(!(ph.T>0)||!eng.on||AM.t==null){g2.fillStyle=mu;g2.font='13px '+FONT_UI;g2.fillText('Activa «Cilindros» y ajusta el ciclo de 720° para ver la animación',W/2,Hh/2);$('anT').textContent='';$('anN').textContent='';return}
   const V=amVal(),cyc=amPaint(g2,W,Hh,AM.t);
   $('anT').textContent=cyc.toFixed(0)+'° · '+fmt(AM.t,'s');
   $('anN').textContent=(V.med?'Válvulas según tus reglas AAA·RCE·AAE·RCA.':'Válvulas con valores típicos (coloca las reglas AAA·RCE·AAE·RCA para usar los tuyos).')+' Esquema genérico: no es la geometría real del motor.';

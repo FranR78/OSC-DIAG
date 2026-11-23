@@ -3,6 +3,11 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.12.03
+- **Logo nuevo Ortu & Rosales Automoción** en la app, la portada y los informes.
+- **Una sola letra, Open Sans**, incrustada (sin internet): interfaz, gráfica y PDF. En el PDF ya salen bien Ω, °, µ, Δ, ≈, ≤ y ≥ (antes «60 ©»).
+- Licencia de la letra: `src/fonts/OFL.txt` (SIL Open Font License, permite incrustarla en un producto comercial).
+
 ## 2026.12.02
 - **Comprobaciones detalladas** (formato de skill ampliado): cada comprobación puede llevar **dónde** (conector, pines), **estado del vehículo**, **herramienta**, **pasos**, **valor correcto** y qué hacer **si sale bien / si sale mal**. Se ven en Procedimientos (desplegable «Comprobar»), en Diagnóstico y en el PDF.
 - Skills **Fran · Red CAN** y **Fran · Equilibrio de cilindros (CKP)** 2026.12.02 con todas sus comprobaciones detalladas (terminación 60 Ω en pines 6–14, aislar cortocircuitos, masas, conector de la unidad, prueba de fugas, cambio de bobina, retorno de inyectores…).

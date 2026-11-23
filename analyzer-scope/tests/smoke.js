@@ -15,7 +15,7 @@ const CAPS = ['seat_altea_fase_pms_y_inyector_1.csv', 'fase_pms_inyecctor_2.csv'
 let ok = 0, bad = 0;
 const check = (name, cond, extra = '') => { if (cond) { ok++; console.log('  ✓', name); } else { bad++; console.log('  ✗', name, extra); } };
 const SP = /[áéíóúñ¿¡«»]|(?<![\w])(de|del|la|las|el|los|con|para|por|una|un|en|al|que|sin|desde|hasta|entre|más|cada|todos|señal|archivos|cilindros|regla|reglas|página|pulsa|elige|canal|canales|disparo|ciclo|tiempo|tiempos|orden|avance|fondo|vista|escala|borrar|texto|línea|flecha|bajada|subida|flanco|umbral|fase|inicio|abrir|limpiar|ajustar|iniciar|parar|crear|descargar|añadir)(?![\w])/gi;
-const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español|[\w.-]*(fase_pms|seat_altea|inyector|inyecctor|cilindro_1)[\w.-]*/gi, '').match(SP) || []))];
+const spanish = t => [...new Set((t.replace(/Ortu (&amp; |& )?(Rosales )?Automoción|Ortúñez|Español|[\w.-]*(fase_pms|seat_altea|inyector|inyecctor|cilindro_1)[\w.-]*/gi, '').match(SP) || []))];
 
 (async () => {
   const b = await pw.chromium.launch({ headless: true });
@@ -327,7 +327,9 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     await pp.click('#tabS');
     const [pd] = await Promise.all([pp.waitForEvent('download'), pp.click('#bPdf')]);
     const pdf = fs.readFileSync(await pd.path()).toString('latin1');
-    check('portal: el PDF incluye la página de diagnóstico con la comprobación marcada', /posibles causas y comprobaciones/.test(pdf) && /\[x\] 1\. Compresi/.test(pdf));
+    const ptx = await pp.evaluate(() => (window.PDF_TXT || []).join('\n'));
+    check('portal: el PDF incluye la página de diagnóstico con la comprobación marcada', /%PDF/.test(pdf.slice(0, 8)) && /posibles causas y comprobaciones/.test(ptx) && /\[x\] 1\. Compresi/.test(ptx), ptx.slice(0, 200));
+    check('PDF con Open Sans incrustada', /OpenSans/.test(pdf));
     await pp.click('#tabX'); await pp.fill('#xQ', 'inyector'); await pp.click('#xBu'); await pp.waitForTimeout(100); await pp.click('#xRes button'); await pp.waitForTimeout(100);
     check('portal: buscar → ver NT (texto seguro, sin HTML ejecutable)', await pp.evaluate(() => /Inyector PD/.test($('xRes').innerText) && /PRV-0123/.test($('xRes').innerText) && !$('xRes').querySelector('img') && !window.__xss));
     await pp.evaluate(() => pqCargar()); await pp.waitForTimeout(100);

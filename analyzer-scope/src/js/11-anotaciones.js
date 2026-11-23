@@ -56,8 +56,8 @@ function drawAnn(g,X,hh,D){
     else if(a.k==='pen'){g.beginPath();a.pts.forEach(([t,f],i)=>{const x=X(t),y=M.t+f*hh;i?g.lineTo(x,y):g.moveTo(x,y)});g.stroke()}
     else if(a.k==='rect'){g.strokeRect(x1,y1,x2-x1,y2-y1);g.globalAlpha=.1;g.fillRect(x1,y1,x2-x1,y2-y1);g.globalAlpha=1}
     else if(a.k==='ell'){g.beginPath();g.ellipse((x1+x2)/2,(y1+y2)/2,Math.abs(x2-x1)/2,Math.abs(y2-y1)/2,0,0,6.2832);g.stroke();g.globalAlpha=.1;g.fill();g.globalAlpha=1}
-    else if(a.k==='text'){g.font='bold '+(12+a.w*2)+'px system-ui';const w=g.measureText(a.txt).width,h=14+a.w*2;
-      g.fillStyle=BGA;g.fillRect(x1-3,y1-h,w+6,h+5);g.fillStyle=col;g.textAlign='left';g.fillText(a.txt,x1,y1);g.font='11px system-ui'}
+    else if(a.k==='text'){g.font='bold '+(12+a.w*2)+'px '+FONT_UI;const w=g.measureText(a.txt).width,h=14+a.w*2;
+      g.fillStyle=BGA;g.fillRect(x1-3,y1-h,w+6,h+5);g.fillStyle=col;g.textAlign='left';g.fillText(a.txt,x1,y1);g.font='11px '+FONT_UI}
     g.lineCap='butt'});
 }
 ['none','text','arrow','line','pen','rect','ell','del'].forEach(t=>$('a_'+t).onclick=()=>setTool(t));

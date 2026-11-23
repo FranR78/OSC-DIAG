@@ -502,11 +502,11 @@
     {
      "texto": "Localizar las tramas dañadas en la señal",
      "tipo": "prueba",
-     "donde": "En la app: botón «▶» de cada trama con CRC mal",
+     "donde": "En la app: botón «Ver en la señal» de cada trama con CRC mal",
      "estado": "—",
      "herramienta": "Analyzer Scope",
      "pasos": [
-      "Pulsa cada «▶»: se abre la señal ampliada en esa trama.",
+      "Pulsa cada «Ver en la señal»: se abre la señal ampliada en esa trama.",
       "Busca picos, escalones o flancos lentos justo en esa trama."
      ],
      "esperado": "Flancos limpios, sin picos",
