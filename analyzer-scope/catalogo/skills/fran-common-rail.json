@@ -1,0 +1,165 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-common-rail",
+ "nombre": "Fran · Common rail diésel",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Diagnóstico de inyección diésel common rail con osciloscopio y transductor: baja presión, bomba, reguladores, inyector y fugas. Sin reglas: las tensiones y corrientes del inyector (pico_pico, maximo) dependen del tipo y del sistema; las cifras son de casos o de manuales concretos. Sin medida aún para presión de raíl frente a consigna, caída de presión tras parar ni ciclo de trabajo del regulador: van como notas.",
+ "acceso": "libre",
+ "reglas": [],
+ "notas": [
+  {
+   "id": "N-CR-01",
+   "titulo": "Principio y orden de descarte",
+   "tema": "corriente-inyector",
+   "texto": "# Principio\n- La UCE compara la presión real del raíl (sensor de 3 cables en la rampa) con la consigna y la corrige con el regulador de caudal y/o el de presión. [Criterio]\n- Regulador de caudal: fino, en baja presión, dosifica lo que entra a la bomba. [Criterio]\n- Regulador de presión: grueso, descarga a retorno. [Criterio]\n- Sin alimentación en ambos no hay presión. [Criterio]\n# Cinco sitios\n- Baja presión, bomba, reguladores, inyectores y fugas. Se descartan en este orden, midiendo. [Criterio]\n# Primer paso\n- Leer, no suponer: DTC, datos congelados y presión real frente a consigna. [Medido]\n- Un arranque exige un mínimo de presión (275-300 bar en un Cummins 6.7). [Teórico OEM]\n- En un caso había 200 bar de diferencia. [Medido]\n- Varias fuentes diésel están en borrador: contrastar con el manual del modelo. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Presión mínima de arranque (Cummins 6.7)",
+     "min": 275,
+     "max": 300,
+     "unidad": "bar",
+     "condicion": "Teórico OEM"
+    },
+    {
+     "magnitud": "Diferencia presión real frente a consigna en un caso",
+     "valor": 200,
+     "unidad": "bar",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: corriente-inyector"
+  },
+  {
+   "id": "N-CR-02",
+   "titulo": "Baja presión y sensor de raíl",
+   "tema": "corriente-inyector",
+   "texto": "# Baja presión\n- La electrobomba da presión previa a la bomba de alta. Si una de las dos falla hay fluctuaciones en el raíl y pérdida de potencia. [Teórico OEM]\n- Filtro, parafinas y cebado antes de tocar la alta. [Criterio]\n# Sensor de raíl\n- Alimentación de 5 V y señal en reposo de 0,5 V (0 bar). [Teórico OEM]\n- Con motor parado un sensor que daba 13 bar delató avería. [Medido]\n- Comprobar el sensor antes de culpar a la bomba. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Alimentación del sensor de raíl",
+     "valor": 5,
+     "unidad": "V",
+     "condicion": "Teórico OEM"
+    },
+    {
+     "magnitud": "Señal del sensor en reposo (0 bar)",
+     "valor": 0.5,
+     "unidad": "V",
+     "condicion": "Teórico OEM"
+    },
+    {
+     "magnitud": "Lectura de un sensor averiado con motor parado",
+     "valor": 13,
+     "unidad": "bar",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: corriente-inyector"
+  },
+  {
+   "id": "N-CR-03",
+   "titulo": "Reguladores de caudal y de presión",
+   "tema": "corriente-inyector",
+   "texto": "# Medir\n- Osciloscopio con el componente conectado. Canal en el mando por masa. [Medido]\n- Ciclo de trabajo y frecuencia con canales matemáticos: freq(A-7.5) y duty(-A), activo a 0 V. [Medido]\n- Acelerar a fondo y ver cómo responde el duty a la demanda. [Medido]\n- Añadir pinza de corriente: curva en «aleta de tiburón». [Medido]\n- El diagnosis no ve cortes rápidos. [Criterio]\n# Mandar o desconectar el regulador de presión\n- Sin mando, la presión residual es la del muelle (unos 50 bar en un caso Siemens). [Teórico OEM]\n- Si con él desconectado la presión no cae a ese valor: obstrucción o viruta en la bomba. [Inferido]\n- Si el limitador se queda abierto, lo tira todo al retorno. [Criterio]\n- ⚠ La maestra de regulador de presión de gasolina (membrana) no vale para common rail.",
+   "valores": [
+    {
+     "magnitud": "Presión residual con regulador de presión sin mando (caso Siemens)",
+     "valor": 50,
+     "unidad": "bar",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: corriente-inyector"
+  },
+  {
+   "id": "N-CR-04",
+   "titulo": "Fuga de alta presión y retorno de inyectores",
+   "tema": "corriente-inyector",
+   "texto": "# Prueba de parada\n- Registrar el sensor, cortar contacto y volver a dar contacto al parar para no perder la señal. [Medido]\n- Caída de presión en menos de 4 s era anómala; con inyectores nuevos aguantó más de 40 s. [Medido]\n- El criterio de 40 s o más es una deducción de un caso. [Inferido]\n- Aislar inyector a inyector: tapón en la salida del raíl, tubo a garrafa, y repetir. [Medido]\n# Retorno de inyectores\n- Transductor en serie en el retorno común, régimen y carga variables. [Teórico OEM]\n- Pulsaciones irregulares o amplitud distinta = fuga interna. [Teórico OEM]\n- El valor en cc/s lo da el fabricante. [Teórico OEM]\n- Estrangular el retorno vigilando la contrapresión. [Medido]\n- Un retorno que burbujea con aire apunta al casquillo o al inyector. [Medido]",
+   "valores": [
+    {
+     "magnitud": "Caída de presión anómala tras parar",
+     "max": 4,
+     "unidad": "s",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Presión que aguanta con inyectores nuevos",
+     "min": 40,
+     "unidad": "s",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: corriente-inyector"
+  },
+  {
+   "id": "N-CR-05",
+   "titulo": "Corriente y tensión del inyector",
+   "tema": "corriente-inyector",
+   "texto": "# Con el inyector conectado\n- Solenoide: pico de unos 80 V, mantenimiento a Vbat, pulso piloto + principal. [Teórico OEM]\n- Piezo: hasta 200 V. Alta tensión: usar atenuadores y nunca perforar cables. [Teórico OEM]\n- Sin presión, el inyector no inyecta aunque reciba mando. [Inferido]\n- Con alimentación y masa correctas pero sin rampa de corriente, el fallo es del propio inyector. [Medido]\n# Solenoide\n- El supresor de transitorios debe recortar el corte inductivo (unos 50 V); si no, rebote y cierre tardío. [Medido]\n# Piezo\n- Desconectar nunca con el motor en marcha. [Teórico OEM]\n- Medir capacidad, no resistencia, y comparar con carga sustitutiva. [Teórico OEM]\n- Un piezo averiado dio 160 V de pilotaje y 0,8 kΩ frente a 179-182 kΩ en los sanos; el aislamiento a masa a 250 V falló. [Medido]\n# Por qué no hay regla\n- Los valores dependen del tipo de inyector y del sistema. Medidas válidas existen (pico_pico, maximo), pero sin umbral general.",
+   "valores": [
+    {
+     "magnitud": "Pico del inyector solenoide",
+     "valor": 80,
+     "unidad": "V",
+     "condicion": "Teórico OEM, orientativo"
+    },
+    {
+     "magnitud": "Tensión máxima del inyector piezo",
+     "max": 200,
+     "unidad": "V",
+     "condicion": "Teórico OEM"
+    },
+    {
+     "magnitud": "Corte inductivo recortado por el supresor",
+     "valor": 50,
+     "unidad": "V",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Resistencia de un inyector piezo averiado",
+     "valor": 0.8,
+     "unidad": "kΩ",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Resistencia de inyectores piezo sanos",
+     "min": 179,
+     "max": 182,
+     "unidad": "kΩ",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: corriente-inyector"
+  },
+  {
+   "id": "N-CR-06",
+   "titulo": "Alzada de aguja",
+   "tema": "corriente-inyector",
+   "texto": "# Sensor\n- Bobina con unos 3,6 V y 30 mA. [Teórico OEM]\n- Señal escueta al ralentí; sube con las rpm. [Teórico OEM]\n- Contar pulsos entre referencias detecta dientes de rueda rotos. [Medido]\n# Identificar cilindro\n- Con sensor de picado en la culata y pinza en el inyector 1 se identifica el cilindro. [Medido]",
+   "valores": [
+    {
+     "magnitud": "Tensión del sensor de alzada de aguja",
+     "valor": 3.6,
+     "unidad": "V",
+     "condicion": "Teórico OEM"
+    },
+    {
+     "magnitud": "Corriente del sensor de alzada de aguja",
+     "valor": 30,
+     "unidad": "mA",
+     "condicion": "Teórico OEM"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: corriente-inyector"
+  },
+  {
+   "id": "N-CR-07",
+   "titulo": "Virutas tras bomba destruida",
+   "tema": "corriente-inyector",
+   "texto": "# Si la bomba se destruyó\n- Una CP4 por falta de llenado genera viruta: prellenar con la función de precarga. [Criterio]\n- Con viruta se limpia o renueva todo: inyectores, raíl, tubos y depósito. [Criterio]\n- Un solo componente nuevo vuelve a fallar si no se limpia lo demás. [Medido]\n# Fuente única\n- Parte de este criterio viene de un solo documento: contrastar con el manual del fabricante. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: corriente-inyector"
+  }
+ ]
+}

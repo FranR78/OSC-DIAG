@@ -1,0 +1,117 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-pwm",
+ "nombre": "Fran · Actuadores PWM",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Actuadores mandados por PWM o masa conmutada (VGT, mariposa, EGR, ralentí, cánister, electroventilador): separa mando UCE, cableado, actuador y mecánica. Sin reglas: no hay entidad de actuador en el catálogo y los umbrales de ciclo de trabajo y corriente dependen del modelo; las cifras son de casos, no de fabricante.",
+ "acceso": "libre",
+ "reglas": [],
+ "notas": [
+  {
+   "id": "N-PWM-01",
+   "titulo": "Las cuatro capas",
+   "tema": "actuadores-pwm",
+   "texto": "# Orden\n- 1. Mando UCE: ¿manda la orden correcta? [Criterio]\n- 2. Cableado y alimentación: ¿llega Vbat y vuelve la masa con carga? [Criterio]\n- 3. Actuador eléctrico: bobina o motor, escobillas, Hall. [Criterio]\n- 4. Mecánica o neumática: agarrotado, fugas, carbonilla. [Criterio]\n# Cómo usarlo\n- Una sola medida suele separar dos capas: anotar qué capa descarta cada una. [Criterio]\n- Tensiones siempre con el componente conectado (prolongador o por detrás del conector, sin perforar). [Criterio]\n- Desconectado solo resistencia y continuidad. Alimentación = Vbat. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: actuadores-pwm"
+  },
+  {
+   "id": "N-PWM-02",
+   "titulo": "Canal de mando: ciclo de trabajo y frecuencia",
+   "tema": "actuadores-pwm",
+   "texto": "# Principio\n- Casi todos: un borne a Vbat y la UCE da masa a impulsos; la excitación coincide con el tramo a 0 V. [Teórico OEM]\n# Medir\n- Ciclo de trabajo y frecuencia con canales matemáticos: el diagnosis refresca lento y pierde caídas e intermitentes. [Medido]\n- Contar el ciclo del lado de masa (negativo): invertirlo da lectura opuesta al escáner. [Medido]\n# Ejemplos\n- Electroventilador BMW: 7 % en reposo, 93 % a máxima, rango de mando 11-93 %. [Medido]\n- Ford: 110 Hz. [Medido]\n- Cifras de coches concretos, no de fabricante: manda la documentación del modelo.",
+   "valores": [
+    {
+     "magnitud": "Ciclo de trabajo en reposo (electroventilador BMW)",
+     "valor": 7,
+     "unidad": "%",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Ciclo de trabajo a máxima (electroventilador BMW)",
+     "valor": 93,
+     "unidad": "%",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Frecuencia de mando (Ford)",
+     "valor": 110,
+     "unidad": "Hz",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: actuadores-pwm"
+  },
+  {
+   "id": "N-PWM-03",
+   "titulo": "Mando: qué significa lo que se ve",
+   "tema": "actuadores-pwm",
+   "texto": "# Síntoma → causa\n- Hay señal no es hay orden: mirar el % pedido antes de culpar al actuador. [Medido]\n- Mando a 0 V con corto a masa no es circuito abierto: la UCE sigue modulando y circula corriente. [Medido]\n- Mando a 12 V fijo con el conector puesto: ese valor no conmuta; cable o módulo, no UCE sin más. [Medido]\n- Mando fijo a Vbat o a 0 V: corto o UCE. [Teórico OEM]\n- Sin señal: continuidad; si el cable está bien, UCE. [Teórico OEM]\n# Reglas\n- Un aviso de circuito abierto no es el diagnóstico: puede ser desequilibrio de fases, inhibición o masa flotante. [Medido]\n- Continuidad con pocos hilos engaña: mover el mazo (wiggle) con el actuador activo. [Criterio]",
+   "fuente": "Biblioteca Pico y notas técnicas del portal: actuadores-pwm"
+  },
+  {
+   "id": "N-PWM-04",
+   "titulo": "Pinza de corriente: qué hace el actuador",
+   "tema": "actuadores-pwm",
+   "texto": "# Lectura\n- La forma de la corriente es el estado del actuador: rampa limpia y reposo; pico inductivo al cortar (bobinas); ondulación al desplazarse. [Criterio]\n- Sin pico inductivo en señales cuadradas sin carga inductiva. [Teórico OEM]\n- Corriente de bloqueo = techo del motor: en una válvula de calefacción, unos 200 mA con unos 50 Ω; más de 1 A = corto eléctrico, no agarrotamiento. [Medido]\n- Chisporroteo de escobillas o delgas sucias: picos de tensión en el positivo y la masa y picos de corriente. [Medido]\n- Corriente errática en motor de ventilador: escobillas gastadas. [Inferido]\n# Trifásico\n- Tres fases uniformes e idénticas, con 120° entre picos. Poner la pinza a cero primero: su deriva imita desequilibrio. [Teórico OEM]\n# Dónde poner la pinza\n- En positivo o en masa del actuador: distingue defecto de instalación o interno. [Inferido]",
+   "valores": [
+    {
+     "magnitud": "Corriente de bloqueo de una válvula de calefacción",
+     "valor": 200,
+     "unidad": "mA",
+     "condicion": "con unos 50 Ω, dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Corriente que indica corto eléctrico en esa válvula",
+     "min": 1,
+     "unidad": "A",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Desfase entre fases de motor trifásico",
+     "valor": 120,
+     "unidad": "°",
+     "condicion": "Teórico OEM"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: actuadores-pwm"
+  },
+  {
+   "id": "N-PWM-05",
+   "titulo": "Posición y realimentación",
+   "tema": "actuadores-pwm",
+   "texto": "# Doble pista\n- Dos señales invertidas que suman 5 V; los extremos se reservan para detectar fallo. [Medido]\n- Pistas coherentes y real distinto del deseado: el fallo está en el control del motor, no en sensor ni cableado. [Medido]\n- Si el sensor va por CAN, no hay tensión de posición que medir: un DTC de posición puede ser el motor interno. [Medido]\n- El escáner muestra igual dos pistas que en realidad van opuestas: no fiarse para ver pistas. [Criterio]\n# Masas\n- Masa de sensores a 5 V: corte, o la UCE inhibe el transistor de masa. [Medido]\n- Fallo de posición con picos de corriente: sospechar masa compartida antes que sensor. [Inferido]\n# Aviso\n- ⚠ Los extremos de tensión de reposo de la mariposa varían por modelo: manda el valor del fabricante.",
+   "valores": [
+    {
+     "magnitud": "Suma de las dos pistas de posición",
+     "valor": 5,
+     "unidad": "V",
+     "condicion": "Medido"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: actuadores-pwm"
+  },
+  {
+   "id": "N-PWM-06",
+   "titulo": "Mecánica y neumática",
+   "tema": "actuadores-pwm",
+   "texto": "# Mecánico\n- Señal y corriente correctas pero el actuador no obedece: agarrotado o suciedad. [Teórico OEM]\n- Muelle de reposo de unos 20-22 % abierto en una mariposa sin control. [Medido]\n# VGT y wastegate de vacío\n- Transductor en T entre electroválvula y cápsula. [Inferido]\n- Si el vacío cae y el soplado sigue subiendo: álabes agarrotados. [Inferido]\n- Si no cae: electroválvula o venteo. [Inferido]\n- Vacío al arrancar: unos 0,5 bar. [Medido]\n# Valvetronic\n- Tope mecánico, sector desgastado o taqué pueden dar falsos eléctricos. [Medido]\n# Aviso\n- No probar paso a paso con 12 V directos. [Teórico OEM]",
+   "valores": [
+    {
+     "magnitud": "Apertura de reposo de una mariposa sin control",
+     "min": 20,
+     "max": 22,
+     "unidad": "%",
+     "condicion": "dato de un caso, no de fabricante"
+    },
+    {
+     "magnitud": "Vacío al arrancar (electroválvula)",
+     "valor": 0.5,
+     "unidad": "bar",
+     "condicion": "dato de un caso, no de fabricante"
+    }
+   ],
+   "fuente": "Biblioteca Pico y notas técnicas del portal: actuadores-pwm"
+  }
+ ]
+}

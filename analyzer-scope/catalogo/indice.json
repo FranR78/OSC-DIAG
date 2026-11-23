@@ -40,6 +40,17 @@
   },
   {
    "tipo": "skill",
+   "id": "fran-common-rail",
+   "nombre": "Fran · Common rail diésel",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-common-rail.json",
+   "temas": [],
+   "reglas": 0
+  },
+  {
+   "tipo": "skill",
    "id": "fran-compresion",
    "nombre": "Fran · Compresión relativa y estado mecánico",
    "autor": "Fran Rosales",
@@ -118,6 +129,17 @@
    "version": "2026.12.06",
    "acceso": "libre",
    "archivo": "skills/fran-picoscope.json",
+   "temas": [],
+   "reglas": 0
+  },
+  {
+   "tipo": "skill",
+   "id": "fran-pwm",
+   "nombre": "Fran · Actuadores PWM",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-pwm.json",
    "temas": [],
    "reglas": 0
   },
