@@ -3,6 +3,9 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.12.09
+- **Skill Red CAN 2026.12.09**: N-CAN-07 explica por qué la pinza en el hilo CAN ve solo a quien emite (corriente a las terminaciones, ≈ 33 mA teóricos), qué pinza vale, y cuándo sirve medir en la gateway o en un punto estrella (ramales con terminación: signo de la corriente).
+
 ## 2026.12.08
 - **Skill Red CAN 2026.12.08** (vídeo de pinza en la red CAN, traducido): la pinza va en un hilo CAN de la unidad (par separado), no hace falta desconectar ni desmontar; cero y filtro; ≈ 40 mA por trama (dato de un caso). Comprobación «Confirmar qué unidad emite el ID» con esos pasos.
 
