@@ -125,7 +125,7 @@ function skPaso(S,i){
     '<div class="skKv"><div><small>Una pantalla dura</small><b>'+skT(r.win)+'</b></div><div><small>Maniobra</small><b>'+skT(skDur(p))+'</b></div><div><small>Muestreo</small><b>'+skF(r.fs)+'</b></div><div><small>Canales</small><b>'+p.canales.length+'</b></div></div>'+
     '<div class="skCk" id="kCk">'+r.o.map(o=>'<div class="skA '+o[0]+'"><b>'+(o[0]==='ok'?'✓':o[0]==='warn'?'!':'✗')+'</b><span><b>'+o[1]+'.</b> '+o[2]+'</span></div>').join('')+'</div></div>'+
    '<div class="skC"><b class="skH">Cargar la captura</b><div class="drop" id="kDrop">'+(cv?'<b>'+skE(cv.name)+'</b><div class="skCk">'+cv.chk.map(o=>'<div class="skA '+o[0]+'"><b>'+(o[0]==='ok'?'✓':'!')+'</b><span>'+o[1]+'</span></div>').join('')+'</div>':
-     'Suelta aquí el CSV exportado de PicoScope')+'<div class="row" style="justify-content:center;margin-top:8px"><button id="kLoad">'+(cv?'Cambiar CSV…':'Elegir CSV…')+'</button>'+(!cv&&(p.requisitos.criterio==='diente'||p.requisitos.criterio==='can')?'<button id="kDemo">Probar con una señal de ejemplo</button>':'')+(cv?'<button id="kVer">Ver en el osciloscopio</button><button id="kQuit">Quitar</button>':'')+'</div></div>'+
+     'Suelta aquí el CSV exportado de PicoScope')+'<div class="row" style="justify-content:center;margin-top:8px"><button id="kLoad">'+(cv?'Cambiar CSV…':'Elegir CSV…')+'</button>'+(!cv&&(p.requisitos.criterio==='diente'||p.requisitos.criterio==='can')?'<button id="kDemo">Probar con una señal de ejemplo</button>':'')+(cv&&!cv.dm?'<button id="kVer">Ver en el osciloscopio</button><button id="kQuit">Quitar</button>':'')+'</div></div>'+
     '<div class="row" style="margin-top:10px"><button data-go="'+(i-1)+'">← Anterior</button><span class="sp"></span><button class="p" data-go="'+(i+1)+'">'+(i<n?'Siguiente: paso '+(i+1):'Ir al resumen')+' →</button></div></div>'+(cv&&p.requisitos.criterio==='diente'?ckpCard(key,cv):'')+(cv&&p.requisitos.criterio==='can'?canCard(key,cv):'');
 }
 function skEditor(S){
@@ -136,7 +136,14 @@ function skEditor(S){
 /* ---- acciones ---- */
 async function skCargaCsv(S,i,f){
   const p=skPasos(S)[i-1];if(!p)return;const key=skKey(S,p);
-  try{st('Leyendo '+f.name+'…');const ds=await readAny(f,u=>st('Leyendo '+f.name+'… '+Math.round(u*100)+' %'));const d=ds[0];
+  try{st('Leyendo '+f.name+'…');
+    const hd=(await f.slice(0,3000).text()).split(/\r?\n/)[0];
+    if(/ciclo n\.?º|cycle (no|#)|^"?(m[aá]x|max)\.?"?[,;]/i.test(hd)&&!/^\s*(tiempo|time)\b/i.test(hd)){  // tabla de DeepMeasure, no forma de onda
+      if(p.requisitos.criterio!=='diente'){st(f.name+': es una tabla de DeepMeasure. Para esta prueba hace falta la forma de onda: exporta la señal a CSV.');$('st').classList.add('err');skTab();return}
+      const dm=ckpDeepMeasure(await f.text());if(dm.err){st(f.name+': '+dm.err);$('st').classList.add('err');skTab();return}
+      const chk=[['ok','Tabla de DeepMeasure: '+dm.n+' dientes en '+skT(dm.E[dm.E.length-1]-dm.E[0])],...dm.warn.map(w=>['warn',w]),['warn','Sin canal de sincronismo: la fase del cilindro 1 se indica a mano y cada cilindro puede ser su pareja.']];
+      SK.csv[key]={name:f.name,dm,ds:[],chk,bad:true};[SK.ckp,SK.ckpO,SK.can,SK.canO].forEach(o=>delete o[key]);st(f.name+': tabla de DeepMeasure cargada en el paso '+i+'.');skTab();return}
+    const ds=await readAny(f,u=>st('Leyendo '+f.name+'… '+Math.round(u*100)+' %'));const d=ds[0];
     const x=d.chs[0].x,n=x.length,dur=n>1?x[n-1]-x[0]:0,fs=dur>0?(n-1)/dur:0,need=skDur(p),r=p.requisitos,chk=[];
     chk.push([d.chs.length>=p.canales.length?'ok':'warn',d.chs.length+(d.chs.length>1?' canales':' canal')+(d.chs.length>=p.canales.length?'':' (el paso pide '+p.canales.length+')')]);
     chk.push([dur>=need*.9?'ok':'warn','Dura '+skT(dur)+(dur>=need*.9?'':' (la maniobra necesita '+skT(need)+')')]);

@@ -25,9 +25,17 @@ function ckpAnaliza(d,o){
   const C=d.chs[o.ick],S=d.chs[o.isy];if(!C||!S||o.ick===o.isy)return{err:'Elige dos canales distintos: el del sensor de cigüeñal y el del sincronismo.'};
   const n=o.order.length;if(n<2||n>12||[...new Set(o.order)].length!==n)return{err:'Revisa el orden de encendido (p. ej. 1-3-4-2).'};
   const E=ckpDientes(C.x,C.y);if(E.length<60)return{err:'No se detectan dientes en «'+C.n+'»: ¿es el canal del sensor de cigüeñal?'};
+  const Y=ckpSync(S.x,S.y);if(!Y.length)return{err:'No se ven pulsos en «'+S.n+'»: sin sincronismo no se sabe qué cilindro es cada uno.'};
+  return ckpCore(E,Y,o);
+}
+/* desde los instantes de los dientes (de la señal o de una tabla DeepMeasure). Y = pulsos de sincronismo, o null:
+   sin sincronismo la fase sale de «PMS del cil. 1 en el diente n.º» y cada cilindro puede ser su pareja (misma posición, 360° después) */
+function ckpCore(E,Y,o){
+  const n=o.order.length;if(n<2||n>12||[...new Set(o.order)].length!==n)return{err:'Revisa el orden de encendido (p. ej. 1-3-4-2).'};
+  if(E.length<60)return{err:'Hay muy pocos dientes ('+E.length+'): hacen falta al menos dos vueltas completas (mejor unos segundos).'};
   const P=[];for(let i=0;i+1<E.length;i++)P.push(E[i+1]-E[i]);
   const G=[];for(let i=3;i<P.length;i++){const m=(P[i-1]+P[i-2]+P[i-3])/3;if(P[i]>1.6*m&&(i+1>=P.length||P[i]>1.6*P[i+1]))G.push(i)}
-  if(G.length<2)return{err:'No se encuentra el hueco de la rueda fónica: hace falta al menos una vuelta completa con hueco.'};
+  if(G.length<2)return{err:'No se encuentran dos huecos de la rueda fónica: hacen falta al menos dos vueltas completas (mejor unos segundos).'};
   const TT=[];for(let j=1;j<G.length;j++)TT.push(G[j]-G[j-1]);const T=Math.round(ckpMed(TT));
   const mm=G.filter(g=>g>0&&g+1<P.length).map(g=>Math.round(P[g]/((P[g-1]+P[g+1])/2))-1),m=Math.max(1,Math.round(ckpMed(mm)));
   const N=T+m,dp=360/N,bad=TT.filter(t=>t!==T).length,warn=[];
@@ -39,9 +47,11 @@ function ckpAnaliza(d,o){
   const tm=[],am=[],rp=[];for(let i=g0;i+1<E.length;i++){const da=th[i+1]-th[i];tm.push((E[i]+E[i+1])/2);am.push((th[i]+th[i+1])/2);rp.push(da/P[i]/6)}
   const rs=rp.map((v,i)=>i&&i<rp.length-1?(rp[i-1]+v+rp[i+1])/3:v);
   // fase: PMS del cilindro 1
-  const Y=ckpSync(S.x,S.y).filter(t=>t>=E[g0]&&t<=E[E.length-1]);if(!Y.length)return{err:'No se ven pulsos en «'+S.n+'»: sin sincronismo no se sabe qué cilindro es cada uno.'};
   const thAt=t=>{const i=Math.max(g0,Math.min(E.length-2,lb(E,t)-1));return th[i]+(t-E[i])/(E[i+1]-E[i])*(th[i+1]-th[i])};
-  const ph=Y.map(t=>((thAt(t)+o.off)%720+720)%720),r0=ph[0],th0=ckpMed(ph.map(a=>{let q=a-r0;if(q>360)q-=720;if(q<-360)q+=720;return q}))+r0;
+  let th0,sinFase=false;
+  if(Y){Y=Y.filter(t=>t>=E[g0]&&t<=E[E.length-1]);if(!Y.length)return{err:'Los pulsos de sincronismo quedan fuera del tramo con dientes.'};
+    const ph=Y.map(t=>((thAt(t)+o.off)%720+720)%720),r0=ph[0];th0=ckpMed(ph.map(a=>{let q=a-r0;if(q>360)q-=720;if(q<-360)q+=720;return q}))+r0}
+  else{th0=(+o.diente||0)*dp+(+o.off||0);sinFase=true}
   // ciclos y ventanas de cada cilindro
   const W=720/n,cyc=[];let k=0,a0=th0;while(a0>am[0])a0-=720;
   for(;a0+720<=am[am.length-1];a0+=720){
@@ -51,15 +61,28 @@ function ckpAnaliza(d,o){
       for(let i=i0;i<i1;i++){const q=rs[i]-(v0+(v1-v0)*(am[i]-am[i0])/sp);if(q>mx)mx=q}c.d[o.order[j]]=mx;
       if(j===0)c.t0=tm[i0];if(j===n-1)c.t1=tm[i1-1]}
     if(!c.ok)continue;let s=0,q=0;for(let i=lb(am,a0);i<lb(am,a0+720);i++){s+=rp[i];q++}c.rpm=s/q;
-    c.comb=Y.some(t=>t>=c.t0-.002&&t<=c.t1);cyc.push(c)}
+    c.comb=Y?Y.some(t=>t>=c.t0-.002&&t<=c.t1):true;cyc.push(c)}
   if(cyc.length<2)return{err:'La captura es demasiado corta: hacen falta al menos 2 ciclos completos (720°).'};
   cyc.forEach((c,i)=>{const p=cyc[i-1];c.reg=!c.comb?(c.rpm>150?'sin':''):p&&c.rpm>p.rpm*1.03?'acel':p&&c.rpm<p.rpm*.97?'dec':'est'});
   const R={};for(const g of['est','acel','sin']){const L=cyc.filter(c=>c.reg===g);if(L.length<2)continue;
     const md={};o.order.forEach(c=>md[c]=ckpMed(L.map(q=>q.d[c])));const mx=Math.max(...Object.values(md));
     R[g]={n:L.length,rpm:Math.round(ckpMed(L.map(q=>q.rpm))),pct:Object.fromEntries(o.order.map(c=>[c,mx>0?Math.max(0,Math.round(md[c]/mx*100)):0]))}}
   const st=Math.max(1,Math.floor(rp.length/700)),serie=[];for(let i=0;i<rp.length;i+=st)serie.push([tm[i],rp[i]]);
-  return{N,T,m,vueltasMal:bad,vueltas:G.length-1,ciclos:cyc.length,R,cyc:cyc.map(c=>({t0:c.t0,t1:c.t1,reg:c.reg})),serie,warn,order:o.order,dur:E[E.length-1]-E[0]};
+  return{N,T,m,sinFase,pares:Object.fromEntries(o.order.map((c,j)=>[c,o.order[(j+n/2)%n]])),vueltasMal:bad,vueltas:G.length-1,ciclos:cyc.length,R,cyc:cyc.map(c=>({t0:c.t0,t1:c.t1,reg:c.reg})),serie,warn,order:o.order,dur:E[E.length-1]-E[0]};
 }
+/* tabla de DeepMeasure (PicoScope 7) exportada a CSV: instantes de cada diente desde «Tiempo de inicio» / «Tiempo final» */
+function ckpDeepMeasure(txt){
+  const L=txt.replace(/^\uFEFF/,'').split(/\r?\n/).filter(l=>l.trim()),D=L[0].includes(';')?';':',',H=L[0].split(D).map(h=>h.trim().replace(/^"|"$/g,'').toLowerCase());
+  const ci=re=>H.findIndex(h=>re.test(h)),i0=ci(/tiempo de inicio|start time/),i1=ci(/tiempo final|end time|stop time/);
+  if(i0<0)return{err:'Esta tabla de DeepMeasure no trae «Tiempo de inicio»: añade esa columna en DeepMeasure (Campos) y exporta otra vez. Con solo Máx./Mín. no se puede analizar.'};
+  const num=v=>+String(v).trim().replace(/^"|"$/g,'').replace(D===';'?',':'\u0000','.');
+  const R=L.slice(1).map(l=>l.split(D)).map(c=>[num(c[i0]),i1>=0?num(c[i1]):NaN]).filter(r=>isFinite(r[0])).sort((a,b)=>a[0]-b[0]);
+  const E=R.map(r=>r[0]);if(R.length&&isFinite(R[R.length-1][1]))E.push(R[R.length-1][1]);
+  const P=[];for(let i=0;i+1<E.length;i++)P.push(E[i+1]-E[i]);
+  // periodos «a escalones»: casi todos son múltiplos de un paso q (el de muestreo) → no se ven diferencias menores que q
+  const pm=ckpMed(P),warn=[],q=[5e-4,2e-4,1e-4,5e-5,2e-5,1e-5,5e-6,2e-6,1e-6].find(c=>c<pm&&P.filter(x=>{const f=x/c-Math.round(x/c);return Math.abs(f)<.2}).length>=.7*P.length)||0;
+  if(q>0&&pm>0&&q/pm>.01)warn.push('Los periodos van a saltos de '+skT(q)+' ('+Math.round(q/pm*100)+' % del periodo): la captura tiene poco muestreo y no se ven diferencias entre cilindros más pequeñas que eso. Graba a 200 kS/s o más.');
+  return{E,n:R.length,warn}}
 /* lo medido, sin opinar (la interpretación la dan las skills: 35-medidas.js) */
 function ckpMedido(r){const L=[],G=[['est','estable'],['acel','en aceleración'],['sin','sin combustión']].filter(g=>r.R[g[0]]);
   if(!r.R.est&&!r.R.acel)L.push(['warn','No hay al menos 2 ciclos con combustión: no se puede comparar el aporte. Graba ralentí y aceleraciones con el sincronismo conectado.']);
@@ -81,14 +104,18 @@ function ckpDemo(o={}){
 }
 /* ---- tarjeta en la prueba ---- */
 function ckpCard(key,cv){
-  const d=cv.ds[0],r=SK.ckp[key],o=SK.ckpO[key]||(SK.ckpO[key]={ick:Math.max(0,d.chs.findIndex(c=>/ckp|cig|crank/i.test(c.n))),isy:-1,ord:eng.order.join('-'),off:0});
+  const dm=cv.dm,d=dm?{chs:[]}:cv.ds[0],r=SK.ckp[key],o=SK.ckpO[key]||(SK.ckpO[key]={ick:Math.max(0,d.chs.findIndex(c=>/ckp|cig|crank/i.test(c.n))),isy:-1,ord:eng.order.join('-'),off:0,diente:0});
   if(o.isy<0)o.isy=o.ick===0?1:0;
   const opt=sel=>d.chs.map((c,i)=>'<option value="'+i+'"'+(i===sel?' selected':'')+'>'+esc(c.n)+'</option>').join('');
+  const fila=dm?'<div class="row"><span class="hint">Tabla de DeepMeasure: '+dm.n+' dientes, sin canal de sincronismo.</span></div><div class="row"><label title="Dientes contados desde el primero tras el hueco hasta el PMS del cilindro 1 (dato del fabricante)">PMS del cil. 1 en el diente n.º <input id="kCkD" type="number" min="0" step="1" value="'+o.diente+'" style="width:64px"></label>':
+    '<div class="row"><label>Sensor de cigüeñal <select id="kCk1">'+opt(o.ick)+'</select></label><label>Sincronismo cil. 1 <select id="kCk2">'+opt(o.isy)+'</select></label>';
   let h='<div class="skC"><b class="skH">Analizar el sensor de cigüeñal</b><p class="hint">Cada cilindro se mide en su propia carrera de trabajo, desde su PMS: el cilindro señalado es el responsable, sin restar uno.</p>'+
-    '<div class="row"><label>Sensor de cigüeñal <select id="kCk1">'+opt(o.ick)+'</select></label><label>Sincronismo cil. 1 <select id="kCk2">'+opt(o.isy)+'</select></label>'+
+    fila+
     '<label>Orden de encendido <input id="kCkO" value="'+esc(o.ord)+'" style="width:90px"></label><label title="Grados desde el pulso de sincronismo hasta el PMS del cilindro 1">Desfase (°) <input id="kCkF" type="number" step="1" value="'+o.off+'" style="width:64px"></label><button class="p" id="kCkGo">Analizar</button></div>';
+  if(dm&&dm.warn.length)h+='<div class="skCk">'+dm.warn.map(w=>'<div class="skA warn"><b>!</b><span>'+w+'</span></div>').join('')+'</div>';
   if(r&&r.err)h+='<div class="skCk"><div class="skA bad"><b>✗</b><span>'+r.err+'</span></div></div>';
   else if(r){
+    if(r.sinFase)h+='<div class="skCk"><div class="skA warn"><b>!</b><span>Sin sincronismo de fase: cada cilindro señalado puede ser su pareja ('+[...new Set(r.order.map(c=>[c,r.pares[c]].sort((a,b)=>a-b).join('↔')))].join(', ')+'). Confírmalo con el CMP, el inyector o la bobina.</span></div></div>';
     h+='<div class="skKv"><div><small>Rueda fónica</small><b>'+r.N+'-'+r.m+'</b></div><div><small>Dientes por vuelta</small><b>'+r.T+'</b></div><div><small>Vueltas</small><b>'+r.vueltas+'</b></div><div><small>Ciclos (720°)</small><b>'+r.ciclos+'</b></div></div>';
     const sk=mdSkills(ckpMedidas(r),{cilindros:r.order.length}),mk={est:mdMarcados(sk,'ckp_aporte_est_pct'),acel:mdMarcados(sk,'ckp_aporte_acel_pct'),sin:mdMarcados(sk,'ckp_aporte_sin_pct')};
     h+='<div class="skCk">'+r.warn.map(w=>'<div class="skA warn"><b>!</b><span>'+w+'</span></div>').join('')+ckpMedido(r).map(l=>'<div class="skA '+l[0]+'"><b>'+(l[0]==='ok'?'✓':'!')+'</b><span><b>[Medido]</b> '+l[1]+'</span></div>').join('')+'</div>'+
@@ -113,8 +140,8 @@ function ckpGraf(r){
 }
 function ckpWire(key){
   const on=(id,f)=>{const e=$(id);if(e)e.onclick=f};
-  on('kCkGo',()=>{const o=SK.ckpO[key];o.ick=+$('kCk1').value;o.isy=+$('kCk2').value;o.ord=$('kCkO').value;o.off=+$('kCkF').value||0;
+  on('kCkGo',()=>{const o=SK.ckpO[key],dm=SK.csv[key].dm;if(!dm){o.ick=+$('kCk1').value;o.isy=+$('kCk2').value}else o.diente=+$('kCkD').value||0;o.ord=$('kCkO').value;o.off=+$('kCkF').value||0;
     const ord=o.ord.split(/[^0-9]+/).filter(Boolean).map(Number);st('Analizando el sensor de cigüeñal…');
-    setTimeout(()=>{try{SK.ckp[key]=ckpAnaliza(SK.csv[key].ds[0],{ick:o.ick,isy:o.isy,order:ord,off:o.off})}catch(e){SK.ckp[key]={err:'No se pudo analizar: '+e.message}}
+    setTimeout(()=>{try{SK.ckp[key]=dm?ckpCore(dm.E,null,{order:ord,off:o.off,diente:o.diente}):ckpAnaliza(SK.csv[key].ds[0],{ick:o.ick,isy:o.isy,order:ord,off:o.off})}catch(e){SK.ckp[key]={err:'No se pudo analizar: '+e.message}}
       st(SK.ckp[key].err?SK.ckp[key].err:'Análisis del sensor de cigüeñal hecho.');skTab()},20)});
 }

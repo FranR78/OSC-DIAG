@@ -3,6 +3,11 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.11.29
+- **Tablas de DeepMeasure en el análisis del cigüeñal:** en una prueba con CKP se puede cargar el CSV de DeepMeasure (columnas «Tiempo de inicio» y «Tiempo final»). Sale el mismo análisis, sin sincronismo: la fase se indica con «PMS del cil. 1 en el diente n.º» y la app avisa de que cada cilindro puede ser su pareja.
+- **Aviso de poco muestreo:** si los periodos van a saltos (p. ej. 100 µs a 10 kS/s) lo dice, con el % del periodo que se pierde.
+- Una tabla de DeepMeasure sin tiempos (solo Máx./Mín.) o en una prueba que no es de CKP se rechaza diciendo qué exportar.
+
 ## 2026.11.28
 - **Scripts → Procedimientos.** Cada procedimiento declara las skills (temas) que necesita; si falta alguna lo avisa y, si está desactivada, ofrece **Activar**. Las medidas salen igual.
 - **Medidas con nombre** (`35-medidas.js`): el análisis del cigüeñal y el de CAN publican medidas (`ckp_aporte_est_pct`, `can_dif_unidad`…) con su catálogo (qué es, unidad, de qué análisis sale).

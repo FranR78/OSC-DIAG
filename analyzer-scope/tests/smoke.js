@@ -602,6 +602,14 @@ const spanish = t => [...new Set((t.replace(/Ortu Automoción|Ortúñez|Español
     check('skill CKP: señala al responsable (cil. 3 flojo, cil. 2 flojo) y no a otro', /^FR-CKP-01:Cilindro 3:/.test(ck.flojo.d[0]) && /^FR-CKP-01:Cilindro 2:/.test(ck.flojo2.d[0]) && ck.flojo.d.filter(x => /^FR-CKP-01/.test(x)).length === 1, JSON.stringify([ck.flojo.d, ck.flojo2.d]));
     check('skill CKP: combustión (gasolina/diésel) frente a fuga de compresión', ck.flojo.d.some(x => /^FR-CKP-03:Cilindro 3/.test(x)) && ck.flojoD.d.some(x => /^FR-CKP-04:Cilindro 3.*inyección/.test(x)) && ck.fuga.d.some(x => /^FR-CKP-02:Cilindro 3.*fuga de compresión/.test(x)), JSON.stringify([ck.flojo.d, ck.flojoD.d, ck.fuga.d]));
     check('skill CKP: motor sano → ningún hallazgo', ck.bien.d.length === 0, JSON.stringify(ck.bien.d));
+    const dmk = await KE(() => { const dm = ckpDemo({ flojo: 3 }), E = ckpDientes(dm.chs[0].x, dm.chs[0].y), fila = (t, i) => (i + 1) + ',' + (E[i + 1] - t) + ',' + t + ',' + E[i + 1];
+      const csv = 'Ciclo n.º,Tiempo de ciclo,Tiempo de inicio,Tiempo final\n' + E.slice(0, -1).map(fila).join('\n'), d = ckpDeepMeasure(csv), r = ckpCore(d.E, null, { order: [1, 3, 4, 2], off: 4, diente: 16 });
+      const Eq = E.map(t => Math.round(t * 1e4) / 1e4), cq = 'Ciclo n.º,Tiempo de ciclo,Tiempo de inicio,Tiempo final\n' + Eq.slice(0, -1).map((t, i) => (i + 1) + ',' + (Eq[i + 1] - t) + ',' + t + ',' + Eq[i + 1]).join('\n');
+      const solo = ckpDeepMeasure('Máx.,Mín.,Pc-Pc\n1,2,3');
+      return { n: d.n, warn: d.warn.length, sinFase: r.sinFase, H: mdSkills(ckpMedidas(r), { cilindros: 4 }).H.map(h => h.regla + ':' + h.sintoma), wq: ckpDeepMeasure(cq).warn.join(' '), solo: solo.err || '' }; });
+    check('DeepMeasure (tabla de dientes): mismo análisis sin sincronismo; señala el 3 o su pareja (2) y avisa de la pareja', dmk.n > 3000 && dmk.sinFase && dmk.H.length && /^FR-CKP-01:Cilindro (3|2):/.test(dmk.H[0]), JSON.stringify(dmk));
+    check('DeepMeasure a 10 kS/s: avisa de que los periodos van a saltos de 100 µs', /saltos de 100 µs/.test(dmk.wq), dmk.wq);
+    check('DeepMeasure sin «Tiempo de inicio» (solo Máx./Mín.): dice qué columna añadir', /Tiempo de inicio/.test(dmk.solo), dmk.solo);
     check('el código no lleva umbrales de diagnóstico (CKP_UMBRAL, CAN_REF, ckpDiag, canDiag fuera)', await KE(() => typeof CKP_UMBRAL === 'undefined' && typeof CAN_REF === 'undefined' && typeof ckpDiag === 'undefined' && typeof canDiag === 'undefined'));
     await k.click('#kL .skI[data-k="FR-EQ-01"]'); await k.click('#kSteps .skS[data-s="1"]'); await k.click('#kDemo'); await k.click('#kCkGo'); await k.waitForTimeout(500);
     check('CKP en la app: señal de ejemplo → tabla por cilindro, gráfica y conclusión', await KE(() => /60-2/.test($('kPaso').textContent) && /\[Medido\] Cilindro 3: aporta/.test($('kPaso').textContent) && /Fran · Equilibrio de cilindros/.test($('kPaso').textContent) && document.querySelectorAll('.ckT tbody tr').length === 4));
