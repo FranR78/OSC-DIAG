@@ -3,7 +3,7 @@
  "paquete": "fran-can",
  "nombre": "Fran · Red CAN (ISO 11898-2)",
  "autor": "Fran Rosales",
- "version": "2026.12.02",
+ "version": "2026.12.04",
  "aviso": "CAN de alta velocidad. El CAN de baja velocidad tolerante a fallos tiene otros niveles. La terminación (60 Ω) se mide con polímetro.",
  "reglas": [
   {
@@ -482,7 +482,7 @@
   {
    "id": "FR-CAN-13",
    "tema": "red-can",
-   "sintoma": "{valor} tramas con CRC mal",
+   "sintoma": "Tramas con CRC mal: {valor}",
    "si": [
     {
      "medida": "can_crc_mal",
@@ -530,7 +530,7 @@
   {
    "id": "FR-CAN-14",
    "tema": "red-can",
-   "sintoma": "{valor} tramas de error",
+   "sintoma": "Tramas de error: {valor}",
    "si": [
     {
      "medida": "can_err_tramas",
@@ -655,7 +655,7 @@
   {
    "id": "FR-CAN-17",
    "tema": "red-can",
-   "sintoma": "Unidad {unidad}: {valor} tramas con CRC mal",
+   "sintoma": "Unidad {unidad}: tramas con CRC mal: {valor}",
    "si": [
     {
      "medida": "can_crc_unidad",
@@ -716,7 +716,7 @@
   {
    "id": "FR-CAN-19",
    "tema": "red-can",
-   "sintoma": "{valor} tramas sin confirmar (ACK): nadie las recibe",
+   "sintoma": "Tramas sin confirmar (ACK): {valor}. Nadie las recibe",
    "si": [
     {
      "medida": "can_sin_ack",

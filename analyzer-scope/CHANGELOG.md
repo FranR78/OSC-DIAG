@@ -3,6 +3,15 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.12.04
+- **PDF nuevo:**
+  - **Portada** con el resultado: número de hallazgos, la lista con la página de cada uno, el vehículo y las fuentes activas.
+  - **La señal** en la página 2. Las medidas genéricas (media, RMS…) solo salen si no hay diagnóstico.
+  - **Una página por hallazgo:** qué es, de qué skill sale, la evidencia con su nombre (no el identificador interno), **dónde** está y la **imagen ampliada del tramo marcado en rojo**, las causas y las **comprobaciones para rellenar en el taller** (casilla, dónde, herramienta, pasos, valor correcto, si sale bien / mal y una línea de «Resultado»).
+  - **Tabla por unidad (ID) o por cilindro**, con en rojo lo que señala la skill.
+- El informe sirve tanto para «Diagnóstico» como para los análisis de «Procedimientos» de la captura abierta.
+- Skill **Fran · Red CAN** 2026.12.04: los síntomas se leen mejor («Tramas con CRC mal: 1»).
+
 ## 2026.12.03
 - **Logo nuevo Ortu & Rosales Automoción** en la app, la portada y los informes.
 - **Una sola letra, Open Sans**, incrustada (sin internet): interfaz, gráfica y PDF. En el PDF ya salen bien Ω, °, µ, Δ, ≈, ≤ y ≥ (antes «60 ©»).

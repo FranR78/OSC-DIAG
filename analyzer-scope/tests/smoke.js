@@ -328,7 +328,7 @@ const spanish = t => [...new Set((t.replace(/Ortu (&amp; |& )?(Rosales )?Automoc
     const [pd] = await Promise.all([pp.waitForEvent('download'), pp.click('#bPdf')]);
     const pdf = fs.readFileSync(await pd.path()).toString('latin1');
     const ptx = await pp.evaluate(() => (window.PDF_TXT || []).join('\n'));
-    check('portal: el PDF incluye la página de diagnóstico con la comprobación marcada', /%PDF/.test(pdf.slice(0, 8)) && /posibles causas y comprobaciones/.test(ptx) && /\[x\] 1\. Compresi/.test(ptx), ptx.slice(0, 200));
+    check('portal: el PDF lleva portada con resultado y la página del hallazgo con la comprobación marcada', /%PDF/.test(pdf.slice(0, 8)) && /Comprobaciones \(marca y anota el resultado\)/.test(ptx) && /\[x\] 1\. Compresi/.test(ptx) && /Informe de diagnóstico/.test(ptx) && /hallazgo/.test(ptx), ptx.slice(0, 200));
     check('PDF con Open Sans incrustada', /OpenSans/.test(pdf));
     await pp.click('#tabX'); await pp.fill('#xQ', 'inyector'); await pp.click('#xBu'); await pp.waitForTimeout(100); await pp.click('#xRes button'); await pp.waitForTimeout(100);
     check('portal: buscar → ver NT (texto seguro, sin HTML ejecutable)', await pp.evaluate(() => /Inyector PD/.test($('xRes').innerText) && /PRV-0123/.test($('xRes').innerText) && !$('xRes').querySelector('img') && !window.__xss));
@@ -656,6 +656,9 @@ const spanish = t => [...new Set((t.replace(/Ortu (&amp; |& )?(Rosales )?Automoc
     check('«Ver en la señal»: abre la captura en el osciloscopio, amplía la carrera del cilindro y la marca', await KE(() => curTab === 'S' && MARCA && /Cilindro 3/.test(MARCA.txt) && view.t0 < MARCA.t0 && view.t0 + view.span > MARCA.t1 && view.span < 0.2));
     const cmp = await KE(() => { const a = canAnaliza(canDemo(), { ih: 0, il: 1 }), h = mdSkills(canMedidas(a)).H.find(x => x.regla === 'FR-CAN-15'), c = h && h.comprobaciones[0]; return c ? { donde: c.donde, pasos: c.pasos.length, bien: !!c.si_bien, mal: !!c.si_mal, sint: h.sintoma, html: mdHallazgosHTML({ H: [h], usadas: ['x'] }, '', null) } : null; });
     check('comprobaciones detalladas: dónde, pasos, si sale bien / mal, con la unidad sustituida y números con coma', cmp && /0x2F1/.test(cmp.donde) && cmp.pasos === 3 && cmp.bien && cmp.mal && /32,5 %/.test(cmp.sint) && /2\. Revisar el conector/.test(cmp.html), JSON.stringify(cmp && { d: cmp.donde, s: cmp.sint }));
+    { const [dl] = await Promise.all([k.waitForEvent('download'), k.evaluate(() => report())]); await dl.path();
+      const tx = await KE(() => PDF_TXT.join('\n'));
+      check('PDF desde un procedimiento: portada con hallazgos, página con «Dónde» e imagen marcada, tabla por cilindro', /Informe de diagnóstico/.test(tx) && /hallazgo/.test(tx) && /Dónde: .*Cilindro 3/.test(tx) && /En rojo, el tramo/.test(tx) && /Aporte de cada cilindro/.test(tx) && /Resultado: _/.test(tx), tx.slice(0, 300)); }
     check('procedimientos: sin errores JS', ke.length === 0, ke.join(' | '));
     await k.close();
   }
