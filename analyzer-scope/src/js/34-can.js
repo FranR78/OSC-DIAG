@@ -164,7 +164,7 @@ function canDecoMedidas(r){const v=r.lv,M=[mdV('can_tramas',r.tramas)];
   if(r.tipo==='dif')M.push(mdV('can_dif',v.amp),mdV('can_rec_dif',v.mn));
   if(r.tipo==='h')M.push(mdV('can_dom_h',v.mx),mdV('can_rec_h',v.mn));
   if(r.tipo==='l')M.push(mdV('can_dom_l',v.mn),mdV('can_rec_l',v.mx));
-  if(r.crcMal!=null)M.push(mdV('can_crc_mal',r.crcMal));if(r.errFr!=null)M.push(mdV('can_err_tramas',r.errFr));if(r.sinAck!=null)M.push(mdV('can_sin_ack',r.sinAck));
+  if(r.crcMal!=null)M.push(mdV('can_crc_mal',r.crcMal),mdV('can_crc_pct',r.tramas?r.crcMal/r.tramas*100:null));if(r.errFr!=null)M.push(mdV('can_err_tramas',r.errFr));if(r.sinAck!=null)M.push(mdV('can_sin_ack',r.sinAck));
   const U=r.U,by=f=>Object.fromEntries(U.map(u=>[u.id,f(u)]));
   M.push(mdP('can_desv_unidad_pct',by(u=>u.desv)));if(r.tipo==='dif')M.push(mdP('can_dif_unidad',by(u=>u.amp)));if(r.crcMal!=null)M.push(mdP('can_crc_unidad',by(u=>u.crc)));
   return M.filter(Boolean)}

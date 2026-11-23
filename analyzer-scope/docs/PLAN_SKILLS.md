@@ -68,6 +68,6 @@ un **simulador didáctico** de irregularidad (δ, RPM en 720°, órdenes de ence
 
 ## 7. Estado (2026-11-28)
 * `src/js/35-medidas.js`: catálogo `MEDIDAS`, `ckpMedidas`, `canMedidas`, `mdSkills` (evalúa las skills activas con el mismo motor que «Diagnóstico»), `mdFaltan`.
-* Skills base nuevas: `src/reglas/fran-ckp.json` (5 reglas, 1 nota) y `src/reglas/fran-can.json` (17 reglas, 1 nota). Borrador.
+* Skills base nuevas: `src/reglas/fran-ckp.json` (5 reglas, 1 nota) y `src/reglas/fran-can.json` (hoy en `catalogo/skills/`: 22 reglas, 6 notas). Borrador.
 * Procedimientos: campo `skills` = temas que necesitan (`aporte-cilindro`, `red-can`, `compresion-relativa`, `pulso-cilindro-*`; sin skill aún: `arranque-carga`, `avance-encendido`, `corriente-inyector`).
 * Pendiente: catálogo central en `apps-script-scope` (hoy las skills base siguen incrustadas al construir; pesan KB), criterios del canal matemático CAN, El Power.

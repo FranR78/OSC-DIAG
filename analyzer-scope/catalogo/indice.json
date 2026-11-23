@@ -6,13 +6,13 @@
    "id": "fran-can",
    "nombre": "Fran · Red CAN (ISO 11898-2)",
    "autor": "Fran Rosales",
-   "version": "2026.12.04",
+   "version": "2026.12.05",
    "acceso": "libre",
    "archivo": "skills/fran-can.json",
    "temas": [
     "red-can"
    ],
-   "reglas": 19
+   "reglas": 22
   },
   {
    "tipo": "skill",

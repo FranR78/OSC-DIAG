@@ -20,6 +20,8 @@ const MEDIDAS=[
   {id:'can_dif',nombre:'Diferencial dominante de la red',unidad:'V',analisis:'can',que:'Mediana del diferencial dominante de todas las unidades'},
   {id:'can_ov_pct',nombre:'Sobreoscilación de los flancos',unidad:'%',analisis:'can',que:'Pico tras el flanco sobre el nivel dominante'},
   {id:'can_crc_mal',nombre:'Tramas con CRC mal',unidad:'',analisis:'can',que:'Tramas cuyo CRC-15 no cuadra'},
+  {id:'can_crc_pct',nombre:'Tramas con CRC mal (%)',unidad:'%',analisis:'can',que:'CRC mal / tramas leídas × 100 (unas pocas pueden ser normales)'},
+  {id:'can_suma_dom',nombre:'Suma H+L en dominante',unidad:'V',analisis:'can',que:'CAN-H + CAN-L en los bits dominantes (≈ 5 V: H sube lo que L baja)'},
   {id:'can_err_tramas',nombre:'Tramas de error',unidad:'',analisis:'can',que:'Dominantes de 6 bits o más'},
   {id:'can_rec_dif',nombre:'Diferencial recesivo de la red',unidad:'V',analisis:'can',que:'H−L en recesivo (tabla de decodificación del canal diferencial)'},
   {id:'can_sin_ack',nombre:'Tramas sin confirmar (ACK)',unidad:'',analisis:'can',que:'Tramas que ninguna otra unidad confirmó (columna ACK de la decodificación)'},
@@ -38,7 +40,7 @@ function ckpMedidas(r){if(!r||r.err)return[];const M=[];
 function canMedidas(r){if(!r||r.err)return[];if(r.deco)return canDecoMedidas(r);const M=[];
   M.push(mdV('can_tramas',r.sin?0:r.tramas),mdV('can_h_med',r.g.hMed),mdV('can_l_med',r.g.lMed),mdV('can_hl_dif_med',r.g.hlMed));
   if(!r.sin){const v=r.lv;M.push(mdV('can_rec_h',v.rH),mdV('can_rec_l',v.rL),mdV('can_dom_h',v.dH),mdV('can_dom_l',v.dL),mdV('can_dif',v.dif),mdV('can_ov_pct',v.ov),
-      mdV('can_crc_mal',r.crcMal),mdV('can_err_tramas',r.errFr));
+      mdV('can_crc_mal',r.crcMal),mdV('can_crc_pct',r.tramas?r.crcMal/r.tramas*100:null),mdV('can_suma_dom',v.dH!=null&&v.dL!=null?v.dH+v.dL:null),mdV('can_err_tramas',r.errFr));
     const U=r.U.filter(u=>u.id!=='?'),by=f=>Object.fromEntries(U.map(u=>[u.id,f(u)]));
     M.push(mdP('can_dif_unidad',by(u=>u.dif)),mdP('can_desv_unidad_pct',by(u=>u.dif!=null&&v.dif?Math.abs(u.dif-v.dif)/v.dif*100:null)),
       mdP('can_ov_unidad_pct',by(u=>u.ov)),mdP('can_crc_unidad',by(u=>u.crc)))}

@@ -9,7 +9,7 @@ function mdDonde(r,h){const e=(h.evidencia||[])[0];if(!r||!e)return[];const L=[]
   const g=/^ckp_aporte_(est|acel|sin)_pct$/.exec(e.medida);
   if(g&&r.cyc)r.cyc.forEach((c,k)=>{if(c.reg===g[1]&&c.w&&c.w[u]&&L.length<6)L.push({t0:c.w[u][0],t1:c.w[u][1],txt:i18('Cilindro')+' '+u+' · '+i18('ciclo')+' '+(k+1)})});
   const ev=t=>(r.EV||[]).filter(x=>x.tipo===t).slice(0,8).map(x=>({t0:x.t0,t1:x.t1,b:x.b,fila:x.fila,txt:(t==='crc'?i18('CRC mal'):i18('Trama de error'))+(x.id!=null&&t==='crc'?' · ID '+mdHex(x.id)+' '+i18('(dudoso)'):'')}));
-  if(e.medida==='can_crc_mal')L.push(...ev('crc'));
+  if(e.medida==='can_crc_mal'||e.medida==='can_crc_pct')L.push(...ev('crc'));
   if(e.medida==='can_err_tramas')L.push(...ev('error'));
   if(e.medida==='can_crc_unidad')L.push(...(r.EV||[]).filter(x=>x.tipo==='crc'&&x.id===+u).slice(0,8).map(x=>({t0:x.t0,t1:x.t1,b:x.b,fila:x.fila,txt:'CRC mal · ID '+mdHex(+u)})));
   else if(/_unidad(_pct)?$/.test(e.medida)&&u!=null&&r.U){const U=r.U.find(x=>String(x.id)===String(u));if(U)U.tt.slice(0,5).forEach(t=>L.push({t0:t[0],t1:t[1],b:t[2],fila:t[3],txt:'ID '+mdHex(U.id)}))}

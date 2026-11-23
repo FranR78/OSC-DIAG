@@ -3,8 +3,8 @@
  "paquete": "fran-can",
  "nombre": "Fran · Red CAN (ISO 11898-2)",
  "autor": "Fran Rosales",
- "version": "2026.12.04",
- "aviso": "CAN de alta velocidad. El CAN de baja velocidad tolerante a fallos tiene otros niveles. La terminación (60 Ω) se mide con polímetro.",
+ "version": "2026.12.05",
+ "aviso": "CAN de alta velocidad (ISO 11898-2). El CAN de baja velocidad tolerante a fallos, LIN y FlexRay tienen otros niveles: ver la nota «Otras redes». La terminación (60 Ω) se mide con polímetro.",
  "reglas": [
   {
    "id": "FR-CAN-01",
@@ -31,6 +31,16 @@
     }
    ],
    "comprobaciones": [
+    {
+     "texto": "Firma con polímetro en el conector de diagnosis",
+     "tipo": "medida",
+     "donde": "Conector de diagnosis: pin 6 (CAN-H) y pin 14 (CAN-L) contra pin 4/5 (masa)",
+     "estado": "Contacto puesto",
+     "herramienta": "Polímetro en V (CC)",
+     "esperado": "Con tráfico: CAN-H ≈ 2,6 V y CAN-L ≈ 2,4 V (valor medio)",
+     "si_bien": "Si el polímetro da valores normales y la red falla, el fallo es intermitente o de una unidad: osciloscopio.",
+     "si_mal": "Línea a masa: 0 V y la otra ≈ 0,7 V. Línea a positivo: la más alta ≈ tensión de batería. H y L unidas: las dos ≈ 2,5 V iguales."
+    },
     {
      "texto": "Buscar a qué unidad o tramo va el cortocircuito de CAN-H a positivo",
      "tipo": "prueba",
@@ -75,6 +85,16 @@
    ],
    "comprobaciones": [
     {
+     "texto": "Firma con polímetro en el conector de diagnosis",
+     "tipo": "medida",
+     "donde": "Conector de diagnosis: pin 6 (CAN-H) y pin 14 (CAN-L) contra pin 4/5 (masa)",
+     "estado": "Contacto puesto",
+     "herramienta": "Polímetro en V (CC)",
+     "esperado": "Con tráfico: CAN-H ≈ 2,6 V y CAN-L ≈ 2,4 V (valor medio)",
+     "si_bien": "Si el polímetro da valores normales y la red falla, el fallo es intermitente o de una unidad: osciloscopio.",
+     "si_mal": "Línea a masa: 0 V y la otra ≈ 0,7 V. Línea a positivo: la más alta ≈ tensión de batería. H y L unidas: las dos ≈ 2,5 V iguales."
+    },
+    {
      "texto": "Buscar a qué unidad o tramo va el cortocircuito de CAN-H a masa",
      "tipo": "prueba",
      "donde": "Conector de diagnosis (OBD): pin 6 = CAN-H, pin 14 = CAN-L, pin 4/5 = masa",
@@ -118,6 +138,16 @@
    ],
    "comprobaciones": [
     {
+     "texto": "Firma con polímetro en el conector de diagnosis",
+     "tipo": "medida",
+     "donde": "Conector de diagnosis: pin 6 (CAN-H) y pin 14 (CAN-L) contra pin 4/5 (masa)",
+     "estado": "Contacto puesto",
+     "herramienta": "Polímetro en V (CC)",
+     "esperado": "Con tráfico: CAN-H ≈ 2,6 V y CAN-L ≈ 2,4 V (valor medio)",
+     "si_bien": "Si el polímetro da valores normales y la red falla, el fallo es intermitente o de una unidad: osciloscopio.",
+     "si_mal": "Línea a masa: 0 V y la otra ≈ 0,7 V. Línea a positivo: la más alta ≈ tensión de batería. H y L unidas: las dos ≈ 2,5 V iguales."
+    },
+    {
      "texto": "Buscar a qué unidad o tramo va el cortocircuito de CAN-L a positivo",
      "tipo": "prueba",
      "donde": "Conector de diagnosis (OBD): pin 6 = CAN-H, pin 14 = CAN-L, pin 4/5 = masa",
@@ -160,6 +190,16 @@
     }
    ],
    "comprobaciones": [
+    {
+     "texto": "Firma con polímetro en el conector de diagnosis",
+     "tipo": "medida",
+     "donde": "Conector de diagnosis: pin 6 (CAN-H) y pin 14 (CAN-L) contra pin 4/5 (masa)",
+     "estado": "Contacto puesto",
+     "herramienta": "Polímetro en V (CC)",
+     "esperado": "Con tráfico: CAN-H ≈ 2,6 V y CAN-L ≈ 2,4 V (valor medio)",
+     "si_bien": "Si el polímetro da valores normales y la red falla, el fallo es intermitente o de una unidad: osciloscopio.",
+     "si_mal": "Línea a masa: 0 V y la otra ≈ 0,7 V. Línea a positivo: la más alta ≈ tensión de batería. H y L unidas: las dos ≈ 2,5 V iguales."
+    },
     {
      "texto": "Buscar a qué unidad o tramo va el cortocircuito de CAN-L a masa",
      "tipo": "prueba",
@@ -215,6 +255,16 @@
     }
    ],
    "comprobaciones": [
+    {
+     "texto": "Medir la resistencia entre CAN-H y CAN-L",
+     "tipo": "medida",
+     "donde": "Conector de diagnosis: pin 6 y pin 14",
+     "estado": "Contacto quitado y red dormida (o batería desconectada)",
+     "herramienta": "Polímetro en Ω",
+     "esperado": "≈ 60 Ω (dos resistencias de 120 Ω)",
+     "si_bien": "60 Ω con H y L al mismo nivel → no es un puente H-L: unidad que bloquea la red (desconectarlas una a una).",
+     "si_mal": "≈ 0 Ω → H y L unidas. Entre 0 y 60 Ω → puente con resistencia (humedad, transceptor): por debajo de ~60–100 Ω la red se degrada."
+    },
     {
      "texto": "Confirmar que la red está despierta",
      "tipo": "prueba",
@@ -482,12 +532,12 @@
   {
    "id": "FR-CAN-13",
    "tema": "red-can",
-   "sintoma": "Tramas con CRC mal: {valor}",
+   "sintoma": "Muchas tramas con CRC mal: {valor} % de las leídas",
    "si": [
     {
-     "medida": "can_crc_mal",
+     "medida": "can_crc_pct",
      "op": ">",
-     "valor": 0
+     "valor": 2
     }
    ],
    "confianza": "media",
@@ -495,6 +545,10 @@
    "causas": [
     {
      "texto": "Interferencias o niveles al límite",
+     "etiqueta": "Inferido"
+    },
+    {
+     "texto": "Una unidad que mete ruido en el bus: si la perturbación es simétrica en H y L la produce la electrónica, no un roce de cable",
      "etiqueta": "Inferido"
     }
    ],
@@ -522,9 +576,67 @@
      "esperado": "< 0,1 V",
      "si_bien": "Masas correctas: revisar el trenzado y los empalmes del mazo CAN.",
      "si_mal": "> 0,1 V → limpiar y apretar ese punto de masa y repetir la captura."
+    },
+    {
+     "texto": "Desconectar unidades una a una mirando la señal",
+     "tipo": "prueba",
+     "donde": "Conectores de las unidades de la red, empezando por las más accesibles",
+     "estado": "Contacto puesto, osciloscopio grabando",
+     "herramienta": "Osciloscopio (2 canales) y Analyzer Scope",
+     "pasos": [
+      "Grabar en continuo (200 ms/div o más) con CAN-H y CAN-L.",
+      "Soltar una unidad, esperar unos segundos y mirar si siguen las tramas dañadas.",
+      "Volver a conectarla y pasar a la siguiente. Al final, borrar los códigos que genera la desconexión."
+     ],
+     "esperado": "Las tramas dañadas desaparecen al soltar una unidad",
+     "si_bien": "Si con todas desconectadas sigue el ruido → cableado: menear el mazo por zonas grabando.",
+     "si_mal": "Al soltar la unidad X desaparecen → conector (terminales) o la propia unidad X."
     }
    ],
-   "fuente": "ISO 11898-2 (CAN de alta velocidad)",
+   "fuente": "Vídeos de diagnóstico de redes (transcripciones) · ISO 11898-2",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-20",
+   "tema": "red-can",
+   "sintoma": "Pocas tramas con CRC mal: {valor}",
+   "si": [
+    {
+     "medida": "can_crc_mal",
+     "op": ">",
+     "valor": 0
+    },
+    {
+     "medida": "can_crc_pct",
+     "op": "<=",
+     "valor": 2
+    }
+   ],
+   "confianza": "baja",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Error puntual: unas pocas tramas mal pueden ser normales; un fallo de comunicación real da muchas",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Repetir con una captura más larga",
+     "tipo": "prueba",
+     "donde": "Conector de diagnosis o el de la unidad sospechosa",
+     "estado": "Contacto puesto (o motor en marcha si el fallo sale así)",
+     "herramienta": "Osciloscopio grabando en continuo",
+     "pasos": [
+      "Capturar varios segundos (200 ms/div, búfer de PicoScope) moviendo cables y conectores.",
+      "Exportar y analizar de nuevo."
+     ],
+     "esperado": "Menos del 2 % de tramas con CRC mal",
+     "si_bien": "Error puntual: no es la causa de la avería.",
+     "si_mal": "Sube el porcentaje → seguir la regla «Muchas tramas con CRC mal»."
+    }
+   ],
+   "fuente": "Vídeos de diagnóstico de redes (transcripciones) · ISO 11898-2",
    "estado": "borrador"
   },
   {
@@ -750,6 +862,100 @@
    ],
    "fuente": "ISO 11898-1 (acuse de recibo)",
    "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-21",
+   "tema": "red-can",
+   "sintoma": "H+L en dominante = {valor} V (debería ser ≈ 5 V)",
+   "si": [
+    {
+     "medida": "can_suma_dom",
+     "op": "fuera",
+     "valor": [
+      4.5,
+      5.5
+     ]
+    }
+   ],
+   "confianza": "media",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Las dos líneas no se mueven igual: una tiene fuga a masa o a positivo, o resistencia en serie",
+     "etiqueta": "Inferido"
+    },
+    {
+     "texto": "Masa desplazada en alguna unidad",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Canal matemático A+B con máscara",
+     "tipo": "prueba",
+     "donde": "Conector de diagnosis: A = CAN-H, B = CAN-L",
+     "estado": "Contacto puesto (o el estado en que falla)",
+     "herramienta": "PicoScope: canal matemático A+B, máscara ±2 % con alarma",
+     "pasos": [
+      "Crear el canal A+B (5 V/div basta) y una máscara de ±2 % alrededor de 5 V.",
+      "Grabar a 200 ms/div con la alarma sonora de la máscara.",
+      "Menear cableado y conectores: cada aviso marca el momento del fallo."
+     ],
+     "esperado": "A+B plano en ≈ 5 V todo el tiempo",
+     "si_bien": "Si A+B es plano, la asimetría era puntual: grabar más tiempo moviendo cables.",
+     "si_mal": "Picos o escalones en A+B → identificar la línea que se aparta (la que no hace espejo) y seguir ese hilo."
+    }
+   ],
+   "fuente": "Vídeos de diagnóstico de redes (transcripciones) · ISO 11898-2",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-CAN-22",
+   "tema": "red-can",
+   "sintoma": "Recesivo desplazado hacia arriba: CAN-H {valor} V en reposo (correcto ≈ 2,5 V)",
+   "si": [
+    {
+     "medida": "can_rec_h",
+     "op": ">",
+     "valor": 2.7
+    },
+    {
+     "medida": "can_rec_l",
+     "op": ">",
+     "valor": 2.7
+    }
+   ],
+   "confianza": "baja",
+   "etiqueta": "Medido",
+   "causas": [
+    {
+     "texto": "Una o varias unidades conectadas a la red pero sin alimentación (cada una sube unos 0,2–0,3 V el reposo)",
+     "etiqueta": "Inferido"
+    },
+    {
+     "texto": "Otra unidad deja de transmitir porque le falta la información de la primera",
+     "etiqueta": "Inferido"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Desconectar unidades hasta que el reposo vuelva a 2,5 V",
+     "tipo": "prueba",
+     "donde": "Conectores de las unidades, primero las accesibles",
+     "estado": "Contacto puesto, osciloscopio con cursores en 2,5 V",
+     "herramienta": "Osciloscopio (2 canales)",
+     "pasos": [
+      "Poner un cursor en 2,5 V y medir el reposo entre dos tramas.",
+      "Soltar unidades una a una y volver a medir.",
+      "En la que cambie, medir +30, +15 y masa."
+     ],
+     "esperado": "Reposo entre tramas ≈ 2,5 V (diferencia < 0,05 V)",
+     "si_bien": "Al soltar una unidad el reposo baja hacia 2,5 V → esa unidad estaba conectada sin hablar: revisar su alimentación, masa y conector.",
+     "si_mal": "No cambia con ninguna → medir el reposo en el conector de cada unidad."
+    }
+   ],
+   "fuente": "Caso real (Audi A6, ABS) en vídeo de diagnóstico de redes · Vídeos de diagnóstico de redes (transcripciones) · ISO 11898-2",
+   "estado": "borrador"
   }
  ],
  "notas": [
@@ -792,6 +998,90 @@
     }
    ],
    "fuente": "ISO 11898-2 (CAN de alta velocidad)"
+  },
+  {
+   "id": "N-CAN-02",
+   "titulo": "Orden de diagnóstico de una red",
+   "tema": "red-can",
+   "texto": "# Antes del osciloscopio\n1. Prueba de funciones: qué hace y qué no hace el vehículo.\n2. Escaneo completo (gateway): quién habla y quién no.\n3. La unidad que no responde: alimentación, masa (caída en mV) y fusibles. Es la causa más común.\n4. Polímetro en el conector de diagnosis (valor medio: orienta, no diagnostica).\n5. Osciloscopio en CAN-H y CAN-L a la vez.\n6. Desconectar unidades una a una (las accesibles primero) o partir la red por la mitad.\n# Ojo\n- Desconectar unidades genera códigos: borrarlos al acabar.\n- Una unidad de un asiento o una puerta con agua puede tumbar toda la red y dejar el coche sin arrancar.",
+   "fuente": "Vídeos de diagnóstico de redes (transcripciones) · ISO 11898-2"
+  },
+  {
+   "id": "N-CAN-03",
+   "titulo": "Firmas con polímetro (CAN alta velocidad)",
+   "tema": "red-can",
+   "texto": "# Con contacto, en pin 6 / 14 contra masa\n- Normal con tráfico: H ≈ 2,6 V, L ≈ 2,4 V.\n- H y L unidas: las dos ≈ 2,5 V iguales.\n- Una línea a masa: esa 0 V, la otra ≈ 0,7 V.\n- Una línea a positivo: la más alta ≈ tensión de batería.\n- CAN-L abierto: H sube a ≈ 3,4 V.\n- CAN-H abierto: H ≈ 2,7 V, L ≈ 1,5 V.\n# Aviso\nSon valores de un caso grabado [Medido en vídeo]; cada red varía. El polímetro promedia: confirmar siempre con el osciloscopio.",
+   "valores": [
+    {
+     "magnitud": "CAN-H con tráfico (polímetro)",
+     "valor": 2.6,
+     "unidad": "V",
+     "condicion": "contacto puesto"
+    },
+    {
+     "magnitud": "CAN-L con tráfico (polímetro)",
+     "valor": 2.4,
+     "unidad": "V",
+     "condicion": "contacto puesto"
+    }
+   ],
+   "fuente": "Vídeos de diagnóstico de redes (transcripciones) · ISO 11898-2"
+  },
+  {
+   "id": "N-CAN-04",
+   "titulo": "Terminación de 60 Ω: qué dice y qué no",
+   "tema": "red-can",
+   "texto": "# Cómo\n- Entre pin 6 y 14, red dormida o batería desconectada.\n- Solo en CAN de alta velocidad.\n# Lectura\n- ≈ 60 Ω: las dos resistencias de 120 Ω están.\n- ≈ 120 Ω: falta una (unidad terminal o tramo abierto).\n- ≈ 40 Ω: hay una tercera.\n- < 60 Ω: puente con resistencia entre H y L; por debajo de ~60–100 Ω la comunicación se degrada.\n# Límite\nSolo ve las resistencias de los extremos: un ramal abierto a una unidad intermedia sigue dando 60 Ω.",
+   "valores": [
+    {
+     "magnitud": "Terminación",
+     "valor": 60,
+     "unidad": "Ω",
+     "condicion": "red dormida"
+    },
+    {
+     "magnitud": "Una resistencia sola",
+     "valor": 120,
+     "unidad": "Ω",
+     "condicion": "falta la otra"
+    }
+   ],
+   "fuente": "Vídeos de diagnóstico de redes (transcripciones) · ISO 11898-2"
+  },
+  {
+   "id": "N-CAN-05",
+   "titulo": "Fallos intermitentes",
+   "tema": "red-can",
+   "texto": "# Captura\n- PicoScope grabando en búfer a 200 ms/div, H y L a la vez.\n- Canal matemático A+B: debe ser plano en ≈ 5 V. Máscara de ±2 % con alarma sonora.\n- Menear mazos y conectores mientras graba.\n# Lectura\n- Perturbación simétrica en H y L (imagen espejo) → la mete la electrónica de una unidad.\n- Ruido en una sola línea → cable, roce o conector.\n- Decodificador: umbral ≈ 3 V en CAN-H y ≈ 2 V en CAN-L; decodificar las dos líneas.\n- Unas pocas tramas con CRC mal pueden ser normales; una avería real da muchas.",
+   "fuente": "Vídeos de diagnóstico de redes (transcripciones) · ISO 11898-2"
+  },
+  {
+   "id": "N-CAN-06",
+   "titulo": "Otras redes",
+   "tema": "red-can",
+   "texto": "# CAN baja velocidad (tolerante a fallos)\n- Reposo: CAN-H ≈ 0 V, CAN-L ≈ 5 V. Dominante: H ≈ 3,6 V, L ≈ 1,4 V.\n- Sigue funcionando con un hilo cortado. Sin terminación de 60 Ω.\n# CAN FD\n- Mismos niveles que el de alta; la parte de datos va más rápido (hasta ~5 Mbit/s).\n# LIN\n- Un hilo. Reposo ≈ tensión de batería (11–12 V), dominante ≈ 1 V (no 0 V).\n- No confundir con un PWM de 0–5 V.\n- Un maestro y hasta ~15 esclavos. Al decodificar, comprobar cabecera y respuesta.\n# FlexRay\n- Reposo ≈ 2,5 V en las dos líneas.\n# PCI (Chrysler hasta ~2005)\n- Un hilo, pin 2 del conector de diagnosis, paquetes de 0 a ~7,5 V.\n# Aviso\nEsta skill solo interpreta CAN de alta velocidad.",
+   "valores": [
+    {
+     "magnitud": "LIN reposo",
+     "min": 11,
+     "max": 12.5,
+     "unidad": "V",
+     "condicion": "contacto puesto"
+    },
+    {
+     "magnitud": "LIN dominante",
+     "valor": 1,
+     "unidad": "V",
+     "condicion": ""
+    },
+    {
+     "magnitud": "CAN baja velocidad, reposo CAN-L",
+     "valor": 5,
+     "unidad": "V",
+     "condicion": "ISO 11898-3"
+    }
+   ],
+   "fuente": "Vídeos de diagnóstico de redes (transcripciones) · ISO 11898-2"
   }
  ],
  "acceso": "libre"
