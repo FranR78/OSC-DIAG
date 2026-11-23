@@ -3,6 +3,10 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.12.06
+- **Skill Transductor de presión 2026.12.06** (biblioteca Pico, WPS500X): 3 reglas en borrador sobre `desv_pico_cil` / `desv_pulso_cil` (escape: empuje más bajo; admisión: jalón más débil; cárter: pico por encima del resto) y 9 notas (dónde medir según síntoma, leer la traza y desfase, adquisición y rangos, escape, restricción de escape, vacío, cárter/PCV, presión en cilindro, junta de culata).
+- Las skills pueden usar también las medidas del Diagnóstico (API_DIAGNOSTICO §4.2).
+
 ## 2026.12.05
 - **Skill Red CAN 2026.12.05** (con 30 vídeos de redes): CRC relativo (pocas tramas mal = baja confianza; > 2 % = avería), suma H+L ≈ 5 V, recesivo desplazado (unidad conectada sin alimentación), firmas con polímetro y 60 Ω en las comprobaciones. 22 reglas, 6 notas (orden de diagnóstico, polímetro, terminación, intermitentes, otras redes: CAN baja velocidad, FD, LIN, FlexRay, PCI).
 - Medidas nuevas: `can_crc_pct`, `can_suma_dom`.

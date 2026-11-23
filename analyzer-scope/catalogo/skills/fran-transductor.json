@@ -1,0 +1,357 @@
+{
+ "formato": "analyzer-scope-reglas/1",
+ "paquete": "fran-transductor",
+ "nombre": "Fran · Transductor de presión",
+ "autor": "Fran Rosales",
+ "version": "2026.12.06",
+ "aviso": "Transductor de presión en escape, admisión y cárter: señala el cilindro que se aparta del resto, no la causa. Umbrales en borrador (no de fabricante): validar con capturas reales y ajustar bien el «Desfase». Sin medida aún para contrapresión de escape, torres ni bolsillos del cilindro: van como notas.",
+ "acceso": "libre",
+ "reglas": [
+  {
+   "id": "FR-TR-01",
+   "tema": "pulso-cilindro-esc",
+   "sintoma": "Cilindro {cil}: empuje de escape más bajo que el resto ({pct} % del mejor)",
+   "contexto": {
+    "entidad": [
+     "transductor escape"
+    ]
+   },
+   "si": [
+    {
+     "medida": "desv_pico_cil",
+     "op": "peor",
+     "valor": 80
+    }
+   ],
+   "confianza": "baja",
+   "etiqueta": "Medido",
+   "notas": [
+    "N-TR-01",
+    "N-TR-02",
+    "N-TR-03",
+    "N-TR-04",
+    "N-TR-05"
+   ],
+   "causas": [
+    {
+     "texto": "Cilindro {cil} sin combustión (encendido o inyección)",
+     "etiqueta": "Inferido",
+     "separar": "Si el jalón aparece en marcha pero no en arranque con inyectores desconectados, es combustión"
+    },
+    {
+     "texto": "Fuga de compresión en el cilindro {cil} (válvula, segmentos, junta)",
+     "etiqueta": "Inferido",
+     "separar": "Presión en el cárter y en el cilindro {cil}: torres inclinadas = fuga"
+    },
+    {
+     "texto": "Válvula de escape del cilindro {cil} que no sella (empujón hacia arriba al acercarse al PMS de compresión)",
+     "etiqueta": "Teórico OEM",
+     "separar": "Transductor en el cilindro {cil}: meseta de escape o bolsillo redondeado"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Confirmar el desfase del pulso",
+     "tipo": "medida",
+     "donde": "Salida del tubo de escape, adaptador estanco",
+     "estado": "Motor en arranque, inyectores desconectados",
+     "herramienta": "Osciloscopio + transductor de pulsos (rango ±5 psi)",
+     "pasos": [
+      "Referencia de encendido del cilindro 1 en otro canal.",
+      "Desconectar un inyector conocido y ver qué ventana cae: así se valida el desfase.",
+      "Repetir con todos los inyectores conectados."
+     ],
+     "esperado": "El cilindro {cil} sigue saliendo el más bajo en varios ciclos de 720°",
+     "si_bien": "Seguir con la comprobación de cárter.",
+     "si_mal": "Ajustar el «Desfase» de la pestaña (manguera y escape retrasan el pulso) y repetir."
+    },
+    {
+     "texto": "Separar bloque o culata",
+     "tipo": "medida",
+     "donde": "Tubo de la varilla de aceite o toma de la PCV, bien sellado",
+     "estado": "Motor en arranque, inyectores desconectados",
+     "herramienta": "Transductor (rango −15 a +50 psi)",
+     "esperado": "Sin pico de cárter que coincida con el PMS de compresión del cilindro {cil}",
+     "si_bien": "La pérdida no está abajo: mirar la culata (válvulas, junta).",
+     "si_mal": "Pico de cárter con el PMS del cilindro {cil}: segmentos o pistón."
+    },
+    {
+     "texto": "Presión en el cilindro {cil}",
+     "tipo": "prueba",
+     "donde": "Orificio de bujía o calentador del cilindro {cil}",
+     "estado": "Motor parado; inyector del cilindro desconectado",
+     "herramienta": "Transductor de cilindro (rango −15 a +500 psi)",
+     "esperado": "Torres rectas y bolsillos iguales a los de un cilindro sano",
+     "si_bien": "Cilindro estanco: la causa es de combustión.",
+     "si_mal": "Torres inclinadas = fuga; bolsillo redondeado = válvula que no abre."
+    }
+   ],
+   "fuente": "Biblioteca Pico (transductor de presión WPS500X): pulsos de escape, vacío de admisión, cárter y presión en cilindro",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-TR-02",
+   "tema": "pulso-cilindro-adm",
+   "sintoma": "Cilindro {cil}: jalón de vacío más débil que el resto ({pct} % del mejor)",
+   "contexto": {
+    "entidad": [
+     "transductor admisión"
+    ]
+   },
+   "si": [
+    {
+     "medida": "desv_pulso_cil",
+     "op": "peor",
+     "valor": 85
+    }
+   ],
+   "confianza": "baja",
+   "etiqueta": "Medido",
+   "notas": [
+    "N-TR-01",
+    "N-TR-02",
+    "N-TR-03",
+    "N-TR-06",
+    "N-TR-08"
+   ],
+   "causas": [
+    {
+     "texto": "Válvula de admisión del cilindro {cil} que no sella",
+     "etiqueta": "Teórico OEM",
+     "separar": "El jalón débil cae con el cilindro {cil} en su PMS de compresión (360° después de su admisión) y la presión sube en el colector"
+    },
+    {
+     "texto": "Válvula de admisión del cilindro {cil} que no abre (balancín, leva, empujador hidráulico)",
+     "etiqueta": "Teórico OEM",
+     "separar": "Transductor en el cilindro {cil}: bolsillo de admisión redondeado"
+    },
+    {
+     "texto": "Fuga por escape, segmentos o junta del cilindro {cil}",
+     "etiqueta": "Inferido",
+     "separar": "Jalón débil en su propia carrera de admisión: la válvula está abierta, la fuga está en otro sitio"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Ver en qué carrera cae el jalón débil",
+     "tipo": "medida",
+     "donde": "Toma central del colector (manguera de la PCV), después de la mariposa",
+     "estado": "Motor en arranque, inyectores desconectados",
+     "herramienta": "Osciloscopio + transductor (rango −15 a +50 psi) + referencia de encendido",
+     "pasos": [
+      "Dividir el ciclo de 720° con cursores y la tabla de pistones.",
+      "No atribuir el jalón al cilindro que dispara en pantalla: hay 360° de desfase."
+     ],
+     "esperado": "Jalón débil en la carrera de admisión del cilindro {cil}",
+     "si_bien": "No es la válvula de admisión: comprobar escape y cárter.",
+     "si_mal": "Si cae 360° después (cilindro en compresión): válvula de admisión que no sella."
+    },
+    {
+     "texto": "Presión en el cilindro {cil}",
+     "tipo": "prueba",
+     "donde": "Orificio de bujía o calentador del cilindro {cil}",
+     "estado": "Motor parado; inyector del cilindro desconectado",
+     "herramienta": "Transductor de cilindro (rango −15 a +500 psi)",
+     "esperado": "Bolsillo de admisión con flancos rectos, igual al de un cilindro sano",
+     "si_bien": "Admisión correcta: buscar la fuga en escape, segmentos o junta.",
+     "si_mal": "Bolsillo redondeado: válvula que no abre (mirar balancín y leva)."
+    }
+   ],
+   "fuente": "Biblioteca Pico (transductor de presión WPS500X): pulsos de escape, vacío de admisión, cárter y presión en cilindro",
+   "estado": "borrador"
+  },
+  {
+   "id": "FR-TR-03",
+   "tema": "pulso-cilindro-car",
+   "sintoma": "Cilindro {cil}: pico de presión en el cárter por encima del resto ({valor} % del pulso medio)",
+   "contexto": {
+    "entidad": [
+     "transductor cárter"
+    ]
+   },
+   "si": [
+    {
+     "medida": "desv_pico_cil",
+     "op": ">",
+     "valor": 25,
+     "por_cilindro": true
+    }
+   ],
+   "confianza": "baja",
+   "etiqueta": "Medido",
+   "notas": [
+    "N-TR-01",
+    "N-TR-02",
+    "N-TR-03",
+    "N-TR-07",
+    "N-TR-09"
+   ],
+   "causas": [
+    {
+     "texto": "Segmentos, pistón o camisa del cilindro {cil}",
+     "etiqueta": "Inferido",
+     "separar": "Pico de cárter que coincide con el PMS de compresión del cilindro {cil} en muchos ciclos"
+    },
+    {
+     "texto": "Captura puntual o desfase mal elegido",
+     "etiqueta": "Inferido",
+     "separar": "Girar muchos ciclos: una avería se repite siempre en el mismo cilindro"
+    }
+   ],
+   "comprobaciones": [
+    {
+     "texto": "Repetir con muchos ciclos",
+     "tipo": "medida",
+     "donde": "Tubo de la varilla de aceite o toma de la PCV, bien sellado",
+     "estado": "Motor en arranque, inyectores desconectados",
+     "herramienta": "Transductor (rango −15 a +50 psi) + referencia de encendido",
+     "esperado": "El pico sale siempre con el PMS de compresión del cilindro {cil}",
+     "si_bien": "Fuga hacia el cárter en el cilindro {cil}: confirmar en el cilindro.",
+     "si_mal": "Si cambia de cilindro o no se repite, no es avería: revisar el desfase."
+    },
+    {
+     "texto": "Presión en el cilindro {cil}",
+     "tipo": "prueba",
+     "donde": "Orificio de bujía o calentador del cilindro {cil}",
+     "estado": "Motor parado; inyector del cilindro desconectado",
+     "herramienta": "Transductor de cilindro (rango −15 a +500 psi); boroscopio",
+     "esperado": "Torres rectas, pico similar al de los demás cilindros",
+     "si_bien": "Fuga pequeña: siempre hay algo de paso por segmentos; valorar con aceite y estado general.",
+     "si_mal": "Torres inclinadas y pico bajo: segmentos o pistón; mirar con boroscopio."
+    }
+   ],
+   "fuente": "Biblioteca Pico (transductor de presión WPS500X): pulsos de escape, vacío de admisión, cárter y presión en cilindro",
+   "estado": "borrador"
+  }
+ ],
+ "notas": [
+  {
+   "id": "N-TR-01",
+   "titulo": "Dónde poner el transductor según el síntoma",
+   "tema": "pulso-cilindro-esc",
+   "texto": "# Principio\n- La compresión relativa dice qué cilindro; el transductor, puesto en otro punto, dice por dónde pierde o qué no sale. Ningún punto da la causa por sí solo. [Criterio]\n- Practicar antes en un coche sano: lo sano hace destacar la avería. [Criterio]\n# Punto según síntoma\n- Un cilindro con fuga: tubo de escape, en arranque. Jalón más profundo que los demás. [Medido]\n- Fallo de encendido en marcha: escape + referencia de encendido del cilindro 1. [Medido]\n- Pierde potencia, correcciones muy negativas, no sube de vueltas: orificio de bujía (uno por banco) + acelerón rápido. Meseta de escape que sube = contrapresión. [Medido]\n- ¿Segmentos o culata?: varilla de aceite o PCV + referencia de encendido. [Medido]\n- Sobrecalentamiento, ¿junta de culata?: radiador (transductor delta). [Medido]\n- Gira, no arranca, chispa fuerte, muchos HC: cilindro + escape en arranque (lavado de cilindro). [Medido]\n- Válvula que no abre: admisión o escape en arranque, luego cilindro. [Medido]",
+   "fuente": "Biblioteca Pico (transductor de presión WPS500X): pulsos de escape, vacío de admisión, cárter y presión en cilindro"
+  },
+  {
+   "id": "N-TR-02",
+   "titulo": "Cómo leer la traza del transductor",
+   "tema": "pulso-cilindro-adm",
+   "texto": "# Sentido\n- Depende del transductor. Con sensor de pulsos: presión sube y aspiración baja, vaya donde vaya. Comprobarlo antes de interpretar. [Criterio]\n- Absoluto: da el valor real y lo mantiene. Delta: solo cambios; plano no es «sin presión». [Teórico OEM]\n# Asignar el cilindro\n- Admisión: el jalón de un cilindro cae 360° después de su PMS de compresión. [Teórico OEM]\n- Escape comparado con la chispa: el orden sale desplazado un evento (4 cil.), dos (6 cil.) o tres (8 cil.). [Teórico OEM]\n- La manguera retrasa el pulso según longitud y RPM: anotarla y validar el desfase provocando un fallo en un cilindro conocido. [Inferido]\n# Límites\n- Jalones iguales no descartan un fallo común a todo el motor (distribución). [Teórico OEM]\n- En la app, el «Desfase» de la pestaña Diagnóstico centra la ventana de cada cilindro: si está mal, señala otro cilindro.",
+   "fuente": "Biblioteca Pico (transductor de presión WPS500X): pulsos de escape, vacío de admisión, cárter y presión en cilindro"
+  },
+  {
+   "id": "N-TR-03",
+   "titulo": "Condiciones de adquisición y rangos del WPS500X",
+   "tema": "pulso-cilindro-esc",
+   "texto": "# Condición según lo que se busca\n- Arranque: fugas e inconsistencias entre ciclos; cadencia constante.\n- Ralentí: restricciones y bolsillos.\n- Acelerón: restricciones y muelles rotos.\n- Frenado de potencia: catalizador parcialmente obstruido. [Teórico OEM]\n# Seguridad\n- Desconectar los inyectores del cilindro medido: evita el lavado. En diésel, un golpe de combustión puede reventar el latiguillo. [Teórico OEM]\n# WPS500X\n- Al encenderlo se calibra el cero a la presión atmosférica.\n- El zoom quita lo que está por debajo de 100 Hz y amplifica el resto: para pulsos pequeños de admisión o escape. [Teórico OEM]\n- El transductor de 100 psi no da salida por debajo de cero (vacío). [Teórico OEM]\n# Volumen muerto\n- El latiguillo añade volumen y baja la compresión leída: corregir con un canal matemático (factor 1,28 en un caso de Astra diésel; dato de un caso, no de fabricante). [Inferido]\n# Registro\n- Guardar en origen y etiquetar punto, herramienta y condición; repetir antes y después con el mismo criterio. [Criterio]",
+   "valores": [
+    {
+     "magnitud": "Rango 1 (cilindro, combustible, saltos de distribución)",
+     "min": -1,
+     "max": 34.5,
+     "unidad": "bar",
+     "condicion": "−15 a +500 psi"
+    },
+    {
+     "magnitud": "Rango 2 (vacío, cárter, combustible)",
+     "min": -1,
+     "max": 3.45,
+     "unidad": "bar",
+     "condicion": "−15 a +50 psi"
+    },
+    {
+     "magnitud": "Rango 3 (pulsos de escape)",
+     "min": -0.345,
+     "max": 0.345,
+     "unidad": "bar",
+     "condicion": "−5 a +5 psi"
+    }
+   ],
+   "fuente": "Biblioteca Pico (transductor de presión WPS500X): pulsos de escape, vacío de admisión, cárter y presión en cilindro"
+  },
+  {
+   "id": "N-TR-04",
+   "titulo": "Pulsos de escape",
+   "tema": "pulso-cilindro-esc",
+   "texto": "# Qué se ve\n- Cilindro sin combustión o con pérdida: jalón negativo en la apertura de escape (vacío almacenado que se ventila). [Teórico OEM]\n- Empujón hacia arriba al acercarse al PMS de compresión: válvula de escape que no sella. [Medido]\n- Un solo cilindro con meseta de escape que su gemelo del banco no tiene: obstrucción entre ese cilindro y el catalizador. [Inferido]\n# Cómo medir\n- Transductor de pulsos (±5 psi) en la salida del tubo; con dos salidas, tapar una o medir cada banco.\n- Referencia de encendido del cilindro 1.\n# Ojo\n- La app compara el máximo de cada ventana (empuje). Un jalón profundo baja también ese máximo, pero confirmar siempre mirando la traza.\n- ⚠ Hay un caso documentado donde el fallo se ve como mayor amplitud del pulso; el fundamento dice jalón profundo. [Criterio]",
+   "fuente": "Biblioteca Pico (transductor de presión WPS500X): pulsos de escape, vacío de admisión, cárter y presión en cilindro"
+  },
+  {
+   "id": "N-TR-05",
+   "titulo": "Restricción de escape (catalizador, DPF)",
+   "tema": "pulso-cilindro-esc",
+   "texto": "# Criterio\n- En la carrera de escape el cilindro debe estar a presión atmosférica. Una meseta que sube con el acelerón = contrapresión. [Medido]\n- Común a los dos bancos: catalizador común o silenciador, no los primarios. Sacudir la tubería: el monolito puede estar suelto. [Medido]\n- La restricción empeora con carga; un motor desincronizado no. [Inferido]\n# Cifras\n- Son de coches concretos: no son un umbral único. Manda la documentación del modelo.\n- El dato de 600 mbar es en el escape a ralentí; los de psi, en cilindro con acelerón: no mezclarlos.",
+   "valores": [
+    {
+     "magnitud": "Contrapresión en cilindro con acelerón, 4 cil. con catalizador restringido",
+     "min": 2.1,
+     "unidad": "bar",
+     "condicion": "> 30 psi, dato de un caso"
+    },
+    {
+     "magnitud": "Contrapresión en cilindro con acelerón, V8 con restricción común",
+     "min": 2.8,
+     "unidad": "bar",
+     "condicion": "> 40 psi en ambos bancos, dato de un caso"
+    },
+    {
+     "magnitud": "Contrapresión en el escape a ralentí con catalizador o DPF obstruido",
+     "min": 600,
+     "unidad": "mbar",
+     "condicion": "dato de un caso"
+    }
+   ],
+   "fuente": "Biblioteca Pico (transductor de presión WPS500X): pulsos de escape, vacío de admisión, cárter y presión en cilindro"
+  },
+  {
+   "id": "N-TR-06",
+   "titulo": "Vacío de admisión",
+   "tema": "pulso-cilindro-adm",
+   "texto": "# Montaje\n- Toma central del colector, después de la mariposa (la manguera de la PCV va bien). Una toma de un solo conducto sesga la lectura hacia ese cilindro. [Medido]\n- Arranque con inyectores desconectados.\n# Lectura\n- Cada cilindro da un jalón; en un 4 cilindros sano, 4 iguales. Dividir los 720° con cursores. [Medido]\n- Jalón débil con el cilindro en compresión y presión que sube en el colector: válvula de admisión que no sella. [Medido]\n- Jalón débil en su propia admisión: la válvula está abierta; mirar escape, segmentos o junta. [Inferido]\n- Cadencia de arranque anormal y vacío que no se recupera hasta el siguiente cilindro: válvula de admisión que no abre. [Medido]",
+   "fuente": "Biblioteca Pico (transductor de presión WPS500X): pulsos de escape, vacío de admisión, cárter y presión en cilindro"
+  },
+  {
+   "id": "N-TR-07",
+   "titulo": "Presión de cárter y PCV",
+   "tema": "pulso-cilindro-car",
+   "texto": "# Lectura\n- Siempre hay algo de fuga por segmentos: se busca el cilindro que se diferencia. [Criterio]\n- Pico de cárter que coincide con el PMS de compresión de un cilindro: sellado de la parte baja (segmentos, pistón). [Inferido]\n- Sin pico coincidente, la pérdida no está abajo: mirar la culata. [Criterio]\n# PCV\n- Ralentí en caliente; estrangular un instante la manguera de la PCV y ver el cambio de presión y de RPM. [Medido]",
+   "valores": [
+    {
+     "magnitud": "Cambio de ralentí al estrangular la PCV (Prius 1.8)",
+     "valor": 78,
+     "unidad": "rpm",
+     "condicion": "dato de un caso"
+    }
+   ],
+   "fuente": "Biblioteca Pico (transductor de presión WPS500X): pulsos de escape, vacío de admisión, cárter y presión en cilindro"
+  },
+  {
+   "id": "N-TR-08",
+   "titulo": "Presión en cilindro: torres y bolsillos",
+   "tema": "pulso-cilindro-adm",
+   "texto": "# Lectura\n- Torres rectas, bolsillos iguales y pico bajo: el cilindro no se llena (distribución), no pierde. [Teórico OEM]\n- Torres inclinadas, diferencial de bolsillo: fuga de volumen. [Teórico OEM]\n- Bolsillo de admisión redondeado: la admisión no abre. Escape con meseta creciente: el escape no abre. [Teórico OEM]\n- Con el cilindro compañero (360° de desfase) en la misma captura se anulan batería y régimen. [Criterio]\n# Antes de leer\n- Batería sana, motor caliente; algunas UCE bajan los picos en arranque (anti-ahogo, distribución variable) sin avería. [Teórico OEM]",
+   "valores": [
+    {
+     "magnitud": "Compresión en arranque con válvula de admisión sin abrir",
+     "valor": 0.8,
+     "unidad": "bar",
+     "condicion": "12 psi, dato de un caso"
+    },
+    {
+     "magnitud": "Compresión en arranque con pistón roto (V6)",
+     "max": 0.35,
+     "unidad": "bar",
+     "condicion": "< 5 psi, dato de un caso"
+    }
+   ],
+   "fuente": "Biblioteca Pico (transductor de presión WPS500X): pulsos de escape, vacío de admisión, cárter y presión en cilindro"
+  },
+  {
+   "id": "N-TR-09",
+   "titulo": "Junta de culata por el circuito de refrigeración",
+   "tema": "pulso-cilindro-car",
+   "texto": "# Prueba\n- Transductor delta en el radiador (o vaso) y tabla del pistón. [Medido]\n- Subida de presión cada vez que un cilindro llega a su PMS de compresión: ese cilindro pasa gases al circuito. [Medido]\n- Girar muchos ciclos para distinguir avería de captura puntual. [Criterio]\n# Relación con el cárter\n- Si el cárter no da pico con ese cilindro, la pérdida está en la culata (junta, válvulas).",
+   "fuente": "Biblioteca Pico (transductor de presión WPS500X): pulsos de escape, vacío de admisión, cárter y presión en cilindro"
+  }
+ ]
+}

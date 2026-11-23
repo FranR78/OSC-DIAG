@@ -70,7 +70,7 @@ Una regla mal escrita no se evalúa. Un paquete importado mal escrito se rechaza
 | `can_crc_pct`, `can_suma_dom` | % de tramas con CRC mal; CAN-H + CAN-L en dominante (≈ 5 V) | %, V | — |
 | `can_rec_dif`, `can_sin_ack` | H−L en recesivo; tramas sin ACK (decodificación) | V, — | — |
 | `can_dif_unidad`, `can_desv_unidad_pct`, `can_ov_unidad_pct`, `can_crc_unidad` | Lo mismo por unidad (ID) | V, % | unidad (`{unidad}` = ID en hex) |
-Skills que las usan: `catalogo/skills/fran-ckp.json`, `catalogo/skills/fran-can.json`. Crear una skill desde documentos: `CREAR_SKILL.md`.
+Skills que las usan: `catalogo/skills/fran-ckp.json`, `catalogo/skills/fran-can.json`. `fran-transductor.json` usa las medidas del Diagnóstico (`desv_pico_cil`, `desv_pulso_cil`, API_DIAGNOSTICO §4.2). Crear una skill desde documentos: `CREAR_SKILL.md`.
 
 ## Comprobaciones detalladas (2026.12.02)
 Cada elemento de `comprobaciones` admite, además de `texto`, `tipo` y `esperado`:

@@ -26,6 +26,21 @@
     "aporte-cilindro"
    ],
    "reglas": 5
+  },
+  {
+   "tipo": "skill",
+   "id": "fran-transductor",
+   "nombre": "Fran · Transductor de presión",
+   "autor": "Fran Rosales",
+   "version": "2026.12.06",
+   "acceso": "libre",
+   "archivo": "skills/fran-transductor.json",
+   "temas": [
+    "pulso-cilindro-esc",
+    "pulso-cilindro-adm",
+    "pulso-cilindro-car"
+   ],
+   "reglas": 3
   }
  ]
 }

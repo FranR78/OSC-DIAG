@@ -600,7 +600,7 @@ const spanish = t => [...new Set((t.replace(/Ortu (&amp; |& )?(Rosales )?Automoc
     check('editor: un script mal escrito no se guarda y dice por qué', /No se guarda: no tiene pasos/.test(await k.textContent('#kESt')), await k.textContent('#kESt'));
     await k.evaluate(() => { const o = JSON.parse(JSON.stringify(SCRIPTS_BASE[0])); o.nombre = 'Mi mecánica'; $('kTx').value = JSON.stringify(o); }); await k.click('#kGu');
     check('editor: guarda los cambios en la copia', await KE(() => JSON.parse(localStorage.getItem('as_scripts'))[0].nombre === 'Mi mecánica' && /Mi mecánica/.test($('kL').textContent)));
-    check('catálogo: la app no trae activas las skills de CKP y CAN (se instalan)', await KE(() => !rgTodos().some(P => /^fran-/.test(P.paquete)) && CAT_IDX.filter(i => i.tipo === 'skill').map(i => i.id).sort().join() === 'fran-can,fran-ckp'));
+    check('catálogo: la app no trae activas las skills de CKP y CAN (se instalan)', await KE(() => !rgTodos().some(P => /^fran-/.test(P.paquete)) && CAT_IDX.filter(i => i.tipo === 'skill').map(i => i.id).sort().join() === 'fran-can,fran-ckp,fran-transductor'));
     await k.click('#kL .skI[data-k="FR-CAN-01"]'); await k.waitForTimeout(100);
     check('procedimiento sin su skill: ofrece «Instalar» desde el catálogo', /Instalar «Fran · Red CAN/.test(await k.textContent('#kCab')));
     await k.click('#kCab .skInst'); await k.waitForTimeout(150);
@@ -638,7 +638,19 @@ const spanish = t => [...new Set((t.replace(/Ortu (&amp; |& )?(Rosales )?Automoc
     check('procedimiento con skills que faltan: lo avisa (arranque-carga) sin bloquear', /necesita skills que no tienes activas: arranque-carga/.test(await k.textContent('#kCab')));
     await k.evaluate(() => rgSetActivo('fran-can', false)); await k.click('#kL .skI[data-k="FR-CAN-01"]'); await k.waitForTimeout(100);
     check('skill desactivada: ofrece activarla y al pulsar queda activa', /Activar «Fran · Red CAN/.test(await k.textContent('#kCab')) && await (async () => { await k.click('#kCab .skAct'); await k.waitForTimeout(100); return await KE(() => rgActivo({ paquete: 'fran-can' }) && !/necesita skills/.test($('kCab').textContent)); })());
-    check('catálogo de medidas: cada medida que usan las skills existe en el motor', await KE(() => { const ids = new Set(MEDIDAS.map(m => m.id)); return Object.values(CATALOGO.items).filter(P => P.reglas).every(P => P.reglas.every(r => r.si.every(c => ids.has(c.medida)))); }));
+    check('catálogo de medidas: cada medida que usan las skills existe en el motor', await KE(() => { const ids = new Set(MEDIDAS.map(m => m.id).concat(Object.keys(MLB))); return Object.values(CATALOGO.items).filter(P => P.reglas).every(P => P.reglas.every(r => r.si.every(c => ids.has(c.medida)))); }));
+    const tr = await KE(() => { const P = CATALOGO.items['skill:fran-transductor'], R = id => P.reglas.find(r => r.id === id);
+      const p = (ent, id, pc) => ({ contexto: { motor: { cilindros: 4 }, senales: [{ canal: 'CH1', entidad: ent }] }, medidas: [{ id, canal: 'CH1', unidad: '%', por_cilindro: pc }] });
+      const E = (r, q) => rgEval(R(r), P, q).map(h => h.sintoma);
+      return { err: rgValida(P), notas: P.notas.length,
+        esc: E('FR-TR-01', p('transductor escape', 'desv_pico_cil', { 1: 7, 2: 8, 3: -22, 4: 7 })), escS: E('FR-TR-01', p('transductor escape', 'desv_pico_cil', { 1: 3, 2: -4, 3: 2, 4: -1 })),
+        escOtro: E('FR-TR-01', p('transductor admisión', 'desv_pico_cil', { 1: 7, 2: 8, 3: -22, 4: 7 })),
+        adm: E('FR-TR-02', p('transductor admisión', 'desv_pulso_cil', { 1: 5, 2: -20, 3: 6, 4: 9 })), admS: E('FR-TR-02', p('transductor admisión', 'desv_pulso_cil', { 1: 4, 2: -5, 3: 3, 4: -2 })),
+        car: E('FR-TR-03', p('transductor cárter', 'desv_pico_cil', { 1: -10, 2: -8, 3: -12, 4: 30 })), carS: E('FR-TR-03', p('transductor cárter', 'desv_pico_cil', { 1: 6, 2: -5, 3: 4, 4: -5 })),
+        nt: rgEval(R('FR-TR-01'), P, p('transductor escape', 'desv_pico_cil', { 1: 7, 2: 8, 3: -22, 4: 7 }))[0].notas_paquete.length }; });
+    check('skill transductor: válida, señala el cilindro que se aparta en escape, admisión y cárter, y no salta con señal sana ni en otro transductor',
+      !tr.err.length && tr.notas >= 9 && tr.esc.length === 1 && /^Cilindro 3/.test(tr.esc[0]) && !tr.escS.length && !tr.escOtro.length && tr.adm.length === 1 && /^Cilindro 2/.test(tr.adm[0]) && !tr.admS.length
+      && tr.car.length === 1 && /^Cilindro 4.*30 %/.test(tr.car[0]) && !tr.carS.length && tr.nt >= 5, JSON.stringify(tr));
     await k.evaluate(() => { const d = canDemo(); d.chs[0].n = 'Canal A'; d.chs[1].n = 'Canal B'; addPages([d]); showTab('X'); }); await k.waitForTimeout(200); await k.click('#xGo'); await k.waitForTimeout(600);
     check('Diagnóstico: con la skill CAN instalada analiza la señal cargada y da el hallazgo (unidad en hex)', await KE(() => /500 kbit\/s/.test($('xAn').textContent) && /Unidad 0x2F1: su nivel se aparta/.test($('xRes').textContent) && /unidad 0x2F1/.test($('xRes').textContent) && !/cilindro 753/.test($('xRes').textContent)), await KE(() => $('xRes').textContent.slice(0, 300)));
     const dco = await KE(() => { const fila = (b, id, v, mx) => b + ',' + id + ',' + v + ',' + mx + ',-0.07,' + (mx + 0.07); const L = ['Buffer Number,ID,Data,Max Voltage,Min Voltage,Voltage Delta'];

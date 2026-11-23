@@ -11,7 +11,7 @@ Salida: un paquete JSON en `catalogo/skills/` (o la mejora de uno existente), pr
 
 ## 1. Leer antes de escribir
 1. `docs/REGLAS.md`: formato `analyzer-scope-reglas/1` y tabla de medidas.
-2. `src/js/35-medidas.js` → `MEDIDAS`: **los únicos ids de medida válidos**.
+2. `src/js/35-medidas.js` → `MEDIDAS` (procedimientos) y `MLB` de `16-diagnostico.js` (pestaña Diagnóstico, API_DIAGNOSTICO §4.2): **los únicos ids de medida válidos**.
 3. `catalogo/skills/fran-can.json`: modelo de paquete completo (reglas, comprobaciones detalladas, notas).
 4. `catalogo/skills/*.json`: ¿ya hay un paquete del mismo `tema`? Si lo hay, **mejorarlo** (subir `version`) en vez de crear otro.
 5. Los documentos del usuario. Si son largos, limpiar primero a un fichero en el scratchpad y leer por secciones.
