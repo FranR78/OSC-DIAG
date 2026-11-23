@@ -31,7 +31,7 @@ async function report(){
     doc.addImage(lg,'JPEG',10,7.5,33,11.4);doc.setTextColor(...hc);doc.setFontSize(15);B(1);doc.text(D.dx?'Informe de diagnóstico':'Informe de señales',50,13.5);B(0);
     doc.setFontSize(8.5);doc.setTextColor(...mc);doc.text('Analyzer Scope · by J.A.Ortúñez y Fran Rosales · '+fecha,50,19);
     doc.setDrawColor(...hc);doc.setLineWidth(.4);doc.line(10,24,287,24);doc.setLineWidth(.2)};
-  const foot=()=>{doc.setFontSize(7.5);doc.setTextColor(...mc);doc.text('Ortu & Rosales Automoción · ortuautomocion.com · Analyzer Scope '+APP_CFG.ver,10,204);doc.text('Pág. '+page,287,204,{align:'right'})};
+  const foot=()=>{doc.setFontSize(7.5);doc.setTextColor(...mc);doc.text('Ortu & Rosales Automoción · Analyzer Scope '+APP_CFG.ver,10,204);doc.text('Pág. '+page,287,204,{align:'right'})};
   const nueva=()=>{foot();doc.addPage();page++;head()};
   let yy=32;
   const line=(t,sz,colr,ind,neg)=>{doc.setFontSize(sz);const L=doc.splitTextToSize(cl(t),275-(ind||0));if(yy+L.length*sz*.42>198){nueva();yy=32}doc.setTextColor(...colr);B(neg);doc.text(L,10+(ind||0),yy);B(0);yy+=L.length*sz*.42+1.4};

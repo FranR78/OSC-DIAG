@@ -3,6 +3,9 @@
 Una entrada por entrega. La versión sale de `src/version.txt` y se ve en el menú ☰, en la pestaña «Objetivo» y en el pie del PDF.
 Política: subir `version.txt` en cada entrega y poner la etiqueta git `scope-<versión>` en el commit entregado.
 
+## 2026.12.04b
+- Sin la dirección web en el pie de la app y del PDF.
+
 ## 2026.12.04
 - **PDF nuevo:**
   - **Portada** con el resultado: número de hallazgos, la lista con la página de cada uno, el vehículo y las fuentes activas.
